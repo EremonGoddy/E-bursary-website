@@ -1,0 +1,21 @@
+.getting-started{
+    background:rgba(0, 0, 0, 0.5) ;
+    backdrop-filter:blur(10px);
+    color:#ffff ;
+}
+
+.empowering{
+    background:rgba(0, 0, 0, 0.5) ;
+    backdrop-filter:blur(10px);
+    color:#ffff ;
+}
+
+@media(max-width:768px){
+.empowering h2 {
+font-size:1.3rem;
+text-align: center;
+}
+ }
+
+
+
