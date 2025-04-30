@@ -10,6 +10,24 @@
     color:#ffff ;
 }
 
+.nav-link {
+    color: black;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .nav-link:hover {
+    color: #FFD700; /* gold on hover */
+  }
+
+  .nab-links {
+    color: black;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .nab-links:hover {
+    color: #FFD700; /* gold on hover */
+  }
+
 @media(max-width:768px){
 .empowering h2 {
 font-size:1.3rem;

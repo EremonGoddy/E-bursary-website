@@ -31,25 +31,25 @@ const HomePage = () => {
           </Link>
           <div className="space-x-4 hidden md:flex">
             <Link
-              className="text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 rounded"
+              className=" nav-link text-lg  transition duration-300 px-3 py-2 rounded"
               to="/"
             >
               Home
             </Link>
             <Link
-              className="text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 rounded"
+              className=" nav-link text-lg  transition duration-300 px-3 py-2 rounded"
               to="/about"
             >
               About
             </Link>
             <Link
-              className="text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 rounded"
+              className=" nav-link text-lg  transition duration-300 px-3 py-2 rounded"
               to="/services"
             >
               Services
             </Link>
             <Link
-              className="text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 rounded"
+              className=" nav-link text-lg  transition duration-300 px-3 py-2 rounded"
               to="/contact"
             >
               Contact
@@ -67,28 +67,28 @@ const HomePage = () => {
         {isMobileMenuOpen && (
           <div className="navbar-collapse bg-white p-4 w-[95%] rounded-lg transition-transform ease-in duration-100 shadow-md z-20 absolute top-[70px] left-1/2 transform -translate-x-1/2">
             <Link
-              className="block text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 text-center"
+              className="nab-links block text-lg   transition duration-300  px-3 py-2 text-center"
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link
-              className="block text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 text-center"
+              className=" nab-links block text-lg   transition duration-300  px-3 py-2 text-center"
               to="/about"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
-              className="block text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 text-center"
+              className="nab-links block text-lg   transition duration-300  px-3 py-2 text-center"
               to="/services"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link
-              className="block text-lg text-gray-700 hover:text-blue-500 transition duration-300 hover:bg-gray-200 px-3 py-2 text-center"
+              className=" nab-links block text-lg   transition duration-300  px-3 py-2 text-center"
               to="/contact"
               onClick={() => setIsMobileMenuOpen(false)}
             >
