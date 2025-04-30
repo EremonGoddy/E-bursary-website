@@ -19,6 +19,7 @@
     color: #FFD700; /* gold on hover */
   }
 
+ 
   .nab-links {
     color: black;
     text-decoration: none;
@@ -27,6 +28,18 @@
   .nab-links:hover {
     color: #FFD700; /* gold on hover */
   }
+.content{
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+ }
+
+ .no-focus{
+border: none;
+outline: none;
+background:transparent; /* Optional: if you want no background */
+ }
+
+
+ 
 
 @media(max-width:768px){
 .empowering h2 {

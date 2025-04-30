@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import "./HomePage.css";
 
 const HomePage = () => {
@@ -56,12 +56,15 @@ const HomePage = () => {
             </Link>
           </div>
           {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <FontAwesomeIcon icon={faBars} className="text-gray-700 text-2xl" />
-          </button>
+          <Link
+  className=" md:hidden p-2 rounded-lg no-focus"
+  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+>
+  <FontAwesomeIcon
+    icon={isMobileMenuOpen ? faXmark : faBars}
+    className="text-gray-700 text-2xl focus"
+  />
+</Link>
         </div>
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
@@ -133,10 +136,10 @@ const HomePage = () => {
       </div>
 
       {/* Content Section */}
-      <div className="content-section py-8 sm:px-0 px-4 mt-[60px]">
-        <div className="grid md:grid-cols-3 gap-8">
+      <div className="content-section py-8 px-4 sm:px-8 mt-[10px]">
+        <div className="grid md:grid-cols-3 gap-1 md:gap-8">
           {/* Program Overview */}
-          <div className="mb-8 p-4 bg-white shadow-lg rounded-lg">
+          <div className="content mb-8 p-4 bg-white  rounded-lg">
             <h2 className="text-xl font-semibold text-gray-800">
               Overview of the Bursary Program
             </h2>
@@ -146,7 +149,7 @@ const HomePage = () => {
           </div>
 
           {/* Key Dates */}
-          <div className="mb-8 p-4 bg-white shadow-lg rounded-lg">
+          <div className=" content mb-8 p-4 bg-white  rounded-lg">
             <h2 className="text-xl font-semibold text-gray-800">Key Dates</h2>
             <ul className="list-disc pl-5 mt-4">
               <li className="text-gray-600">📅 Application Open: <strong>12/3/2024</strong></li>
@@ -157,7 +160,7 @@ const HomePage = () => {
           </div>
 
           {/* Important Announcement */}
-          <div className="mb-8 p-4 bg-white shadow-lg rounded-lg">
+          <div className="content mb-8 p-4 bg-white  rounded-lg">
             <h2 className="text-xl font-semibold text-gray-800">
               Important Announcement
             </h2>
