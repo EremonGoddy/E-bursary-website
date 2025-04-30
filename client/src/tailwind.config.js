@@ -9,3 +9,8 @@ module.exports = {
     },
     plugins: [],
   };
+
+  export default defineConfig({
+    base: '/',
+  })
+  
