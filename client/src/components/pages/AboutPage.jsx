@@ -92,7 +92,7 @@ const AboutPage = () => {
         <img
           src="/images/mission.jpg"
           alt="About Us"
-          className="w-full object-cover h-[50vh] md:h-[65vh]"
+          className="w-full object-cover h-[40vh] md:h-[60vh]"
         />
         <div className=" abouts absolute top-0 mt-55 left-0 w-full h-20 flex items-center justify-center bg-black bg-opacity-50">
           <h2 className="text-4xl md:text-6xl text-white font-bold">About Us</h2>
