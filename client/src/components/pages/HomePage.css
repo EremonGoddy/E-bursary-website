@@ -10,6 +10,12 @@
     color:#ffff ;
 }
 
+.abouts{
+    background:rgba(0, 0, 0, 0.3) ;
+    backdrop-filter:blur(10px);
+    color:#ffff ;
+}
+
 .nav-link {
     color: black;
     text-decoration: none;
@@ -38,13 +44,24 @@ outline: none;
 background:transparent; /* Optional: if you want no background */
  }
 
+ .contact-button{
+  background-color: #1F2937;
+  color: #ffff;
+ }
 
+ .contact-button:hover {
+  background-color: #374151; /* slightly lighter gray */
+}
  
 
 @media(max-width:768px){
 .empowering h2 {
 font-size:1.3rem;
 text-align: center;
+}
+
+.abouts{
+margin-top: 130px;
 }
  }
 
