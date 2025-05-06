@@ -1,7 +1,21 @@
 .getting-started{
     background:rgba(0, 0, 0, 0.5) ;
     backdrop-filter:blur(10px);
-    color:#ffff ;
+    color:white ;
+    font-size: 1.2rem;
+    text-decoration: none;
+    padding: 10px 20px; /* Adds internal spacing */
+    border-radius: 5px; 
+}
+
+.getting-started:hover{
+    background:rgba(0, 0, 0, 0.7) ;
+    backdrop-filter:blur(10px);
+    color:white ;
+    font-size: 1.2rem;
+    text-decoration: none;
+    padding: 10px 20px; /* Adds internal spacing */
+    border-radius: 5px; 
 }
 
 .empowering{
