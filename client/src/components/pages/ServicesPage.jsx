@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import "./HomePage.css";
 
 const ServicesPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

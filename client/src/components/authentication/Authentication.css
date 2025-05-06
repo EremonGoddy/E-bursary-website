@@ -1,0 +1,16 @@
+.eye{
+  
+    font-size: 25px;
+    color: grey;
+    cursor: pointer;
+    margin-top:35px;
+}
+
+.buttonsignin{
+    background-color: #1F2937;
+    color: #ffff;
+   }
+  
+   .buttonsignin:hover {
+    background-color: #374151; /* slightly lighter gray */
+  }

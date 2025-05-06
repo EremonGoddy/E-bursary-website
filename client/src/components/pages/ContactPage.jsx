@@ -8,6 +8,7 @@ import {
   faPhoneAlt,
   faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
+import "./HomePage.css";
 
 const ContactPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
