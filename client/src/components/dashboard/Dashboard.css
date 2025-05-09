@@ -46,7 +46,7 @@ background: #1F2937;
   
   .sidebar ul li {
     list-style: none;
-    margin-top: 40px;
+    margin-top:30px;
     text-align: center;
     position: relative; /* Add relative positioning for tooltips */
   }
@@ -212,12 +212,7 @@ background: #1F2937;
                 width: calc(100% - 60px);
                 transition: 0.3s;
                 
-              }
-
-         
-            
-     
-           
+              }       
   }
 
   
