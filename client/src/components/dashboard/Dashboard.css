@@ -26,9 +26,10 @@ background: #1F2937;
 }
 
 .sidebar #btn {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     transition: 0.3s;
     cursor: pointer;
+    margin-top: 15px;
   }
 
   .sidebar.active {
@@ -45,6 +46,7 @@ background: #1F2937;
   
   .sidebar ul li {
     list-style: none;
+    margin-top: 40px;
     text-align: center;
     position: relative; /* Add relative positioning for tooltips */
   }
@@ -58,7 +60,7 @@ background: #1F2937;
   }
 
   .sidebar ul li a .icon {
-    font-size: 22px;
+    font-size: 24px;
   }
   
   .sidebar ul li .links-name {
@@ -152,6 +154,7 @@ background: #1F2937;
             }
             
             .sidebar #btn {
+              margin-top: 10px;
                 font-size: 1.4rem;
                 transition: 0.3s;
                 cursor: pointer;
@@ -166,11 +169,13 @@ background: #1F2937;
               }
             
               .sidebar ul {
-                padding-left:5px;
+                padding-left:0px;
+                margin-top: 0px;
               }
               
               .sidebar ul li {
                 list-style: none;
+                margin-top: 15px;
                 text-align: center;
                 position: relative; /* Add relative positioning for tooltips */
               }
