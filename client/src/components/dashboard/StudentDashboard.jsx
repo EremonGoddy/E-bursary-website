@@ -87,7 +87,7 @@ const StudentDashboard = () => {
       <div className="topbar bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-20">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">EBursary</h1>
-          <h2 className="text-lg font-semibold">Welcome, {userName}</h2>
+          <h2 className="text-lg font-semibold">Welcome: {userName}</h2>
           <div className=" image flex space-x-2">
             <img
               src="/images/patient.png"
@@ -260,7 +260,7 @@ const StudentDashboard = () => {
                 </div>
               </>
             ) : (
-              <div className="bg-white p-6 shadow rounded-md text-center">
+              <div className="  bg-white p-6 shadow rounded-md text-center">
                 <h2 className="text-xl font-bold">Dashboard is empty</h2>
                 <p>Please click on the 'Apply' icon in the sidebar to complete your information.</p>
               </div>

@@ -1,17 +1,19 @@
 .topbar h1{
 font-size: 2rem;
+margin-left: 30px;
 }
 
 .topbar h2{
 font-size: 1.4rem;
+margin-left: 1100px;
 }
 
-.topbar .image{
-margin-right: 70px;
+.topbar .image img{
+margin-right: 140px;
 }
 
 .topbar .image .message{
-margin-left: 40px;
+margin-right: 50px;
 }
 
 .sidebar{
@@ -107,7 +109,9 @@ background: #1F2937;
     margin-left: 60px;
     width: calc(100% - 60px);
     transition: 0.3s;
+    
   }
+
   
   
   .sidebar.active ~ .main-content {
@@ -115,21 +119,40 @@ background: #1F2937;
     width: calc(100% - 250px);
   }
 
+
   @media (max-width: 768px) {
     .topbar h1{
         font-size: 1.2rem;
+        margin-left: 10px;
         }
         
         .topbar h2{
         font-size: 1rem;
+        margin-left: 30px;
         }
 
-        .topbar .image{
-            margin-right:0px;
+        .topbar .image img{
+          margin-right: 10px;
+          height: 30px;
+          width: 30px;
+          }
+          
+          .topbar .image .message{
+          margin-right: 5px;
+          font-size: 1.3rem;
+          }
+
+          .sidebar{
+            margin-top: -40px;
+            width: 50px;
             }
-            .topbar .image .message{
-                margin-left: 0px;
-                }
+            .sidebar #btn {
+              font-size: 1.4rem;
+              
+            }
+
+         
+           
   }
 
   
