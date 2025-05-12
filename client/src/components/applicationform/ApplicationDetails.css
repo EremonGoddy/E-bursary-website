@@ -1,0 +1,229 @@
+.topbardetails h1{
+font-size: 2rem;
+margin-left: 30px;
+}
+
+.topbardetails h2{
+font-size: 1.4rem;
+margin-left: 900px;
+}
+
+.topbardetails .image img{
+margin-right: 140px;
+}
+
+.topbardetails .image .message{
+margin-right: 50px;
+}
+
+.sidebardetails{
+margin-top:-20px;
+width: 60px;
+height: 100vh;
+position: fixed;
+transition: 0.3s;
+background: #1F2937;
+}
+
+.sidebardetails #btn {
+    font-size: 1.7rem;
+    transition: 0.3s;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+
+  .sidebardetails.active {
+    width: 250px;
+  }
+
+  .sidebardetails.active #btn{
+    transform: translateX(100px);
+  }
+
+  .sidebardetails ul {
+    padding-left: 0;
+  }
+  
+  .sidebardetails ul li {
+    list-style: none;
+    margin-top:30px;
+    text-align: center;
+    position: relative; /* Add relative positioning for tooltips */
+  }
+
+  .sidebardetails ul li a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebardetails ul li a .icons {
+    font-size: 24px;
+  }
+  
+  .sidebardetails ul li .links-name {
+    display: none; /* Hide link names by default */
+  }
+
+  .sidebardetails.active ul li a {
+    justify-content: flex-start;
+    padding-left: 10px;
+  }
+
+  .sidebardetails.active ul li .links-name {
+    display: inline; /* Show link names when sidebar is active */
+    margin-left: 10px;
+  }
+
+  .sidebardetails ul li .tooltip {
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    margin-top: 5px;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    width: 122px;
+    background:#1F2937;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    opacity: 0;
+    line-height: 35px;
+    height: 35px;
+    pointer-events: none;
+    display: block;
+  }
+
+  .sidebardetails.active ul li .tooltip {
+    display: none;
+  }
+  
+  .sidebardetails ul li:hover .tooltip {
+    opacity: 1;
+    top: 50%;
+  }
+
+   .main-details {
+    margin-left: 330px;
+    width: calc(100% - 330px);
+    transition: 0.3s;
+    background-color: white;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    
+  }
+
+  
+  
+  .sidebardetails.active ~ .main-details {
+    margin-left: 450px;
+    width: calc(100% - 450px);
+  }
+
+  .detailsbutton{
+background-color: blue;
+color:white;
+width: 200px;
+margin-left:920px ;
+font-size: 1.1rem;
+  }
+
+
+  @media (max-width: 768px) {
+    .topbar h1{
+        font-size: 1.2rem;
+        margin-left: 10px;
+        }
+        
+        .topbar h2{
+        font-size: 1rem;
+        margin-left: 30px;
+        }
+
+        .topbar .image img{
+          margin-right: 10px;
+          height: 30px;
+          width: 30px;
+          }
+          
+          .topbar .image .message{
+          margin-right: 5px;
+          font-size: 1.3rem;
+          }
+
+          .sidebar{
+            margin-top:-40px;
+            width: 50px;
+            height: 100vh;
+            position: fixed;
+            transition: 0.3s;
+            background: #1F2937;
+            }
+            
+            .sidebar #btn {
+              margin-top: 10px;
+                font-size: 1.4rem;
+                transition: 0.3s;
+                cursor: pointer;
+              }
+            
+              .sidebar.active {
+                width: 200px;
+              }
+            
+              .sidebar.active #btn{
+                transform: translateX(150px);
+              }
+            
+              .sidebar ul {
+                padding-left:0px;
+                margin-top: 0px;
+              }
+              
+              .sidebar ul li {
+                list-style: none;
+                margin-top: 15px;
+                text-align: center;
+                position: relative; /* Add relative positioning for tooltips */
+              }
+            
+              .sidebar ul li a {
+                color: white;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+            
+              .sidebar ul li a .icon {
+                font-size: 20px;
+              }
+              
+              .sidebar ul li .links-name {
+                display: none; /* Hide link names by default */
+              }
+            
+              .sidebar.active ul li a {
+                justify-content: flex-start;
+                padding-left: 10px;
+              }
+            
+              .sidebar.active ul li .links-name {
+                display: inline; /* Show link names when sidebar is active */
+                margin-left: 10px;
+              }
+          
+            
+               .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+                transition: 0.3s;
+                
+              }       
+  }
+
+  

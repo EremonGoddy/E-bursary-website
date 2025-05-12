@@ -8,6 +8,13 @@ import RegisterPage from './components/authentication/RegisterPage';
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import CommitteeDashboard from './components/dashboard/CommitteeDashboard';
 import StudentDashboard from './components/dashboard/StudentDashboard';
+import PersonalDetails from './components/applicationform/PersonalDetails';
+import AmountDetails from './components/applicationform/AmountDetails';
+import DisclosureDetails from './components/applicationform/DisclosureDetails';
+import FamilyDetails from './components/applicationform/FamilyDetails';
+import StudentSetting from './components/applicationform/StudentSetting';
+import Documentupload from './components/applicationform/DocumentUpload';
+import StudentReport from './components/applicationform/StudentReport';
 
 
 function App() {
@@ -26,6 +33,13 @@ function App() {
         <Route path="/admindashboard" element={<AdminDashboard/>} />
         <Route path="/committeedashboard" element={<CommitteeDashboard/>} />
         <Route path="/studentdashboard" element={<StudentDashboard/>} />
+        <Route path="/personaldetails" element={<PersonalDetails/>} />
+        <Route path="/amountdetails" element={<AmountDetails/>} />
+        <Route path="/disclosuredetails" element={<DisclosureDetails/>} />
+        <Route path="/familydetails" element={<FamilyDetails/>} />
+        <Route path="/studentsetting" element={<StudentSetting/>} />
+        <Route path="/documentupload" element={<Documentupload/>} />
+        <Route path="/studentreport" element={<StudentReport/>} />
       </Routes>
     </div>
   </Router>

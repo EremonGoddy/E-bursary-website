@@ -119,7 +119,7 @@ const StudentDashboard = () => {
                 <span className="tooltip">Dashboard</span>
               </li>
               <li>
-                <Link to="/personaldetails" className="flex items-center space-x-2">
+                <Link to="/studentsetting" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faFileAlt} className="icon text-lg" />
                   <span className="links-name">Apply</span>
                 </Link>
@@ -133,7 +133,7 @@ const StudentDashboard = () => {
                 <span className="tooltip">File attached</span>
               </li>
               <li>
-                <Link to="/report" className="flex items-center space-x-2">
+                <Link to="/studentreport" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faDownload} className="icon text-lg" />
                   <span className="links-name">Download Report</span>
                 </Link>
@@ -147,7 +147,7 @@ const StudentDashboard = () => {
                 <span className="tooltip">Messages</span>
               </li>
               <li>
-                <Link to="/setting" className="flex items-center space-x-2">
+                <Link to="/studentsetting" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faCog} className="icon text-lg" />
                   <span className="links-name">Settings</span>
                 </Link>
