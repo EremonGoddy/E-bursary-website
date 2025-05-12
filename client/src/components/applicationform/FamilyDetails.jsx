@@ -11,6 +11,7 @@ import {
   faCog,
   faSignOutAlt,
   faBars,
+  
 } from '@fortawesome/free-solid-svg-icons';
 import "./ApplicationDetails.css";
 
@@ -84,7 +85,7 @@ const FamilyDetails = () => {
               alt="User"
               className="rounded-full w-10 h-10"
             />
-            <FontAwesomeIcon icon={faComments} className="text-3xl" />
+            <FontAwesomeIcon icon={faBell} className=" message text-3xl" />
           </div>
         </div>
       </div>
