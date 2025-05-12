@@ -74,13 +74,13 @@ const PersonalDetails = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">EBursary</h1>
           <h2 className="text-lg font-semibold">Welcome: {userName}</h2>
-          <div className="flex items-center space-x-2">
+          <div className=" image flex items-center space-x-2">
             <img
               src="/images/patient.png"
               alt="User"
               className="rounded-full w-10 h-10"
             />
-            <FontAwesomeIcon icon={faComments} className="text-3xl" />
+            <FontAwesomeIcon icon={faComments} className="message text-3xl" />
           </div>
         </div>
       </div>
@@ -154,7 +154,7 @@ const PersonalDetails = () => {
     <div className="main-details max-w-6xl flex-1 p-4">
           <h1 className="text-2xl font-bold mb-4">Bursary Application Form</h1>
           <h2 className="text-xl font-semibold mb-6">Student Details</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="fullname" className="block font-medium mb-2">Full Name</label>
               <input type="text" id="fullname" name="fullname" value={formData.fullname} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" placeholder="Enter Full Name" />
