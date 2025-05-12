@@ -119,7 +119,7 @@ const StudentDashboard = () => {
                 <span className="tooltip">Dashboard</span>
               </li>
               <li>
-                <Link to="/studentsetting" className="flex items-center space-x-2">
+                <Link to="/personaldetails" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faFileAlt} className="icon text-lg" />
                   <span className="links-name">Apply</span>
                 </Link>
