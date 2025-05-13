@@ -1,23 +1,28 @@
-.topbardetails h1{
+
+
+.topbar h1{
 font-size: 2rem;
 margin-left: 30px;
 }
 
-.topbardetails h2{
+.topbar h2{
 font-size: 1.4rem;
-margin-left: 900px;
+margin-left: 1100px;
 }
 
-.topbardetails .image img{
+.topbar .image img{
 margin-right: 140px;
+width: 40px;
+height:40px;
 }
 
-.topbardetails .image .message{
+.topbar .image .notify{
 margin-right: 50px;
+font-size:2rem ;
 }
 
-.sidebardetails{
-margin-top:-20px;
+.sidebar{
+margin-top:-85px;
 width: 60px;
 height: 100vh;
 position: fixed;
@@ -25,33 +30,34 @@ transition: 0.3s;
 background: #1F2937;
 }
 
-.sidebardetails #btn {
+.sidebar #btn {
     font-size: 1.7rem;
     transition: 0.3s;
     cursor: pointer;
+    margin-left:12px;
     margin-top: 15px;
   }
 
-  .sidebardetails.active {
+  .sidebar.active {
     width: 250px;
   }
 
-  .sidebardetails.active #btn{
-    transform: translateX(100px);
+  .sidebar.active #btn{
+    transform: translateX(190px);
   }
 
-  .sidebardetails ul {
+  .sidebar ul {
     padding-left: 0;
   }
   
-  .sidebardetails ul li {
+  .sidebar ul li {
     list-style: none;
     margin-top:30px;
     text-align: center;
     position: relative; /* Add relative positioning for tooltips */
   }
 
-  .sidebardetails ul li a {
+  .sidebar ul li a {
     color: white;
     text-decoration: none;
     display: flex;
@@ -59,25 +65,25 @@ background: #1F2937;
     justify-content: center;
   }
 
-  .sidebardetails ul li a .icons {
+  .sidebar ul li a .icon {
     font-size: 24px;
   }
   
-  .sidebardetails ul li .links-name {
+  .sidebar ul li .links-name {
     display: none; /* Hide link names by default */
   }
 
-  .sidebardetails.active ul li a {
+  .sidebar.active ul li a {
     justify-content: flex-start;
     padding-left: 10px;
   }
 
-  .sidebardetails.active ul li .links-name {
+  .sidebar.active ul li .links-name {
     display: inline; /* Show link names when sidebar is active */
     margin-left: 10px;
   }
 
-  .sidebardetails ul li .tooltip {
+  .sidebar ul li .tooltip {
     position: absolute;
     left: 60px;
     top: 50%;
@@ -98,61 +104,70 @@ background: #1F2937;
     display: block;
   }
 
-  .sidebardetails.active ul li .tooltip {
+  .sidebar.active ul li .tooltip {
     display: none;
   }
   
-  .sidebardetails ul li:hover .tooltip {
+  .sidebar ul li:hover .tooltip {
     opacity: 1;
     top: 50%;
   }
 
    .main-details {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    margin-left:350px;
+    width: calc(100% - 350px);
     transition: 0.3s;
     background-color: white;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
     border-radius: 20px;
+    margin-top: -50px;
     
   }
 
-  
-  
-  .sidebardetails.active ~ .main-details {
-    margin-left: 450px;
-    width: calc(100% - 450px);
+  .sidebar.active ~ .main-details {
+    margin-left: 550px;
+    width: calc(100% - 550px);
   }
 
-  .detailsbutton{
-background-color: blue;
-color:white;
-width: 200px;
-margin-left:920px ;
-font-size: 1.1rem;
+  .main-details h1{
+  font-size:2.2rem;
   }
+
+  .main-details h2{
+  font-size:1.5rem;
+  }
+
+  .buttondetails{
+  background-color:#1F2937;
+  color:white;
+  margin-left: 550px;
+  }
+
+  
+  
+ 
 
 
   @media (max-width: 768px) {
     .topbar h1{
         font-size: 1.2rem;
-        margin-left: 10px;
+        margin-left: 0px;
         }
         
         .topbar h2{
         font-size: 1rem;
-        margin-left: 30px;
+        margin-left: 15px;
         }
 
         .topbar .image img{
-          margin-right: 10px;
+          margin-right: 20px;
           height: 30px;
           width: 30px;
           }
           
-          .topbar .image .message{
-          margin-right: 5px;
-          font-size: 1.3rem;
+          .topbar .image .notify{
+          margin-right:0px;
+          font-size: 1.6rem;
           }
 
           .sidebar{
@@ -218,12 +233,31 @@ font-size: 1.1rem;
               }
           
             
-               .main-content {
-                margin-left: 60px;
-                width: calc(100% - 60px);
+               .main-details {
+                margin-top: 0px;
+                margin-left: 70px;
+                width: calc(100% - 70px);
                 transition: 0.3s;
                 
-              }       
+              }  
+  .sidebar.active ~ .main-details {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+              
+.main-details h1{
+  font-size:1.3rem;
+  }
+
+  .main-details h2{
+  font-size:1.2rem;
+  }
+
+  .buttondetails{
+  background-color:#1F2937;
+  color:white;
+  margin-left: 170px;
+  }
   }
 
   

@@ -15,6 +15,7 @@ import {
   faUser,
   faBars,
   faEdit,
+  faBell,
 } from '@fortawesome/free-solid-svg-icons';
 import "./Dashboard.css";
 
@@ -94,7 +95,7 @@ const StudentDashboard = () => {
               alt="User"
               className="rounded-full w-10 h-10"
             />
-            <FontAwesomeIcon icon={faComments} className=" message text-3xl" />
+            <FontAwesomeIcon icon={faBell} className=" message text-3xl" />
           </div>
         </div>
       </div>
