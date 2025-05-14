@@ -141,7 +141,7 @@ const HomePage = () => {
         <div className="grid md:grid-cols-3 gap-1 md:gap-8">
           {/* Program Overview */}
           <div className=" mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)] ">
-            <h2 className="text-[1.2rem] md:text-3xl font-semibold text-gray-800 text-center">
+            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center">
               Overview of the Bursary Program
             </h2>
             <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">
@@ -151,7 +151,7 @@ const HomePage = () => {
 
           {/* Key Dates */}
           <div className="mb-8 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
-            <h2 className="text-[1.2rem] md:text-3xl font-semibold text-gray-800 text-center">Key Dates</h2>
+            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center">Key Dates</h2>
             <ul className="list-disc pl-5 mt-4 text-[1rem] md:text-[1.15rem] ">
               <li className="text-gray-600 px-3 py-2">📅 Application Open: <strong>12/3/2024</strong></li>
               <li className="text-gray-600 px-3 py-2">📅 Deadline: <strong>25/3/2024</strong></li>
@@ -162,7 +162,7 @@ const HomePage = () => {
 
           {/* Important Announcement */}
           <div className=" mb-8 p-4 bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
-            <h2 className="text-[1.2rem] md:text-3xl font-semibold text-gray-800 text-center ">
+            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center ">
               Important Announcement
             </h2>
             <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">
