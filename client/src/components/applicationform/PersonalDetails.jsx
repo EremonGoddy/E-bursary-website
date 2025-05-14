@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,54 +10,26 @@ import {
   faComments,
   faCog,
   faSignOutAlt,
+  faCashRegister,
+  faCheckDouble,
+  faUser,
   faBars,
+  faEdit,
   faBell,
 } from '@fortawesome/free-solid-svg-icons';
-import './ApplicationDetails.css';
+import "./ApplicationDetails.css";
 
-const Personaldetails = () => {
+const PersonalDetails = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
+  const [studentDetails, setStudentDetails] = useState({});
+  const [isEditFormVisible, setEditFormVisible] = useState(false);
+  const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
-  const [formData, setFormData] = useState({
-    fullname: '',
-    email: '',
-    subcounty: '',
-    ward: '',
-    village: '',
-    birth: '',
-    gender: '',
-    institution: '',
-    year: '',
-    admission: ''
-  });
-
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
 
   // Function to toggle sidebar active state
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Send form data to the backend
-    axios.post('http://localhost:5000/api/personal-details', formData)
-      .then((response) => {
-        alert('Data inserted successfully');
-        const userId = response.data.userId;
-        sessionStorage.setItem('userId', userId); // Store userId in sessionStorage
-        navigate('/Amountdetails');
-      })
-      .catch((error) => {
-        console.error('There was an error inserting the data!', error);
-      });
   };
 
   useEffect(() => {
@@ -65,26 +37,65 @@ const Personaldetails = () => {
     const name = sessionStorage.getItem('userName');
 
     if (!token) {
-      navigate('/signin'); // Redirect if not authenticated
+      navigate('/signin');
     } else {
       setUserName(name);
+
+      axios
+        .get('http://localhost:5000/api/student', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          setStudentDetails(response.data);
+          setFormData(response.data);
+        })
+        .catch((error) => console.error('Error fetching student data:', error));
     }
   }, [navigate]);
 
+  const handleEditClick = () => {
+    setEditFormVisible(true);
+  };
+
+  const handleCloseForm = () => {
+    setEditFormVisible(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const token = sessionStorage.getItem('authToken');
+    axios
+      .put('http://localhost:5000/api/student/update', formData, {
+        headers: { Authorization: token },
+      })
+      .then((response) => {
+        setStudentDetails(response.data);
+        setEditFormVisible(false);
+      })
+      .catch((error) => console.error('Error updating student data:', error));
+  };
+
+  const isStudentRegistered = Object.keys(studentDetails).length > 0;
+
   return (
-    <div className="w-full max-w-screen-xl mx-auto">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Fixed Top Bar */}
       <div className="topbar bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-20">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">EBursary</h1>
           <h2 className="text-lg font-semibold">Welcome: {userName}</h2>
-          <div className="image flex space-x-2">
+          <div className=" image flex space-x-2">
             <img
               src="/images/patient.png"
               alt="User"
-              className="rounded-full"
+              className="rounded-full w-10 h-10"
             />
-            <FontAwesomeIcon icon={faBell} className="notify text-xl" />
+            <FontAwesomeIcon icon={faBell} className=" message text-3xl" />
           </div>
         </div>
       </div>
@@ -92,15 +103,15 @@ const Personaldetails = () => {
       {/* Sidebar and Main Content */}
       <div className="flex flex-row pt-20">
         {/* Sidebar */}
-        <div className={`sidebar ${sidebarActive ? 'active' : ''} `}>
+        <div className={`sidebar ${sidebarActive ? 'active' : ''} w-64 text-white p-4 h-full transition-transform`}>
           <div className="d-flex flex-column">
             <FontAwesomeIcon
               icon={faBars}
-              className="text-white text-xl mb-4 cursor-pointer"
+              className="bi bi-list text-white text-2xl mb-4 cursor-pointer"
               id="btn"
               onClick={toggleSidebar}
             />
-            <ul className="space-y-14 items-center">
+            <ul className="space-y-14  items-center">
               <li>
                 <Link to="/student" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faHouse} className="icon text-lg" />
@@ -123,7 +134,7 @@ const Personaldetails = () => {
                 <span className="tooltip">File attached</span>
               </li>
               <li>
-                <Link to="/report" className="flex items-center space-x-2">
+                <Link to="/studentreport" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faDownload} className="icon text-lg" />
                   <span className="links-name">Download Report</span>
                 </Link>
@@ -137,7 +148,7 @@ const Personaldetails = () => {
                 <span className="tooltip">Messages</span>
               </li>
               <li>
-                <Link to="/setting" className="flex items-center space-x-2">
+                <Link to="/studentsetting" className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faCog} className="icon text-lg" />
                   <span className="links-name">Settings</span>
                 </Link>
@@ -155,66 +166,111 @@ const Personaldetails = () => {
         </div>
 
         {/* Main Content */}
-        <div className="main-details flex-1 p-7">
-          <h1 className="text-2xl font-bold mb-4">Bursary Application Form</h1>
-           <h2 className="text-2xl font-bold mb-4">Student Details</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto w-full">
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="fullname" className="text-sm font-bold mb-1">Full Name</label>
-              <input type="text" id="fullname" name="fullname" value={formData.fullname} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Full Name" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="email" className="text-sm font-bold mb-1">Email</label>
-              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Email" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="subcounty" className="text-sm font-bold mb-1">Sub county</label>
-              <input type="text" id="subcounty" name="subcounty" value={formData.subcounty} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Sub county" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="ward" className="text-sm font-bold mb-1">Ward</label>
-              <input type="text" id="ward" name="ward" value={formData.ward} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Ward" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="village" className="text-sm font-bold mb-1">Village unit</label>
-              <input type="text" id="village" name="village" value={formData.village} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter your village" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="birth" className="text-sm font-bold mb-1">Date of birth</label>
-              <input type="date" id="birth" name="birth" value={formData.birth} onChange={handleChange} className="border rounded p-2 w-full" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label className="text-sm font-bold mb-1">Gender</label>
-              <div className="flex items-center space-x-4">
-                <label>
-                  <input type="radio" name="gender" value="Male" onChange={handleChange} /> Male
-                </label>
-                <label>
-                  <input type="radio" name="gender" value="Female" onChange={handleChange} /> Female
-                </label>
+        <div className="main-content flex-1 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {isStudentRegistered ? (
+              <>
+                {/* Bursary Funds & Status */}
+                <div className="bg-white p-6 shadow rounded-md">
+                  <h2 className="text-xl font-bold">Bursary funds allocated:</h2>
+                  <p>{studentDetails.bursary}</p>
+                  <FontAwesomeIcon icon={faCashRegister} className="text-green-500" />
+                  <h2 className="text-xl font-bold mt-6">Status of the application:</h2>
+                  <p>{studentDetails.status}</p>
+                  <FontAwesomeIcon icon={faCheckDouble} className="text-blue-500" />
+                </div>
+
+                {/* User Profile */}
+                <div className="bg-white p-6 shadow rounded-md">
+                  <h2 className="text-xl font-bold">User Profile</h2>
+                  <hr className="my-4" />
+                  <div className="text-center">
+                    <img
+                      className="rounded-full w-24 h-24 mx-auto"
+                      src="/images/patient.png"
+                      alt="Profile"
+                    />
+                    <h5 className="text-lg font-semibold mt-4">
+                      {studentDetails.fullname}
+                    </h5>
+                    <p className="text-gray-500">Student</p>
+                  </div>
+                  <hr className="my-4" />
+                  <p>
+                    <strong>Student No:</strong> {studentDetails.admission}
+                  </p>
+                  <p>
+                    <strong>School:</strong> {studentDetails.institution}
+                  </p>
+                </div>
+
+                {/* Personal Information */}
+                <div className="bg-white p-6 shadow rounded-md">
+                  <h2 className="text-xl font-bold">Personal Information</h2>
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 mt-4 rounded"
+                    onClick={handleEditClick}
+                  >
+                    <FontAwesomeIcon icon={faEdit} /> Update Profile
+                  </button>
+                  <hr className="my-4" />
+                  <table className="table-auto w-full text-left">
+                    <tbody>
+                      <tr>
+                        <th className="pr-4">Full name:</th>
+                        <td>{studentDetails.fullname}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Email:</th>
+                        <td>{studentDetails.email}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Sub County:</th>
+                        <td>{studentDetails.subcounty}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Ward:</th>
+                        <td>{studentDetails.ward}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Village unit:</th>
+                        <td>{studentDetails.village}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Date of birth:</th>
+                        <td>{studentDetails.birth}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Sex:</th>
+                        <td>{studentDetails.gender}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Name of institution:</th>
+                        <td>{studentDetails.institution}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Year:</th>
+                        <td>{studentDetails.year}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4">Admission:</th>
+                        <td>{studentDetails.admission}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : (
+              <div className="  bg-white p-6 shadow rounded-md text-center">
+                <h2 className="text-xl font-bold">Dashboard is empty</h2>
+                <p>Please click on the 'Apply' icon in the sidebar to complete your information.</p>
               </div>
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="institution" className="text-sm font-bold mb-1">Institution</label>
-              <input type="text" id="institution" name="institution" value={formData.institution} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Institution" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="year" className="text-sm font-bold mb-1">Year</label>
-              <input type="number" id="year" name="year" value={formData.year} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Year" />
-            </div>
-            <div className="flex flex-col col-span-2 md:col-span-1">
-              <label htmlFor="admission" className="text-sm font-bold mb-1">Admission</label>
-              <input type="text" id="admission" name="admission" value={formData.admission} onChange={handleChange} className="border rounded p-2 w-full" placeholder="Enter Admission" />
-            </div>
-            <div className="col-span-2">
-              <button type="submit" className="buttondetails">Next</button>
-            </div>
-          </form>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Personaldetails;
-
+export default PersonalDetails;
