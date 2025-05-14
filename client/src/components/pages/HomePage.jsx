@@ -118,7 +118,7 @@ const HomePage = () => {
                 alt="Bursary program"
               />
               <div className="empowering absolute bottom-0 left-0 w-full h-[60px] sm:h-[120px] md:h-[80px]  flex justify-center items-center">
-                <h2 className="text-[1.2rem] md:text-4xl text-white mt-[1px] font-bold">
+                <h2 className="text-[1.2rem] md:text-4xl text-white mt-[1px] font-bold text-center">
                   Empowering Education in Turkana Through Bursaries: Your Path to Success
                 </h2>
               </div>
