@@ -66,11 +66,12 @@ app.get("/api/verify-password", authenticateToken, async (req, res) => {
   }
 });
 
-// ✅ Signin route
+// ... rest of your code above
+
+// ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const userQuery = "SELECT * FROM users WHERE email = $1";
     const userResult = await db.query(userQuery, [email]);
 
@@ -79,6 +80,10 @@ app.post("/api/signin", async (req, res) => {
     }
 
     const user = userResult.rows[0];
+    console.log('User from DB:', user);
+    console.log('Password from request:', password);
+    console.log('Password hash from DB:', user.password);
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -117,7 +122,6 @@ app.post("/api/signin", async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.error("Error in /api/signin:", error);
-    console.log("Comparing passwords:", password, user.password);
     res.status(500).json({ message: "Server error" });
   }
 });
