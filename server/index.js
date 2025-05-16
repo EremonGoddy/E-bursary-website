@@ -117,6 +117,7 @@ app.post("/api/signin", async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.error("Error in /api/signin:", error);
+    console.log("Comparing passwords:", password, user.password);
     res.status(500).json({ message: "Server error" });
   }
 });
