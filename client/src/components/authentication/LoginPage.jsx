@@ -24,7 +24,7 @@ const LoginPage = () => {
     }
 
     axios
-      .post('https://bursary-backend.onrender.com/api/signin', { email, password })
+      .post('https://e-bursary-backend.onrender.com/api/signin', { email, password })
       .then((response) => {
         const { token, student, role, name } = response.data;
         const storage = rememberMe ? localStorage : sessionStorage;

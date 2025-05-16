@@ -35,7 +35,7 @@ const RegisterPage = () => {
     }
 
     axios
-      .post('https://bursary-backend.onrender.com/api/post', formData)
+      .post('https://e-bursary-backend.onrender.com/api/post', formData)
       .then(() => {
         alert('Registration successful');
         navigate('/login');
