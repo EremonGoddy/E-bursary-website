@@ -1,20 +1,28 @@
 const { Pool } = require('pg');
-
-// Load environment variables from .env file
 require('dotenv').config();
 
-// Create a new pool of connections
 const pool = new Pool({
-  host: process.env.DATABASE_HOST,       // Database host from Render
-  port: parseInt(process.env.DATABASE_PORT, 10), // Port should be a number
-  user: process.env.DATABASE_USER,       // Database username
-  password: process.env.DATABASE_PASSWORD, // Database password
-  database: process.env.DATABASE_NAME,   // Database name
+  host: process.env.DATABASE_HOST,
+  port: parseInt(process.env.DATABASE_PORT, 10),
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
   ssl: {
-    rejectUnauthorized: false,           // Necessary for connecting to Render's managed databases
-  }
+    rejectUnauthorized: false,
+  },
 });
 
+// ✅ Define the function
+async function testConnection() {
+  try {
+    const res = await pool.query("SELECT NOW()");
+    console.log("✅ Database connected successfully:", res.rows[0]);
+  } catch (err) {
+    console.error("❌ Database connection failed:", err.message);
+  }
+}
+
+// ✅ Call it only once
 testConnection();
 
 module.exports = pool;
