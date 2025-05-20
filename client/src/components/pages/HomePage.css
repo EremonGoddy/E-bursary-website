@@ -1,16 +1,22 @@
 .empowering{
-    background:rgba(0, 0, 0, 0.5) ;
-    backdrop-filter:blur(10px);
-    color:#ffff ;
+background:rgba(0, 0, 0, 0.5) ;
+backdrop-filter:blur(10px);
+color:#ffff ;
+}
+
+.blurs{
+background:rgba(0, 0, 0, 0.3) ;
+backdrop-filter:blur(20px);
+color:#ffff ;
 }
 
 .getting-started{
-    background:rgba(0, 0, 0, 0.5) ;
-    backdrop-filter:blur(10px);
+background:rgba(0, 0, 0, 0.5) ;
+backdrop-filter:blur(10px);
 }
 
 .getting-started:hover{
-    background:rgba(0, 0, 0, 0.8) ;
-    backdrop-filter:blur(10px);
+background:rgba(0, 0, 0, 0.8) ;
+backdrop-filter:blur(10px);
 }
 
