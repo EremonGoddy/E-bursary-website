@@ -16,32 +16,32 @@ const ContactPage = () => {
   return (
     <div className="w-full overflow-x-hidden">
       {/* Navbar - Fixed */}
-      <nav className="navbar bg-white fixed top-0 left-0 w-full shadow-lg z-20">
-        <div className="container mx-auto px-4 sm:px-0 py-2 flex justify-between items-center">
-          <Link className="text-2xl font-bold text-blue-500 hover:text-blue-600" to="/">
+      <nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20">
+        <div className=" mx-auto px-4 sm:px-0 py-2 flex justify-between items-center">
+          <Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1F2937]" to="/">
             Ebursary
           </Link>
           <div className="space-x-4 hidden md:flex">
             <Link
-              className="nav-link text-lg transition duration-300 px-3 py-2 rounded"
+              className="text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/"
             >
               Home
             </Link>
             <Link
-              className="nav-link text-lg transition duration-300 px-3 py-2 rounded"
+              className="text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/about"
             >
               About
             </Link>
             <Link
-              className="nav-link text-lg transition duration-300 px-3 py-2 rounded"
+              className="text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/services"
             >
               Services
             </Link>
             <Link
-              className="nav-link text-lg transition duration-300 px-3 py-2 rounded"
+              className="text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/contact"
             >
               Contact
@@ -49,41 +49,41 @@ const ContactPage = () => {
           </div>
           {/* Mobile Menu Toggle */}
           <button
-            className="mobile-menu md:hidden p-2 rounded-lg focus:outline-none focus:ring-0"
+            className=" md:hidden p-2 rounded-lg focus:outline-none"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <FontAwesomeIcon
               icon={isMobileMenuOpen ? faXmark : faBars}
-              className="text-gray-700 text-2xl"
+              className="text-gray-700 text-3xl focus"
             />
           </button>
         </div>
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="navbar-collapse bg-white p-4 w-[95%] rounded-lg transition-transform ease-in duration-100 shadow-md z-20 absolute top-[70px] left-1/2 transform -translate-x-1/2">
+          <div className="bg-white p-4 w-[95%]  rounded-lg transition-transform ease-in duration-100 shadow-md z-20 absolute top-[70px] left-1/2 transform -translate-x-1/2 h-[240px]">
             <Link
-              className="nab-links block text-lg transition duration-300 px-3 py-2 text-center"
+              className="block text-lg   transition duration-300  px-3 py-3 text-center hover:text-[#FFD700]"
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link
-              className="nab-links block text-lg transition duration-300 px-3 py-2 text-center"
+              className="block text-lg   transition duration-300  px-3 py-3 text-center hover:text-[#FFD700]"
               to="/about"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
-              className="nab-links block text-lg transition duration-300 px-3 py-2 text-center"
+              className="block text-lg   transition duration-300  px-3 py-3 text-center hover:text-[#FFD700]"
               to="/services"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link
-              className="nab-links block text-lg transition duration-300 px-3 py-2 text-center"
+              className="block text-lg   transition duration-300  px-3 py-3 text-center hover:text-[#FFD700]"
               to="/contact"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -100,49 +100,48 @@ const ContactPage = () => {
           alt="About Us"
           className="w-full object-cover h-[40vh] md:h-[65vh]"
         />
-        <div className="abouts absolute top-0 mt-55 left-0 w-full h-20 flex items-center justify-center bg-black bg-opacity-50">
-          <h2 className="text-4xl md:text-6xl text-white font-bold">Contact us</h2>
+        <div className="empowering absolute mb-28 md:mb-4 lg:mt-8 xl:mb-50  bottom-0 left-0 w-full h-[60px] sm:h-[120px] md:h-[80px]  flex justify-center items-center">
+          <h2 className="text-[1.2rem] md:text-4xl text-white mt-[1px] font-bold text-center">Contact us</h2>
         </div>
       </div>
 
       {/* Services Section */}
-      <div className="content-section py-6 px-4 sm:px-6 mt-[10px]">
+      <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Location */}
-          <div className="content mb-4 p-4 bg-white rounded-lg shadow-lg flex items-start gap-4">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-blue-500 text-2xl" />
+          <div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[#1F2937] text-2xl" />
             <div>
-              <h4 className="text-xl font-semibold text-gray-800">Location</h4>
-              <p className="text-base text-gray-600 mt-2">
+              <h4 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800">Location</h4>
+              <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">
                 Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
               </p>
             </div>
           </div>
 
           {/* Phone */}
-          <div className="content mb-4 p-4 bg-white rounded-lg shadow-lg flex items-start gap-4">
-            <FontAwesomeIcon icon={faPhoneAlt} className="text-blue-500 text-2xl" />
+          <div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+            <FontAwesomeIcon icon={faPhoneAlt} className="text-[#1F2937] text-2xl" />
             <div>
-              <h4 className="text-xl font-semibold text-gray-800">Phone</h4>
-              <p className="text-base text-gray-600 mt-2">+254707556732</p>
-              <p className="text-base text-gray-600">+254707556732</p>
+              <h4 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800">Phone</h4>
+              <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">+254707556732</p>
+              <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">+254707556732</p>
             </div>
           </div>
 
           {/* Email */}
-          <div className="content mb-4 p-4 bg-white rounded-lg shadow-lg flex items-start gap-4">
-            <FontAwesomeIcon icon={faEnvelope} className="text-blue-500 text-2xl" />
+          <div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+            <FontAwesomeIcon icon={faEnvelope} className="text-[#1F2937] text-2xl" />
             <div>
-              <h4 className="text-xl font-semibold text-gray-800">Email</h4>
-              <p className="text-base text-gray-600 mt-2">eremon.godwin@gmail.com</p>
+              <h4 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800">Email</h4>
+              <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">eremon.godwin@gmail.com</p>
             </div>
           </div>
 
           {/* Contact Details */}
-          <div className="contents mb-4 p-4 bg-transparent rounded-lg">
-      
-            <p className="text-base text-gray-600 mt-2">
-            <h3 className="text-xl font-semibold text-gray-800">Contact Us</h3>
+          <div className="mb-4 p-4 bg-transparent rounded-lg">
+          <h3 className="text-[1.3rem] md:text-3xl  font-semibold text-gray-800">Contact Us</h3>
+            <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">
               Have questions or need assistance? We're here to help! Whether you’re seeking information,
               need support, or have feedback, feel free to reach out. Fill out the form below with your
               details and message, and our team will respond promptly.
@@ -151,35 +150,35 @@ const ContactPage = () => {
           </div>
 
           {/* Message Form */}
-          <div className="content mb-4 p-4 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-center mb-6">Send us a Message</h2>
+          <div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center">Send us a Message</h2>
             <form className="p-4 space-y-4">
               <div>
-                <label className="block text-gray-700 font-medium mb-1">Your Name</label>
+                <label className="block text-gray-700 text-[1rem] md:text-[1.15rem] font-semibold mb-1">Name</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border text-[1rem] md:text-[1.15rem]  border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
                   placeholder="John Doe"
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-1">Email</label>
+                <label className="block text-gray-700 text-[1rem] md:text-[1.15rem] font-semibold mb-1">Email</label>
                 <input
                   type="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 text-[1rem] md:text-[1.15rem]  border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
                   placeholder="example@email.com"
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-1">Message</label>
+                <label className="block text-gray-700 text-[1rem] md:text-[1.15rem] font-semibold mb-1">Message</label>
                 <textarea
-                  className="w-full px-4 py-2 h-24 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 h-24 border text-[1rem] md:text-[1.15rem]  border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
                   placeholder="Write your message here..."
                 />
               </div>
               <button
                 type="submit"
-                className="contact-button w-full"
+                className="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
               >
                 Send Message
               </button>

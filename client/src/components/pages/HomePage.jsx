@@ -5,52 +5,52 @@ import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import "./HomePage.css";
 
 const HomePage = () => {
-  const images = [
-    "/images/arrangement-education-growth-concept.jpg",
-    "/images/homepic.jpg",
-    "/images/homephoto.jpg",
-  ];
+const images = [
+"/images/arrangement-education-growth-concept.jpg",
+"/images/homepic.jpg",
+"/images/homephoto.jpg",
+];
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const [currentImageIndex, setCurrentImageIndex] = useState(0);
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [images.length]);
+useEffect(() => {
+const interval = setInterval(() => {
+setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+}, 3000);
+return () => clearInterval(interval);
+}, [images.length]);
 
-  return (
- <div className="w-full overflow-x-hidden">
-      {/* Navbar - Fixed */}
-      <nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20">
-        <div className="container mx-auto px-4 sm:px-0 py-2 flex justify-between items-center">
-          <Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1F2937]
-          " to="/">
-            Ebursary
-          </Link>
-          <div className="space-x-4 hidden md:flex">
-            <Link
-              className=" text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
-              to="/"
-            >
+return (
+<div className="w-full overflow-x-hidden">
+{/* Navbar - Fixed */}
+<nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20">
+<div className="container mx-auto px-4 sm:px-0 py-2 flex justify-between items-center">
+<Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1F2937]
+" to="/">
+Ebursary
+</Link>
+<div className="space-x-4 hidden md:flex">
+<Link
+className=" text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+to="/"
+>
               Home
             </Link>
             <Link
-              className="  text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+              className=" text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/about"
             >
               About
             </Link>
             <Link
-              className=" text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+              className=" text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/services"
             >
               Services
             </Link>
             <Link
-              className="  text-2xl  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+              className="  text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
               to="/contact"
             >
               Contact
@@ -141,18 +141,18 @@ const HomePage = () => {
         <div className="grid md:grid-cols-3 gap-1 md:gap-8">
           {/* Program Overview */}
           <div className=" mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)] ">
-            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center">
+            <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">
               Overview of the Bursary Program
             </h2>
-            <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">
+            <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
               The Turkana County Bursary Program is designed to support deserving students from Turkana County in their pursuit of higher education. The program aims to alleviate financial barriers and empower talented individuals to achieve their academic goals. Eligible candidates will receive financial assistance to cover tuition fees, textbooks, and other educational expenses.
             </p>
           </div>
 
           {/* Key Dates */}
           <div className="mb-8 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
-            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center">Key Dates</h2>
-            <ul className="list-disc pl-5 mt-4 text-[1rem] md:text-[1.15rem] ">
+            <h2 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800 text-center">Key Dates</h2>
+            <ul className=" pl-5 mt-4 text-[1rem] md:text-[1.1rem] ">
               <li className="text-gray-600 px-3 py-2">📅 Application Open: <strong>12/3/2024</strong></li>
               <li className="text-gray-600 px-3 py-2">📅 Deadline: <strong>25/3/2024</strong></li>
               <li className="text-gray-600 px-3 py-2">📢 Recipients Announced: <strong>2/4/2024</strong></li>
@@ -162,10 +162,10 @@ const HomePage = () => {
 
           {/* Important Announcement */}
           <div className=" mb-8 p-4 bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
-            <h2 className="text-[1.3rem] md:text-3xl font-semibold text-gray-800 text-center ">
+            <h2 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800 text-center ">
               Important Announcement
             </h2>
-            <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.15rem]">
+            <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
               We are pleased to announce that the application period for the Turkana County Bursary Program is now open. All interested candidates are encouraged to submit their applications before the deadline to be considered for financial assistance. Additionally, please note that this year, we have expanded the eligibility criteria to include students pursuing vocational and technical courses.
             </p>
           </div>
@@ -173,7 +173,7 @@ const HomePage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white text-center py-4 text-[1rem] md:text-2xl">
+      <footer className="bg-gray-800 text-white text-center py-4 text-[1rem] md:text-[1.35rem]">
         &copy; {new Date().getFullYear()} E-Bursary | Empowering Education in Turkana
       </footer>
     </div>
