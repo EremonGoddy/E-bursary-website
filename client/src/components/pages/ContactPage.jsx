@@ -16,7 +16,7 @@ const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 return (
 <div className="w-full overflow-x-hidden">
 {/* Navbar - Fixed */}
-<nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20 pl-20 pr-20">
+<nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20 md:pl-20 md:pr-20">
 <div className=" mx-auto px-4 sm:px-0 py-2 flex justify-between items-center">
 <Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1F2937]" to="/">
 Ebursary
