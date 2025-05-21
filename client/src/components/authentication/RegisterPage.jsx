@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import "./Authentication.css";
 
 const RegisterPage = () => {
 const [formData, setFormData] = useState({
@@ -49,7 +48,7 @@ setShowPassword((prevState) => !prevState);
 
 return (
 <div className="flex items-center justify-center min-h-screen">
-<div className="bg-white rounded-lg p-8 w-11/12 max-w-md shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+<div className="bg-white rounded-lg p-8 w-11/12 max-w-md shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Sign Up</h2>
 <form onSubmit={handleSubmit}>
 <div className="mb-4">
