@@ -26,8 +26,7 @@ return (
 {/* Navbar - Fixed */}
 <nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20 md:pl-20 md:pr-20">
 <div className=" mx-auto  px-4 sm:px-0 py-2 flex justify-between items-center">
-<Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1F2937]
-" to="/">
+<Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1F2937]" to="/">
 Ebursary
 </Link>
 <div className="space-x-4 hidden md:flex">
