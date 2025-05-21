@@ -74,7 +74,7 @@ onChange={(e) => setPassword(e.target.value)}
 placeholder="Enter your password"
 />
 <span
-className=" text-[1rem] md:text-[1.6rem] mt-10 md:mt-7 absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
+className=" text-[1.4rem] md:text-[1.6rem] mt-7 md:mt-7 absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
 onClick={togglePasswordVisibility}
 style={{
 display: 'inline-flex',
@@ -99,19 +99,19 @@ onChange={(e) => setRememberMe(e.target.checked)}
 />
 <label htmlFor="rememberMe" className="ml-2 text-[1rem] md:text-[1.1rem] text-gray-700">Remember me</label>
 </div>
-<Link to="/forgotpassword" className="text-[1rem] md:text-[1.1rem] text-gray-700 hover:underline">Forgot password?</Link>
+<Link to="/forgotpassword" className="text-[1rem] md:text-[1.1rem] text-blue-600 hover:text-blue-800">Forgot password?</Link>
 </div>
 
 <button
 type="submit"
-className="text-[1rem] md:text-[1.1rem] w-full text-white  py-2 rounded-lg bg-gray-700  transition"
+className="text-[1rem] md:text-[1.1rem] w-full text-white  py-2 rounded-lg bg-gray-900 hover:bg-gray-700 cursor-pointer  transition"
 >
 Sign in
 </button>
 
 <div className="text-center mt-4">
 <span className="text-[1rem] md:text-[1.1rem] text-gray-600">Don't have an account? </span>
-<Link to="/register" className="text-[1rem] md:text-[1.1rem] text-blue-500 hover:underline">Create an Account</Link>
+<Link to="/register" className="text-[1rem] md:text-[1.1rem]  text-blue-600 hover:text-blue-800">Create an Account</Link>
 </div>
 </form>
 </div>
