@@ -103,7 +103,7 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 {/* Location */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
 <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[#1F2937] text-2xl" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Location</h4>
@@ -114,7 +114,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Phone */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
 <FontAwesomeIcon icon={faPhoneAlt} className="text-[#1F2937] text-2xl" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Phone</h4>
@@ -124,7 +124,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Email */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
 <FontAwesomeIcon icon={faEnvelope} className="text-[#1F2937] text-2xl" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Email</h4>
@@ -133,7 +133,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Contact Details */}
-<div className="mb-4 p-4 bg-transparent rounded-lg">
+<div className="mb-3 p-4 bg-transparent rounded-lg">
 <h3 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800">Contact Us</h3>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
 Have questions or need assistance? We're here to help! Whether you’re seeking information,
@@ -144,7 +144,7 @@ We look forward to connecting with you and addressing your needs effectively!
 </div>
 
 {/* Message Form */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Send us a Message</h2>
 <form className="p-4 space-y-4">
 <div>
