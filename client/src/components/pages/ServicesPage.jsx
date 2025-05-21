@@ -95,7 +95,7 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
 {/* Student Registration */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Student Registration</h2>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
 Easily register for bursary applications through our user-friendly system. 
@@ -106,7 +106,7 @@ allowing students to focus on their education without hassle.
 </div>
 
 {/* Application Tracking */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Application Tracking</h2>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
 Track your bursary application in real time with our transparent system. 
@@ -116,7 +116,7 @@ updates. No need to follow up manually — our platform keeps you in the loop.
 </div>
 
 {/* Document Upload */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Document Upload</h2>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
 Upload required documents securely and with ease. Our system supports multiple 
@@ -126,7 +126,7 @@ your application digitally, reducing the need for physical paperwork.
 </div>
 
 {/* Allocation Notifications */}
-<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-4 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Allocation Notifications</h2>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
 Get notified about bursary allocation and disbursement status. Our alerts 

@@ -101,9 +101,9 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 
 {/* Services Section */}
 <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6 mb-3 md:mb-8">
 {/* Location */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[#1F2937] text-2xl" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Location</h4>
@@ -114,7 +114,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Phone */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <FontAwesomeIcon icon={faPhoneAlt} className="text-[#1F2937] text-2xl" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Phone</h4>
@@ -124,59 +124,61 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Email */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <FontAwesomeIcon icon={faEnvelope} className="text-[#1F2937] text-2xl" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Email</h4>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">eremon.godwin@gmail.com</p>
 </div>
 </div>
+</div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  {/* Contact Details */}
+  <div className="mb-3 p-4 bg-transparent rounded-lg flex flex-col justify-center">
+    <h3 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800">Contact Us</h3>
+    <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
+      Have questions or need assistance? We're here to help! Whether you’re seeking information,
+      need support, or have feedback, feel free to reach out. Fill out the form below with your
+      details and message, and our team will respond promptly.
+      We look forward to connecting with you and addressing your needs effectively!
+    </p>
+  </div>
 
-{/* Contact Details */}
-<div className="mb-3 p-4 bg-transparent rounded-lg">
-<h3 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800">Contact Us</h3>
-<p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
-Have questions or need assistance? We're here to help! Whether you’re seeking information,
-need support, or have feedback, feel free to reach out. Fill out the form below with your
-details and message, and our team will respond promptly.
-We look forward to connecting with you and addressing your needs effectively!
-</p>
-</div>
-
-{/* Message Form */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
-<h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Send us a Message</h2>
-<form className="p-4 space-y-4">
-<div>
-<label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Name</label>
-<input
-type="text"
-className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem]  border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-placeholder="John Doe"
-/>
-</div>
-<div>
-<label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Email</label>
-<input
-type="email"
-className="w-full px-4 py-2 text-[1rem] md:text-[1.1rem]  border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-placeholder="example@email.com"/>
-</div>
-<div>
-<label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Message</label>
-<textarea
-className="w-full px-4 py-2 h-24 border text-[1rem] md:text-[1.1rem]  border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-placeholder="Write your message here..."
-/>
-</div>
-<button
-type="submit"
-className="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
->
-Send Message
-</button>
-</form>
-</div>
+  {/* Message Form */}
+  <div className="mb-3 p-4 bg-white rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] ml-auto w-full max-w-lg">
+    <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">Send us a Message</h2>
+    <form className="p-4 space-y-4">
+      <div>
+        <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Name</label>
+        <input
+          type="text"
+          className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+          placeholder="John Doe"
+        />
+      </div>
+      <div>
+        <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Email</label>
+        <input
+          type="email"
+          className="w-full px-4 py-2 text-[1rem] md:text-[1.1rem] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+          placeholder="example@email.com"
+        />
+      </div>
+      <div>
+        <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Message</label>
+        <textarea
+          className="w-full px-4 py-2 h-24 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+          placeholder="Write your message here..."
+        />
+      </div>
+      <button
+        type="submit"
+        className="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
+      >
+        Send Message
+      </button>
+    </form>
+  </div>
 </div>
 </div>
 

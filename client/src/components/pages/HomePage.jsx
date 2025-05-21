@@ -130,7 +130,7 @@ Get Started
 <div className=" py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
 <div className="grid md:grid-cols-3 gap-1 md:gap-8">
 {/* Program Overview */}
-<div className=" mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)] ">
+<div className=" mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">
 Overview of the Bursary Program
 </h2>
@@ -140,7 +140,7 @@ The Turkana County Bursary Program is designed to support deserving students fro
 </div>
 
 {/* Key Dates */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800 text-center">Key Dates</h2>
 <ul className=" pl-5 mt-4 text-[1rem] md:text-[1.1rem] ">
 <li className="text-gray-600 px-3 py-2">📅 Application Open: <strong>12/3/2024</strong></li>
@@ -151,7 +151,7 @@ The Turkana County Bursary Program is designed to support deserving students fro
 </div>
 
 {/* Important Announcement */}
-<div className=" mb-3 p-4 bg-white rounded-lg shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]">
+<div className=" mb-3 p-4 bg-white rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
 <h2 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800 text-center ">
 Important Announcement
 </h2>
