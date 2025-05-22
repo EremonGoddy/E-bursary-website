@@ -118,8 +118,9 @@ mt-10
 text-white p-4 
 flex flex-col
 transition-all duration-300
+min-h-screen
+md:min-h-screen
 `}
-style={{ minHeight: '100vh' }}
 >
 <FontAwesomeIcon
 icon={faBars}
@@ -407,13 +408,18 @@ onClick={toggleSidebar}
 className={`
  bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md  col-span-1
 transition-all duration-300
-w-[500px]   // <-- Add this for a fixed width of 700px
+w-[300px]   // <-- Add this for a fixed width of 700px
+md:w-[500px]
 mx-auto     // <-- Center it horizontally
-mt-60
+mt-10
+md:mt-60
+${sidebarActive
+? 'ml-[200px] md:ml-[450px]'  // 100px on mobile, 450px on md+
+: 'ml-[60px] md:ml-[300px]'   // 20px on mobile, 300px on md+
+}
 `}
-style={{
-marginLeft: sidebarActive ? 450 : 300, // shifts right, but keeps full width   
-}}
+
+  
 >
 <h2 className="text-[1rem] md:text-[1.3rem] font-bold text-center">Dashboard is empty</h2>
 <p className="block text-[1rem] md:text-[1.1rem]" >Please click on the 'Apply' icon in the sidebar to complete your information.</p>
