@@ -290,7 +290,7 @@ Settings
 <li className="relative group">
 <div className="flex items-center">
 <Link to="/" className={`
-flex items-center space-x-2 mt-15 text-white no-underline
+flex items-center space-x-2 mt-20 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 `}>
@@ -299,7 +299,7 @@ ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 </Link>
 <span
 className={`
-absolute left-[60px] top-1/2 mt-[28px] -translate-y-1/2
+absolute left-[60px] top-1/2 mt-[38px] -translate-y-1/2
 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
 text-center shadow-lg transition-all duration-300 ease-in-out
 opacity-0 group-hover:opacity-100
