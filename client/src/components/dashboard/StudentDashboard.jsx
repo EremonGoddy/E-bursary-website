@@ -129,7 +129,7 @@ text-[1.7rem] mt-4 transition-all duration-300 cursor-pointer self-start
 `}
 onClick={toggleSidebar}
 />
-<ul className="space-y-14 mt-12 md:mt-4 pl-0">
+<ul className="space-y-12 mt-12 md:mt-4 pl-0">
 {/* Dashboard */}
 <li className="list-none mt-[30px] text-center relative group">
 <div className="flex items-center">
@@ -290,7 +290,7 @@ Settings
 <li className="relative group">
 <div className="flex items-center">
 <Link to="/" className={`
-flex items-center space-x-2 mt-30 text-white no-underline
+flex items-center space-x-2 mt-10 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 `}>
@@ -299,7 +299,7 @@ ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 </Link>
 <span
 className={`
-absolute left-[60px] top-1/2 mt-[60px] -translate-y-1/2
+absolute left-[60px] top-1/2 mt-[20px] -translate-y-1/2
 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
 text-center shadow-lg transition-all duration-300 ease-in-out
 opacity-0 group-hover:opacity-100
@@ -425,7 +425,7 @@ mx-auto     // <-- Center it horizontally
 mt-60
 `}
 style={{
-marginLeft: sidebarActive ? 500 : 380, // shifts right, but keeps full width   
+marginLeft: sidebarActive ? 450 : 300, // shifts right, but keeps full width   
 }}
 >
 <h2 className="text-[1rem] md:text-[1.3rem] font-bold text-center">Dashboard is empty</h2>
