@@ -415,7 +415,7 @@ mt-10
 md:mt-60
 ${sidebarActive
 ? 'ml-[200px] md:ml-[450px]'  // 100px on mobile, 450px on md+
-: 'ml-[60px] md:ml-[300px]'   // 20px on mobile, 300px on md+
+: 'ml-[40px] md:ml-[300px]'   // 20px on mobile, 300px on md+
 }
 `}
 
