@@ -126,7 +126,7 @@ icon={faBars}
 className={`
  text-white 
 ${sidebarActive ? 'transform translate-x-[150px] md:translate-x-[190px]' : ''}
-text-[1.4rem] md:text-[1.7rem] mt-4 transition-all duration-300 cursor-pointer self-start
+text-[1.4rem] md:text-[1.7rem] -ml-1 md:ml-0 mt-4 transition-all duration-300 cursor-pointer self-start
 `}
 onClick={toggleSidebar}
 />
@@ -279,7 +279,7 @@ onClick={toggleSidebar}
   <li className="relative group">
     <div className="flex items-center">
       <Link to="/" className={`
-        flex items-center w-full space-x-2 mt-20 text-white no-underline
+        flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
@@ -287,7 +287,7 @@ onClick={toggleSidebar}
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
       </Link>
       <span className={`
-        absolute left-[60px] top-1/2 mt-[38px] -translate-y-1/2
+        absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
         rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
         text-center shadow-lg transition-all duration-300 ease-in-out
         opacity-0 group-hover:opacity-100
