@@ -147,7 +147,7 @@ const StudentDashboard = () => {
               <li
                 key={text}
            className={`relative group h-12 flex items-center justify-center 
-        ${isLogout ? 'mt-20 md:mt-32' : ''}  // Add Tailwind margin top for "Logout"
+        ${isLogout ? 'mt-23 md:mt-27' : ''}  // Add Tailwind margin top for "Logout"
       `}
               >
                 <Link
@@ -315,11 +315,11 @@ const StudentDashboard = () => {
                   md:mt-60
                   ${sidebarActive
                     ? 'ml-[180px] md:ml-[450px]'
-                    : 'ml-[30px] md:ml-[300px]'
+                    : 'ml-[32px] md:ml-[300px]'
                   }
                 `}
               >
-                <h2 className="text-[1rem] md:text-[1.3rem] font-bold text-center">
+                <h2 className="text-[1.2rem] md:text-[1.3rem] font-bold text-center">
                   Dashboard is empty
                 </h2>
                 <p className="block text-[1rem] md:text-[1.1rem]">
