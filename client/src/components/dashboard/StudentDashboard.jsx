@@ -112,8 +112,8 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 className={`
 fixed top-0 left-0 z-30 bg-[#1F2937] 
 h-screen 
-${sidebarActive ?  'w-[200px] sm:w-[220px] md:w-[250px]' 
-    : 'w-[48px] sm:w-[54px] md:w-[60px]'} 
+${sidebarActive ?  'w-[180px]  md:w-[210px]' 
+    : 'w-[40px]  md:w-[50px]'} 
 mt-10
 text-white p-4 
 flex flex-col
@@ -126,8 +126,8 @@ md:min-h-screen
 icon={faBars}
 className={`
  text-white 
-${sidebarActive ? 'transform translate-x-[150px] md:translate-x-[190px]' : ''}
-text-[1.4rem] md:text-[1.7rem] -ml-1 md:ml-0 mt-4 transition-all duration-300 cursor-pointer self-start
+${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
+text-[1.4rem] md:text-[1.7rem] -ml-1.5 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
 `}
 onClick={toggleSidebar}
 />
@@ -140,7 +140,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faHouse} className="text-[1.4rem] md:text-2xl" />
+        <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
       </Link>
       <span className={`
@@ -164,7 +164,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faFileAlt} className="text-[1.4rem] text-2xl" />
+        <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
       </Link>
       <span className={`
@@ -188,7 +188,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faPaperclip} className="text-[1.4rem] text-2xl" />
+        <FontAwesomeIcon icon={faPaperclip} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>File attached</span>
       </Link>
       <span className={`
@@ -212,7 +212,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faDownload} className="text-[1.4rem] text-2xl" />
+        <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Download Report</span>
       </Link>
       <span className={`
@@ -236,7 +236,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faComments} className="text-[1.4rem] text-2xl" />
+        <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
       </Link>
       <span className={`
@@ -260,7 +260,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faCog} className="text-[1.4rem] text-2xl" />
+        <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[2px] md:ml-[10px]' : 'hidden'}`}>Settings</span>
       </Link>
       <span className={`
@@ -284,7 +284,7 @@ onClick={toggleSidebar}
         transition-all duration-200
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
-        <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.4rem] text-2xl" />
+        <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
         <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
       </Link>
       <span className={`
@@ -414,8 +414,8 @@ mx-auto     // <-- Center it horizontally
 mt-10
 md:mt-60
 ${sidebarActive
-? 'ml-[200px] md:ml-[450px]'  // 100px on mobile, 450px on md+
-: 'ml-[40px] md:ml-[300px]'   // 20px on mobile, 300px on md+
+? 'ml-[180px] md:ml-[450px]'  // 100px on mobile, 450px on md+
+: 'ml-[60px] md:ml-[300px]'   // 20px on mobile, 300px on md+
 }
 `}
 
