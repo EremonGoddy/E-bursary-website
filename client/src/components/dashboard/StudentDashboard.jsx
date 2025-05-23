@@ -421,7 +421,7 @@ ${sidebarActive
 
   
 >
-<h2 className="text-[1rem] md:text-[1.3rem] font-bold text-center">Dashboard is empty</h2>
+<h2 className="text-[1.3rem] md:text-[1.3rem] font-bold text-center">Dashboard is empty</h2>
 <p className="block text-[1rem] md:text-[1.1rem]" >Please click on the 'Apply' icon in the sidebar to complete your information.</p>
 </div>
 )}
