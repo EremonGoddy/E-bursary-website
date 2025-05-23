@@ -25,7 +25,7 @@ const sidebarLinks = [
   { to: '/studentreport', icon: faDownload, text: 'Download Report' },
   { to: '#', icon: faComments, text: 'Messages' },
   { to: '/studentsetting', icon: faCog, text: 'Settings' },
-  { to: '/', icon: faSignOutAlt, text: 'Logout' },
+  { to: '/', icon: faSignOutAlt, text: 'Logout', isLogout: true  },
 ];
 
 const StudentDashboard = () => {
@@ -142,11 +142,13 @@ const StudentDashboard = () => {
             `}
             onClick={toggleSidebar}
           />
-          <ul className="space-y-10 mt-8">
-            {sidebarLinks.map(({ to, icon, text }, idx) => (
+          <ul className="space-y-4 md:space-y-8 mt-2 md:mt-8">
+            {sidebarLinks.map(({ to, icon, text, isLogout }, idx) => (
               <li
                 key={text}
-                className="relative group h-12 flex items-center justify-center"
+           className={`relative group h-12 flex items-center justify-center 
+        ${isLogout ? 'mt-20 md:mt-32' : ''}  // Add Tailwind margin top for "Logout"
+      `}
               >
                 <Link
                   to={to}
