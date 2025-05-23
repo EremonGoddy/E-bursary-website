@@ -137,7 +137,7 @@ const StudentDashboard = () => {
             icon={faBars}
             className={`
               text-white 
-              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
+              ${sidebarActive ? 'transform translate-x-[133px] md:translate-x-[153px]' : ''}
               text-[1.4rem] md:text-[1.7rem]  mt-4 transition-all duration-300 cursor-pointer self-start
             `}
             onClick={toggleSidebar}
@@ -147,7 +147,7 @@ const StudentDashboard = () => {
               <li
                 key={text}
            className={`relative group h-12 flex items-center justify-center 
-        ${isLogout ? 'mt-23 md:mt-27' : ''}  // Add Tailwind margin top for "Logout"
+        ${isLogout ? 'mt-25 md:mt-26' : ''}  // Add Tailwind margin top for "Logout"
       `}
               >
                 <Link
