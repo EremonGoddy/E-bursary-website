@@ -213,7 +213,7 @@ onClick={toggleSidebar}
         ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
       `}>
         <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
-        <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Download Report</span>
+        <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
       </Link>
       <span className={`
         absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
@@ -224,7 +224,7 @@ onClick={toggleSidebar}
         leading-[35px] h-[35px] block
         ${sidebarActive ? 'hidden' : 'block'}
       `}>
-        Download Report
+      Report
       </span>
     </div>
   </li>
