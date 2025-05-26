@@ -20,30 +20,30 @@ import StudentReport from './components/applicationform/StudentReport';
 function App() {
 
 
-  return (
-    <Router>
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<HomePage/>} />
-        <Route path="/about" element={<AboutPage/>} />
-        <Route path="/services" element={<ServicesPage/>} />
-        <Route path="/contact" element={<ContactPage/>} />
-        <Route path="/login" element={<LoginPage/>} />
-        <Route path="/register" element={<RegisterPage/>} />
-        <Route path="/admindashboard" element={<AdminDashboard/>} />
-        <Route path="/committeedashboard" element={<CommitteeDashboard/>} />
-        <Route path="/studentdashboard" element={<StudentDashboard/>} />
-        <Route path="/personaldetails" element={<PersonalDetails/>} />
-        <Route path="/amountdetails" element={<AmountDetails/>} />
-        <Route path="/disclosuredetails" element={<DisclosureDetails/>} />
-        <Route path="/familydetails" element={<FamilyDetails/>} />
-        <Route path="/studentsetting" element={<StudentSetting/>} />
-        <Route path="/documentupload" element={<Documentupload/>} />
-        <Route path="/studentreport" element={<StudentReport/>} />
-      </Routes>
-    </div>
-  </Router>
-  )
+return (
+<Router>
+<div className="App">
+<Routes>
+<Route path="/" element={<HomePage/>} />
+<Route path="/about" element={<AboutPage/>} />
+ <Route path="/services" element={<ServicesPage/>} />
+<Route path="/contact" element={<ContactPage/>} />
+<Route path="/login" element={<LoginPage/>} />
+<Route path="/register" element={<RegisterPage/>} />
+<Route path="/admindashboard" element={<AdminDashboard/>} />
+<Route path="/committeedashboard" element={<CommitteeDashboard/>} />
+<Route path="/studentdashboard" element={<StudentDashboard/>} />
+<Route path="/personaldetails" element={<PersonalDetails/>} />
+<Route path="/amountdetails" element={<AmountDetails/>} />
+<Route path="/disclosuredetails" element={<DisclosureDetails/>} />
+<Route path="/familydetails" element={<FamilyDetails/>} />
+<Route path="/studentsetting" element={<StudentSetting/>} />
+<Route path="/documentupload" element={<Documentupload/>} />
+<Route path="/studentreport" element={<StudentReport/>} />
+</Routes>
+</div>
+</Router>
+)
 }
 
 export default App

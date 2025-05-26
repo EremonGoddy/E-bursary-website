@@ -41,7 +41,7 @@ navigate('/signin');
 setUserName(name);
 
 axios
-.get('http://localhost:5000/api/student', {
+.get('https://e-bursary-backend.onrender.com/api/student', {
 headers: { Authorization: token },
 })
 .then((response) => {
@@ -64,7 +64,7 @@ const handleFormSubmit = (e) => {
 e.preventDefault();
 const token = sessionStorage.getItem('authToken');
 axios
-.put('http://localhost:5000/api/student/update', formData, {
+.put('https://e-bursary-backend.onrender.com/api/student/update', formData, {
 headers: { Authorization: token },
 })
 .then((response) => {
@@ -135,7 +135,7 @@ onClick={toggleSidebar}
   {/* Dashboard */}
   <li className="list-none mt-[30px] text-center relative group">
     <div className="flex items-center">
-      <Link to="/student" className={`
+      <Link to="/personaldetails" className={`
         flex items-center w-full space-x-2 text-white no-underline
         transition-all duration-200
         ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
