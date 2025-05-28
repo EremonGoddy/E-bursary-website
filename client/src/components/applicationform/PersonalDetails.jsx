@@ -3,24 +3,24 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse,
-  faFileAlt,
-  faPaperclip,
-  faDownload,
-  faComments,
-  faCog,
-  faSignOutAlt,
-  faBars,
-  faBell,
+faHouse,
+faFileAlt,
+faPaperclip,
+faDownload,
+faComments,
+faCog,
+faSignOutAlt,
+faBars,
+faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 const PersonalDetails = () => {
-  const [sidebarActive, setSidebarActive] = useState(false);
-  const [studentDetails, setStudentDetails] = useState({});
-  const [userName, setUserName] = useState('');
-  const [formData, setFormData] = useState({
-    fullname: '',
-    email: '',
+const [sidebarActive, setSidebarActive] = useState(false);
+const [studentDetails, setStudentDetails] = useState({});
+const [userName, setUserName] = useState('');
+const [formData, setFormData] = useState({
+fullname: '',
+email: '',
     subcounty: '',
     ward: '',
     village: '',
