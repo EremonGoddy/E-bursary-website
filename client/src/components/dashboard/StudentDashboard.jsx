@@ -112,7 +112,7 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 className={`
 fixed top-0 left-0 z-30 bg-[#1F2937] 
 h-screen 
-${sidebarActive ?  'w-[180px]  md:w-[210px]' 
+${sidebarActive ?  'w-[180px]  md:w-[210px] fixed' 
     : 'w-[40px]  md:w-[50px]'} 
 mt-10
 text-white p-4 
