@@ -326,7 +326,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 {/* User Profile */}
 <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]  rounded flex flex-col items-center">
-<h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.50rem]">User Profile</h2>
+<h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.35rem]">User Profile</h2>
 <hr className="my-4 w-full" />
 <div className="text-center leading-8">
 <img
@@ -334,16 +334,16 @@ className="rounded-full w-24 h-24 mx-auto"
 src="/images/patient.png"
 alt="Profile"
 />
-<h5 className="font-semibold mt-4 text-[1.2rem] md:text-[1.5rem]">
+<h5 className="font-semibold mt-4 text-[1rem] md:text-[1.1rem]">
 {studentDetails.fullname}
 </h5>
-<p className="text-gray-500 text-[1.2rem] md:text-[1.35rem]">Student</p>
+<p className="text-gray-500 text-[1rem] md:text-[1.1rem]">Student</p>
 </div>
 <hr className="my-4 w-full " />
-<p className='leading-8 text-[1rem] md:text-[1.2rem]'>
+<p className='leading-8 text-[1rem] md:text-[1.1rem]'>
 <strong>Student No:</strong> {studentDetails.admission}
 </p>
-<p className='leading-8 text-[1rem] md:text-[1.2rem]'>
+<p className='leading-8 text-[1rem] md:text-[1.1rem]'>
 <strong>School:</strong> {studentDetails.institution}
 </p>
 </div>
@@ -356,12 +356,12 @@ alt="Profile"
       className="bg-blue-500 text-white px-3  md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
       onClick={handleEditClick}
     >
-      <FontAwesomeIcon icon={faEdit} className="text-[1.3rem] md:text-[1.2rem]" /> Update Profile
+      <FontAwesomeIcon icon={faEdit} className="text-[1rem] md:text-[1.2rem]" /> Update Profile
     </button>
   </div>
   <hr className="my-4" />
   <table className="table-auto w-full text-left">
-    <tbody className="leading-8 text-[1rem] md:text-[1.2rem]">
+    <tbody className="leading-8 text-[1rem] md:text-[1.1rem]">
       <tr>
         <th className="pr-4">Full name:</th>
         <td>{studentDetails.fullname}</td>
