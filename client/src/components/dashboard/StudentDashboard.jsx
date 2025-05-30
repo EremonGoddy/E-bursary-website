@@ -314,12 +314,12 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 {/* Bursary Funds & Status */}
 <div className="flex flex-col gap-4">
 <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center mb-2">
-<h2 className="text-[1.2rem] md:text-[1.45rem] font-bold mb-1">Bursary funds allocated:</h2>
+<h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1">Bursary funds allocated:</h2>
 <p className="mb-2">{studentDetails.bursary}</p>
 <FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-3xl" />
 </div>
 <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center">
-<h2 className="text-[1.2rem] md:text-[1.45rem]  font-bold mb-1">Status of the application:</h2>
+<h2 className="text-[1.2rem] md:text-[1.2rem]  font-bold mb-1">Status of the application:</h2>
 <p className="mb-2">{studentDetails.status}</p>
 <FontAwesomeIcon icon={faCheckDouble} className="text-blue-500 text-3xl" />
 </div>
@@ -350,13 +350,13 @@ alt="Profile"
 {/* Personal Information */}
 <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded">
   <div className="flex items-center mb-4">
-    <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl mb-6 md:mb-0 md:text-3xl mr-2" />
-    <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.55rem]">Personal Information</h2>
+    <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl md:text-2xl mr-2" />
+    <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem]">Personal Information</h2>
     <button
       className="bg-blue-500 text-white px-3  md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
       onClick={handleEditClick}
     >
-      <FontAwesomeIcon icon={faEdit} className="mr-2 text-[1.3rem] md:text-[1.2rem]" /> Update Profile
+      <FontAwesomeIcon icon={faEdit} className="text-[1.3rem] md:text-[1.2rem]" /> Update Profile
     </button>
   </div>
   <hr className="my-4" />
