@@ -314,96 +314,96 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 {/* Bursary Funds & Status */}
 <div className="flex flex-col gap-4">
 <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center mb-2">
-<h2 className="text-lg font-bold mb-1">Bursary funds allocated:</h2>
+<h2 className="text-[1.2rem] md:text-[1.45rem] font-bold mb-1">Bursary funds allocated:</h2>
 <p className="mb-2">{studentDetails.bursary}</p>
-<FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-2xl" />
+<FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-3xl" />
 </div>
 <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center">
-<h2 className="text-lg font-bold mb-1">Status of the application:</h2>
+<h2 className="text-[1.2rem] md:text-[1.45rem]  font-bold mb-1">Status of the application:</h2>
 <p className="mb-2">{studentDetails.status}</p>
-<FontAwesomeIcon icon={faCheckDouble} className="text-blue-500 text-2xl" />
+<FontAwesomeIcon icon={faCheckDouble} className="text-blue-500 text-3xl" />
 </div>
 </div>
 {/* User Profile */}
-<div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center">
-<h2 className="text-xl font-bold mb-2">User Profile</h2>
+<div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]  rounded flex flex-col items-center">
+<h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.50rem]">User Profile</h2>
 <hr className="my-4 w-full" />
-<div className="text-center">
+<div className="text-center leading-8">
 <img
 className="rounded-full w-24 h-24 mx-auto"
 src="/images/patient.png"
 alt="Profile"
 />
-<h5 className="text-lg font-semibold mt-4">
+<h5 className="font-semibold mt-4 text-[1.2rem] md:text-[1.5rem]">
 {studentDetails.fullname}
 </h5>
-<p className="text-gray-500">Student</p>
+<p className="text-gray-500 text-[1.2rem] md:text-[1.35rem]">Student</p>
 </div>
-<hr className="my-4 w-full" />
-<p>
+<hr className="my-4 w-full " />
+<p className='leading-8 text-[1.2rem] md:text-[1.2rem]'>
 <strong>Student No:</strong> {studentDetails.admission}
 </p>
-<p>
+<p className='leading-8 text-[1.2rem] md:text-[1.2rem]'>
 <strong>School:</strong> {studentDetails.institution}
 </p>
 </div>
 {/* Personal Information */}
 <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded">
-<div className="flex items-center mb-4">
-<FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl mr-2" />
-<h2 className="text-xl font-bold">Personal Information</h2>
-</div>
-<button
-className="bg-blue-500 text-white px-4 py-2 mb-4 rounded hover:bg-blue-600"
-onClick={handleEditClick}
->
-<FontAwesomeIcon icon={faEdit} /> Update Profile
-</button>
-<hr className="my-4" />
-<table className="table-auto w-full text-left">
-<tbody>
-<tr>
-<th className="pr-4">Full name:</th>
-<td>{studentDetails.fullname}</td>
-</tr>
-<tr>
-<th className="pr-4">Email:</th>
-<td>{studentDetails.email}</td>
-</tr>
-<tr>
-<th className="pr-4">Sub County:</th>
-<td>{studentDetails.subcounty}</td>
-</tr>
-<tr>
-<th className="pr-4">Ward:</th>
-<td>{studentDetails.ward}</td>
-</tr>
-<tr>
-<th className="pr-4">Village unit:</th>
-<td>{studentDetails.village}</td>
-</tr>
-<tr>
-<th className="pr-4">Date of birth:</th>
-<td>{studentDetails.birth}</td>
-</tr>
-<tr>
-<th className="pr-4">Sex:</th>
-<td>{studentDetails.gender}</td>
-</tr>
-<tr>
-<th className="pr-4">Name of institution:</th>
-<td>{studentDetails.institution}</td>
-</tr>
-<tr>
-<th className="pr-4">Year:</th>
-<td>{studentDetails.year}</td>
-</tr>
-<tr>
-<th className="pr-4">Admission:</th>
-<td>{studentDetails.admission}</td>
-</tr>
-</tbody>
-</table>
+  <div className="flex items-center mb-4">
+    <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl mb-6 md:mb-0 md:text-3xl mr-2" />
+    <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.55rem]">Personal Information</h2>
+    <button
+      className="bg-blue-500 text-white px-3  md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
+      onClick={handleEditClick}
+    >
+      <FontAwesomeIcon icon={faEdit} className="mr-2 text-[1.3rem] md:text-[1.2rem]" /> Update Profile
+    </button>
+  </div>
+  <hr className="my-4" />
+  <table className="table-auto w-full text-left">
+    <tbody className="leading-8 text-[1.2rem] md:text-[1.2rem]">
+      <tr>
+        <th className="pr-4">Full name:</th>
+        <td>{studentDetails.fullname}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Email:</th>
+        <td>{studentDetails.email}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Sub County:</th>
+        <td>{studentDetails.subcounty}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Ward:</th>
+        <td>{studentDetails.ward}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Village unit:</th>
+        <td>{studentDetails.village}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Date of birth:</th>
+        <td>{studentDetails.birth}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Sex:</th>
+        <td>{studentDetails.gender}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Name of institution:</th>
+        <td>{studentDetails.institution}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Year:</th>
+        <td>{studentDetails.year}</td>
+      </tr>
+      <tr>
+        <th className="pr-4">Admission:</th>
+        <td>{studentDetails.admission}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 </>
 ) : (
