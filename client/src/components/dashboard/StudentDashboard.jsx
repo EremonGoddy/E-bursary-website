@@ -340,10 +340,10 @@ alt="Profile"
 <p className="text-gray-500 text-[1.2rem] md:text-[1.35rem]">Student</p>
 </div>
 <hr className="my-4 w-full " />
-<p className='leading-8 text-[1.2rem] md:text-[1.2rem]'>
+<p className='leading-8 text-[1rem] md:text-[1.2rem]'>
 <strong>Student No:</strong> {studentDetails.admission}
 </p>
-<p className='leading-8 text-[1.2rem] md:text-[1.2rem]'>
+<p className='leading-8 text-[1rem] md:text-[1.2rem]'>
 <strong>School:</strong> {studentDetails.institution}
 </p>
 </div>
@@ -361,7 +361,7 @@ alt="Profile"
   </div>
   <hr className="my-4" />
   <table className="table-auto w-full text-left">
-    <tbody className="leading-8 text-[1.2rem] md:text-[1.2rem]">
+    <tbody className="leading-8 text-[1rem] md:text-[1.2rem]">
       <tr>
         <th className="pr-4">Full name:</th>
         <td>{studentDetails.fullname}</td>
