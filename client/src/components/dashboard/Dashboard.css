@@ -1,0 +1,9 @@
+.shadow-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7); /* Dark overlay */
+  z-index: 40; /* Sits behind the modal but above other content */
+}
