@@ -411,8 +411,8 @@ const StudentDashboard = () => {
                   mt-10
                   md:mt-60
                   ${sidebarActive
-                    ? 'ml-[180px] md:ml-[450px]'
-                    : 'ml-[35px] md:ml-[300px]'
+                    ? 'ml-[180px] md:ml-[480px]'
+                    : 'ml-[15px] md:ml-[450px]'
                   }
                 `}
               >
@@ -435,7 +435,7 @@ const StudentDashboard = () => {
               {/* Cancel (close) icon in top right */}
               <FontAwesomeIcon
                 icon={faTimes}
-                className='absolute top-1 right-2 text-gray-400 hover:text-gray-600 text-lg text-[1.7rem] md:text-[2.4rem] cursor-pointer'
+                className='absolute top-1 right-2 text-[#1F2937]  hover:text-gray-600 text-lg text-[1.7rem] md:text-[2.4rem] cursor-pointer'
                 onClick={handleCloseForm}
               />
               <form onSubmit={handleFormSubmit}>
