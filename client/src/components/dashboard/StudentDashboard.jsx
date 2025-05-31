@@ -412,7 +412,7 @@ const StudentDashboard = () => {
                   md:mt-60
                   ${sidebarActive
                     ? 'ml-[180px] md:ml-[480px]'
-                    : 'ml-[15px] md:ml-[450px]'
+                    : 'ml-[2px] md:ml-[450px]'
                   }
                 `}
               >
