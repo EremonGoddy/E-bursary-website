@@ -403,9 +403,9 @@ const StudentDashboard = () => {
             ) : (
               <div
                 className={`
-                  bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md  col-span-1
+                  bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md  flex flex-col gap-4
                   transition-all duration-300
-                  w-[300px]
+                  w-[280px]
                   md:w-[500px]
                   mx-auto
                   mt-10
