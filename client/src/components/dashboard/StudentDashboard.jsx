@@ -26,31 +26,47 @@ const StudentDashboard = () => {
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Function to toggle sidebar active state
+  // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
 
+  // Fetch student info
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
-
     if (!token) {
       navigate('/signin');
     } else {
       setUserName(name);
-
+      setLoading(true);
       axios
         .get('https://e-bursary-backend.onrender.com/api/student', {
-          headers: { Authorization: token },
+          headers: {
+            Authorization: token,
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+            Expires: '0',
+          },
         })
         .then((response) => {
           setStudentDetails(response.data);
           setFormData(response.data);
+          setLoading(false);
         })
-        .catch((error) => console.error('Error fetching student data:', error));
+        .catch((error) => {
+          setLoading(false);
+          // Only clear state if auth truly failed
+          if (error.response && error.response.status === 401) {
+            setStudentDetails({});
+            setFormData({});
+            navigate('/signin');
+          }
+          console.error('Error fetching student data:', error);
+        });
     }
   }, [navigate]);
 
@@ -62,26 +78,53 @@ const StudentDashboard = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Update and force refetch for always-fresh data display
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
+    setEditFormVisible(false);
+    setLoading(true);
     axios
       .put('https://e-bursary-backend.onrender.com/api/student/update', formData, {
         headers: { Authorization: token },
       })
       .then((response) => {
-        setStudentDetails(response.data);
-        setEditFormVisible(false);
+        // Refetch data from backend to guarantee latest info
+        axios
+          .get('https://e-bursary-backend.onrender.com/api/student', {
+            headers: {
+              Authorization: token,
+              'Cache-Control': 'no-cache',
+              Pragma: 'no-cache',
+              Expires: '0',
+            },
+          })
+          .then((getResponse) => {
+            setStudentDetails(getResponse.data);
+            setFormData(getResponse.data);
+            setLoading(false);
+          })
+          .catch((fetchError) => {
+            setLoading(false);
+            alert('Error fetching updated student data.');
+          });
       })
-      .catch((error) => console.error('Error updating student data:', error));
+      .catch((error) => {
+        setLoading(false);
+        alert('Error updating student data. Please try again.');
+        console.error('Error updating student data:', error);
+      });
   };
 
   const isStudentRegistered = Object.keys(studentDetails).length > 0;
 
   return (
     <div className="w-full min-h-screen relative">
-
-             {/* Fixed Top Bar */}
+      {/* Fixed Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
@@ -101,7 +144,6 @@ const StudentDashboard = () => {
         </div>
       </div>
 
-      
       <div className="flex pt-20 min-h-screen">
         {/* Sidebar */}
         <div
@@ -127,7 +169,7 @@ const StudentDashboard = () => {
             onClick={toggleSidebar}
           />
           <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
-            {/* Dashboard */}
+            {/* ...Sidebar items unchanged... */}
             <li className="list-none mt-[30px] text-center relative group">
               <div className="flex items-center">
                 <Link to="/personaldetails" className={`
@@ -151,7 +193,7 @@ const StudentDashboard = () => {
                 </span>
               </div>
             </li>
-            {/* Apply */}
+            {/* ...other sidebar items... */}
             <li className="relative group">
               <div className="flex items-center">
                 <Link to="/personaldetails" className={`
@@ -175,7 +217,6 @@ const StudentDashboard = () => {
                 </span>
               </div>
             </li>
-            {/* File attached */}
             <li className="relative group">
               <div className="flex items-center">
                 <Link to="/documentupload" className={`
@@ -199,7 +240,6 @@ const StudentDashboard = () => {
                 </span>
               </div>
             </li>
-            {/* Download Report */}
             <li className="relative group">
               <div className="flex items-center">
                 <Link to="/studentreport" className={`
@@ -223,7 +263,6 @@ const StudentDashboard = () => {
                 </span>
               </div>
             </li>
-            {/* Messages */}
             <li className="relative group">
               <div className="flex items-center">
                 <Link to="#" className={`
@@ -247,7 +286,6 @@ const StudentDashboard = () => {
                 </span>
               </div>
             </li>
-            {/* Settings */}
             <li className="relative group">
               <div className="flex items-center">
                 <Link to="/studentsetting" className={`
@@ -271,7 +309,6 @@ const StudentDashboard = () => {
                 </span>
               </div>
             </li>
-            {/* Logout */}
             <li className="relative group">
               <div className="flex items-center">
                 <Link to="/" className={`
@@ -299,11 +336,15 @@ const StudentDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-300 pr-3 pl-3 md:pr-10 md:pl-10
+        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
           ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
         `}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {isStudentRegistered ? (
+            {loading ? (
+              <div className="col-span-1 md:col-span-3 flex justify-center items-center min-h-[300px]">
+                <span className="text-gray-500 text-lg animate-pulse">Loading...</span>
+              </div>
+            ) : isStudentRegistered ? (
               <>
                 {/* Bursary Funds & Status */}
                 <div className="flex flex-col gap-4">
