@@ -480,7 +480,7 @@ const StudentDashboard = () => {
                 onClick={handleCloseForm}
               />
               <form onSubmit={handleFormSubmit}>
-                <div className="mb-4 mt-8 md:mt-12  flex items-center gap-2">
+                <div className="mb-2 md:mb-4 mt-8 md:mt-12  flex items-center gap-2">
                   <label htmlFor="fullname" className="block font-medium text-[1.1rem] min-w-[70px] md:min-w-[90px]">
                     Full Name
                   </label>
@@ -493,7 +493,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="email" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
                     Email
                   </label>
@@ -506,7 +506,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="subcounty" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
                     Sub County
                   </label>
@@ -519,7 +519,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="ward" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
                     Ward
                   </label>
@@ -532,7 +532,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="village" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
                     Village Unit
                   </label>
@@ -545,7 +545,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="birth" className="block font-medium text-[1.1rem] min-w-[70px] md:min-w-[90px]">
                     Date of Birth
                   </label>
@@ -558,7 +558,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="gender" className="block font-medium text-[1.1rem] min-w-[40px] md:min-w-[90px]">
                     Sex
                   </label>
@@ -571,7 +571,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="institution" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
                     Name of Institution
                   </label>
@@ -584,7 +584,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="year" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
                     Year
                   </label>
@@ -597,7 +597,7 @@ const StudentDashboard = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 md:mb-4 flex items-center gap-2">
                   <label htmlFor="admission" className="block font-medium text-[1.1rem] min-w-[70px] md:min-w-[90px]">
                     Admission
                   </label>

@@ -81,7 +81,7 @@ email: '',
   }, [navigate]);
 
   return (
-    <div className="w-full min-h-screen relative bg-gray-100">
+    <div className="w-full min-h-screen relative bg-white-100">
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
@@ -299,8 +299,8 @@ email: '',
         </div>
 
         {/* Main Content Area */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-300`}>
-          <div className="bg-white rounded-lg shadow-md max-w-3xl mx-auto mt-8 p-8">
+        <div className={`flex-1 ml-10 md:ml-64  transition-all duration-300`}>
+          <div className="bg-white rounded-lg  max-w-[310px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto mt-8 p-8">
             <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
             <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Student Details</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
