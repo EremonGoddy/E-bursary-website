@@ -115,7 +115,7 @@ const StudentReport = () => {
   };
 
   return (
-    <div className="w-full min-h-screen relative bg-gray-100">
+    <div className="w-full min-h-screen relative bg-white-100">
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
@@ -331,8 +331,8 @@ const StudentReport = () => {
           </ul>
         </div>
         {/* Main Content Area */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-300`}>
-          <div className="bg-white rounded-lg shadow-md max-w-3xl mx-auto mt-8 p-8">
+        <div className={`flex-1 ml-10 md:ml-30 p-4 transition-all duration-300`}>
+     <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[800px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-center">Bursary Report</h1>
             <table className="w-full border-collapse bg-white shadow-md rounded">
               <thead>

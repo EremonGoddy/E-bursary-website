@@ -196,7 +196,7 @@ const StudentDashboard = () => {
             {/* ...other sidebar items... */}
             <li className="relative group">
               <div className="flex items-center">
-                <Link to="/personaldetails" className={`
+                <Link to="/disclosuredetails" className={`
                   flex items-center w-full space-x-2 text-white no-underline
                   transition-all duration-200
                   ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}

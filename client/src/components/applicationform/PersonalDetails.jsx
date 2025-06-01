@@ -299,26 +299,26 @@ email: '',
         </div>
 
         {/* Main Content Area */}
-        <div className={`flex-1 ml-10  md:ml-64  transition-all duration-300`}>
-          <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
-            <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
-            <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Student Details</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              <div>
-                <label htmlFor="fullname" className="block font-medium mb-1">Full Name</label>
-                <input
-                  type="text"
-                  id="fullname"
-                  name="fullname"
-                  value={formData.fullname}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Full Name"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block font-medium mb-1">Email</label>
+<div className={`flex-1 ml-10  md:ml-64  transition-all duration-300`}>
+<div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
+<h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
+<h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Student Details</h2>
+<form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+<div>
+<label htmlFor="fullname" className="block font-medium mb-1">Full Name</label>
+<input
+type="text"
+id="fullname"
+name="fullname"
+value={formData.fullname}
+onChange={handleChange}
+className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
+placeholder="Enter Full Name"
+required
+/>
+</div>
+<div>
+<label htmlFor="email" className="block font-medium mb-1">Email</label>
                 <input
                   type="email"
                   id="email"
