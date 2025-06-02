@@ -114,6 +114,20 @@ const StudentReport = () => {
     doc.save('Bursary_Report.pdf');
   };
 
+  // Prepare report data
+  const reportRows = [
+    { label: 'Reference Number', value: studentDetails.reference_number || 'N/A' },
+    { label: 'Application Title', value: 'Bursary Application' },
+    { label: 'Application Status', value: studentDetails.status || 'N/A' },
+    { label: 'Download Application', value: (
+      <FontAwesomeIcon
+        icon={faDownload}
+        className="cursor-pointer text-blue-500"
+        onClick={downloadReport}
+      />
+    )},
+  ];
+
   return (
     <div className="w-full min-h-screen relative bg-white-100">
       {/* Top Bar */}
@@ -334,32 +348,48 @@ const StudentReport = () => {
         <div className={`flex-1 ml-8 md:ml-30 p-4 transition-all duration-300`}>
           <div className="bg-white rounded-lg max-w-[340px] md:max-w-[800px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto -mt-4 md:mt-50 mb-4 md:mb-6 p-1 md:p-8">
             <h1 className="text-1xl md:text-2xl font-bold mb-2 text-center">Bursary Report</h1>
-            {/* Responsive Table Wrapper */}
-            <div className="w-full overflow-x-auto">
-              <table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
-                <thead>
-                  <tr className="bg-blue-500 text-white text-[0.9rem] md:text-1xl">
-                    <th className="p-0 md:p-3 text-left">Reference Number</th>
-                    <th className="p-0 md:p-3 text-left">Application Title</th>
-                    <th className="p-0 md:p-3 text-left">Application Status</th>
-                    <th className="p-0 md:p-3 text-left">Download Application</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b text-[0.9rem] md:text-[1.1rem]">
-                    <td className="p-0 md:p-3">{studentDetails.reference_number || 'N/A'}</td>
-                    <td className="p-0 md:p-3">Bursary Application</td>
-                    <td className="p-0 md:p-3">{studentDetails.status || 'N/A'}</td>
-                    <td className="p-0 md:p-3">
-                      <FontAwesomeIcon
-                        icon={faDownload}
-                        className="cursor-pointer text-blue-500"
-                        onClick={downloadReport}
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            {/* Responsive Report Info: vertical on mobile, table on md+ */}
+            <div>
+             {/* Mobile vertical layout */}
+<div className="block md:hidden">
+  {reportRows.map((row, idx) => (
+    <div key={row.label} className="flex items-center py-2 border-b last:border-b-0">
+      <span className="font-semibold w-1/2 text-sm bg-blue-500 text-white px-2 py-1 rounded-1">
+        {row.label}
+      </span>
+      <span className="w-1/2 text-sm bg-white-100 px-2 py-1 rounded-r">
+        {row.value}
+      </span>
+    </div>
+  ))}
+</div>
+              {/* Desktop table layout */}
+              <div className="hidden md:block w-full overflow-x-auto">
+                <table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
+                  <thead>
+                    <tr className="bg-blue-500 text-white text-[0.9rem] md:text-1xl">
+                      <th className="p-2 text-left">Reference Number</th>
+                      <th className="p-2 text-left">Application Title</th>
+                      <th className="p-2 text-left">Application Status</th>
+                      <th className="p-2 text-left">Download Application</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b text-[0.9rem] md:text-[1.1rem]">
+                      <td className="p-2">{studentDetails.reference_number || 'N/A'}</td>
+                      <td className="p-2">Bursary Application</td>
+                      <td className="p-2">{studentDetails.status || 'N/A'}</td>
+                      <td className="p-2">
+                        <FontAwesomeIcon
+                          icon={faDownload}
+                          className="cursor-pointer text-blue-500"
+                          onClick={downloadReport}
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             {/* End Responsive Table Wrapper */}
           </div>
