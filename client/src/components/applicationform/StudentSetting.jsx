@@ -12,6 +12,8 @@ import {
   faSignOutAlt,
   faBars,
   faBell,
+  faEye,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 
 const StudentSetting = () => {
@@ -23,14 +25,30 @@ const StudentSetting = () => {
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 
+  // Password field visibility states
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const navigate = useNavigate();
 
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
+
+  // Toggle functions for each field
+  const toggleCurrentVisibility = () => setShowCurrent((s) => !s);
+  const toggleNewVisibility = () => setShowNew((s) => !s);
+  const toggleConfirmVisibility = () => setShowConfirm((s) => !s);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
     setMessage('');
     setIsError(false);
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setMessage('All password fields are required');
+      setIsError(true);
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setMessage('New password and confirmation do not match');
@@ -59,7 +77,7 @@ const StudentSetting = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setMessage(response.data.message);
+        setMessage(response.data.message || 'Password updated successfully');
         setIsError(false);
         setCurrentPassword('');
         setNewPassword('');
@@ -81,6 +99,14 @@ const StudentSetting = () => {
       setUserName(name);
     }
   }, [navigate]);
+
+  // Helper: Render password status label
+  const PasswordLabel = ({ value, label }) => (
+    <span className={`ml-2 px-2 py-0.5 rounded text-xs font-medium 
+      ${value ? "bg-green-100 text-green-700 border border-green-300" : "bg-red-100 text-red-700 border border-red-300"}`}>
+      {value ? `${label} set` : `${label} not set`}
+    </span>
+  );
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
@@ -303,42 +329,87 @@ const StudentSetting = () => {
         <div className={`flex-1 ml-10 md:ml-30 p-4 transition-all duration-300`}>
           <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h2 className="text-2xl font-bold mb-4 text-center">Change Password</h2>
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div>
-                <label htmlFor="currentPassword" className="block font-medium mb-2">Current Password</label>
+            <form onSubmit={handleChangePassword} className="space-y-4 relative">
+              <div className="relative">
+                <label htmlFor="currentPassword" className="block font-medium mb-2">
+                  Current Password
+                  <PasswordLabel value={!!currentPassword} label="Password" />
+                </label>
                 <input
-                  type="password"
+                  type={showCurrent ? "text" : "password"}
                   id="currentPassword"
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
+                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 pr-12"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   required
                   placeholder="Enter current password"
+                  autoComplete="current-password"
                 />
+                <span
+                  className="text-[1.4rem] md:text-[1.6rem] absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
+                  onClick={toggleCurrentVisibility}
+                  style={{
+                    display: 'inline-flex',
+                    width: 'auto',
+                    padding: '0.5rem',
+                  }}
+                >
+                  <FontAwesomeIcon icon={showCurrent ? faEye : faEyeSlash} />
+                </span>
               </div>
-              <div>
-                <label htmlFor="newPassword" className="block font-medium mb-2">New Password</label>
+              <div className="relative">
+                <label htmlFor="newPassword" className="block font-medium mb-2">
+                  New Password
+                  <PasswordLabel value={!!newPassword} label="Password" />
+                </label>
                 <input
-                  type="password"
+                  type={showNew ? "text" : "password"}
                   id="newPassword"
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
+                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 pr-12"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   placeholder="Enter new password"
+                  autoComplete="new-password"
                 />
+                <span
+                  className="text-[1.4rem] md:text-[1.6rem] absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
+                  onClick={toggleNewVisibility}
+                  style={{
+                    display: 'inline-flex',
+                    width: 'auto',
+                    padding: '0.5rem',
+                  }}
+                >
+                  <FontAwesomeIcon icon={showNew ? faEye : faEyeSlash} />
+                </span>
               </div>
-              <div>
-                <label htmlFor="confirmPassword" className="block font-medium mb-2">Confirm New Password</label>
+              <div className="relative">
+                <label htmlFor="confirmPassword" className="block font-medium mb-2">
+                  Confirm New Password
+                  <PasswordLabel value={!!confirmPassword} label="Password" />
+                </label>
                 <input
-                  type="password"
+                  type={showConfirm ? "text" : "password"}
                   id="confirmPassword"
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
+                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 pr-12"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="Re-enter new password"
+                  autoComplete="new-password"
                 />
+                <span
+                  className="text-[1.4rem] md:text-[1.6rem] absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
+                  onClick={toggleConfirmVisibility}
+                  style={{
+                    display: 'inline-flex',
+                    width: 'auto',
+                    padding: '0.5rem',
+                  }}
+                >
+                  <FontAwesomeIcon icon={showConfirm ? faEye : faEyeSlash} />
+                </span>
               </div>
               <div className="flex justify-end mt-6">
                 <button
