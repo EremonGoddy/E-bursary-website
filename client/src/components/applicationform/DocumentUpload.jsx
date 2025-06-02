@@ -293,38 +293,37 @@ const Documentupload = () => {
        <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
             <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Document Upload Form</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
-              <div>
-                <label htmlFor="documentName" className="block font-medium mb-2">Document Name</label>
-                <input
-                  type="text"
-                  value={formData.documentName}
-                  readOnly
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 bg-gray-100"
-                  placeholder="No file chosen"
-                />
-              </div>
-              <div>
-                <label htmlFor="document" className="block font-medium mb-2">Upload Document</label>
-                <input
-                  type="file"
-                  id="document"
-                  name="document"
-                  onChange={handleFileChange}
-                  required
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-              </div>
-            </form>
-            <div className="flex justify-end mt-8">
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
-              >
-                Submit
-              </button>
-            </div>
+     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
+  <div>
+    <label htmlFor="documentName" className="block font-medium mb-2">Document Name</label>
+    <input
+      type="text"
+      value={formData.documentName}
+      readOnly
+      className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 bg-gray-100"
+      placeholder="No file chosen"
+    />
+  </div>
+  <div>
+    <label htmlFor="document" className="block font-medium mb-2">Upload Document</label>
+    <input
+      type="file"
+      id="document"
+      name="document"
+      onChange={handleFileChange}
+      required
+      className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+    />
+  </div>
+  <div className="flex justify-end mt-8">
+    <button
+      type="submit"
+      className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
+    >
+      Submit
+    </button>
+  </div>
+</form>
             {uploadStatus && (
               <div className="mt-4">
                 <p className={`font-semibold ${uploadStatus.includes('success') ? "text-green-600" : "text-red-600"}`}>{uploadStatus}</p>

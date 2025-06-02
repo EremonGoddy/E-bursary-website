@@ -4,6 +4,8 @@ require('dotenv').config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const fs = require('fs');
+const path = require('path');
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -587,9 +589,17 @@ app.get("/api/disclosureInformation/:id", (req, res) => {
   });
 });
 
+// Use /tmp/uploads for cloud environments like Render
+const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
@@ -602,12 +612,21 @@ app.post('/api/upload', upload.single('document'), (req, res) => {
   const { documentName } = req.body;
   const document = req.file;
 
+  if (!document) {
+    return res.status(400).send('No file uploaded');
+  }
+
+  // Optionally: Only store file name or relative path in DB
+  const filePath = document.path.startsWith('/tmp/')
+    ? document.path // on Render
+    : path.relative(__dirname, document.path); // on local
+
   const query = `
     INSERT INTO uploaded_document (document_name, file_path) 
     VALUES ($1, $2)
   `;
 
-  db.query(query, [documentName, document.path], (err, result) => {
+  db.query(query, [documentName, filePath], (err, result) => {
     if (err) {
       console.error('Error saving to database:', err);
       return res.status(500).send('Database error');
