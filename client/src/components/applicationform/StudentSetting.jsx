@@ -301,7 +301,7 @@ const StudentSetting = () => {
         </div>
         {/* Main Content Area */}
         <div className={`flex-1 ml-10 md:ml-30 p-4 transition-all duration-300`}>
-<div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
+          <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h2 className="text-2xl font-bold mb-4 text-center">Change Password</h2>
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
@@ -313,6 +313,7 @@ const StudentSetting = () => {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   required
+                  placeholder="Enter current password"
                 />
               </div>
               <div>
@@ -324,6 +325,7 @@ const StudentSetting = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
+                  placeholder="Enter new password"
                 />
               </div>
               <div>
@@ -335,18 +337,18 @@ const StudentSetting = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  placeholder="Re-enter new password"
                 />
               </div>
+              <div className="flex justify-end mt-6">
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
+                >
+                  Update Password
+                </button>
+              </div>
             </form>
-            <div className="flex justify-end mt-6">
-              <button
-                type="submit"
-                onClick={handleChangePassword}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
-              >
-                Update Password
-              </button>
-            </div>
             {message && (
               <p className={`mt-4 text-center ${isError ? 'text-red-500' : 'text-green-500'}`}>{message}</p>
             )}
