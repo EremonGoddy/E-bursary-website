@@ -364,10 +364,10 @@ const StudentReport = () => {
               <div className="block md:hidden">
                 {reportRows.map((row) => (
                   <div key={row.label} className="flex items-center py-2 border-b last:border-b-0">
-                    <span className="font-semibold w-1/2 text-[0.9rem] bg-blue-500 text-white px-2 py-1 rounded-1">
+                    <span className="font-semibold w-1/2 text-[1rem] bg-blue-500 text-white px-2 py-1 rounded-1">
                       {row.label}
                     </span>
-                    <span className="w-1/2 text-[0.9rem] bg-white-100 px-2 py-1 rounded-r">
+                    <span className="w-1/2 text-[1rem] bg-white-100 px-2 py-1 rounded-r">
                       {row.value}
                     </span>
                   </div>
@@ -377,7 +377,7 @@ const StudentReport = () => {
               <div className="hidden md:block w-full overflow-x-auto">
                 <table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
                   <thead>
-                    <tr className="bg-blue-500 text-white text-1xl">
+                    <tr className="bg-blue-500 text-white text-[1.1rem]">
                       <th className="p-2 text-left">Reference Number</th>
                       <th className="p-2 text-left">Application Title</th>
                       <th className="p-2 text-left">Application Status</th>
