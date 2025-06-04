@@ -11,7 +11,7 @@ name: '',
 email: '',
 password: '',
 confirmPassword: '',
-role: 'Admin',
+role: 'Student',
 });
 const [errors, setErrors] = useState({});
 const [isTermsAccepted, setIsTermsAccepted] = useState(false);
