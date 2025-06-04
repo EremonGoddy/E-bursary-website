@@ -13,7 +13,7 @@ import {
   faFileAlt,
   faChartBar,
   faFileLines,
-  faGear,
+  faCog,
   faSignOutAlt,
   faBell,
 } from '@fortawesome/free-solid-svg-icons';
@@ -21,7 +21,7 @@ import {
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const AdminDashboard = () => {
-  const [sidebarActive, setSidebarActive] = useState(true);
+  const [sidebarActive, setSidebarActive] = useState(false);
   const [adminDetails, setAdminDetails] = useState({});
   const [bursaryAmount, setBursaryAmount] = useState(0);
   const [allocatedAmount, setAllocatedAmount] = useState(0);
@@ -32,13 +32,11 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
 
-  const toggleSidebar = () => {
-    setSidebarActive(!sidebarActive);
-  };
+  const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/api/committee-count')
+      .get('http://e-bursary-backend.onrender.com/api/committee-count')
       .then((response) => {
         setBursaryAmount(response.data.amount);
         setAllocatedAmount(response.data.allocated);
@@ -49,7 +47,7 @@ const AdminDashboard = () => {
       });
 
     axios
-      .get('http://localhost:5000/api/admin-details')
+      .get('http://e-bursary-backend.onrender.com/api/admin-details')
       .then((response) => {
         setAdminDetails({
           name: response.data.name,
@@ -59,7 +57,7 @@ const AdminDashboard = () => {
       .catch((error) => console.error('Error fetching admin details:', error));
 
     axios
-      .get('http://localhost:5000/api/quick-statistics')
+      .get('http://e-bursary-backend.onrender.com/api/quick-statistics')
       .then((response) => {
         const { total, approved, rejected } = response.data;
         setTotalApplications(total);
@@ -73,7 +71,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await axios.get('http://localhost:5000/api/users');
+      const response = await axios.get('http://e-bursary-backend.onrender.com/api/users');
       setUsers(response.data);
     };
     fetchUsers();
@@ -81,17 +79,17 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchLogs = async () => {
-      const response = await axios.get('http://localhost:5000/api/activity-logs');
+      const response = await axios.get('http://e-bursary-backend.onrender.com/api/activity-logs');
       setActivityLogs(response.data);
     };
     fetchLogs();
   }, []);
 
   const handleDeleteUser = async (userId) => {
-    await axios.delete(`http://localhost:5000/api/users/${userId}`);
-    const usersResponse = await axios.get('http://localhost:5000/api/users');
+    await axios.delete(`http://e-bursary-backend.onrender.com/api/users/${userId}`);
+    const usersResponse = await axios.get('http://e-bursary-backend.onrender.com/api/users');
     setUsers(usersResponse.data);
-    const logsResponse = await axios.get('http://localhost:5000/api/activity-logs');
+    const logsResponse = await axios.get('http://e-bursary-backend.onrender.com/api/activity-logs');
     setActivityLogs(logsResponse.data);
   };
 
@@ -123,116 +121,285 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Fixed Top Bar */}
-      <div className="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-20">
+    <div className="w-full min-h-screen relative">
+      {/* Top Bar */}
+      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">EBursary</h2>
-          <h1 className="text-lg font-semibold">Welcome, {adminDetails.name}</h1>
-          <div className="flex items-center space-x-4">
-            <FontAwesomeIcon icon={faBell} className="text-2xl text-gray-600" />
-            <img
-              src="/images/patient.png"
-              alt="Admin"
-              className="rounded-full w-10 h-10"
-            />
+          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
+          <div className="flex items-center space-x-6">
+            <h2 className="mr-2 md:mr-5 text-[1.1rem] md:text-[1.20rem] font-semibold">
+              Welcome, {adminDetails.name}
+            </h2>
+            <div className="flex items-center space-x-2">
+              <img
+                src="/images/patient.png"
+                alt="Admin"
+                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
+              />
+              <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Sidebar and Main Content */}
-      <div className="flex flex-row pt-20">
+      <div className="flex pt-20 min-h-screen">
         {/* Sidebar */}
-        <div className="w-64 bg-blue-900 text-white p-4 h-full">
-          <ul className="space-y-6 flex flex-col items-center md:items-start">
-            <li>
-              <Link to="/admindashboard" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faHouse} className="text-lg" />
-                <span>Dashboard</span>
-              </Link>
+        <div
+          className={`
+            fixed top-0 left-0 z-30 bg-[#1F2937] 
+            h-screen 
+            ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
+            mt-10
+            text-white p-4 
+            flex flex-col
+            transition-all duration-300
+            min-h-screen
+            md:min-h-screen
+          `}
+        >
+          <FontAwesomeIcon
+            icon={faBars}
+            className={`
+              text-white 
+              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
+              text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
+            `}
+            onClick={toggleSidebar}
+          />
+          <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
+            {/* Dashboard */}
+            <li className="list-none mt-[30px] text-center relative group">
+              <div className="flex items-center">
+                <Link to="/admindashboard" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[40px] h-[40px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Dashboard
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/usermanagement" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faUserGear} className="text-lg" />
-                <span>User Management</span>
-              </Link>
+            {/* User Management */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/usermanagement" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faUserGear} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>User Management</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  User Management
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/bursarymanagement" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faBank} className="text-lg" />
-                <span>Bursary Management</span>
-              </Link>
+            {/* Bursary Management */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/bursarymanagement" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faBank} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Bursary Management</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Bursary Management
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/monitoring" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faFileAlt} className="text-lg" />
-                <span>Application Monitoring</span>
-              </Link>
+            {/* Application Monitoring */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/monitoring" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Application Monitoring</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Application Monitoring
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/adminreport" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faChartBar} className="text-lg" />
-                <span>Analysis</span>
-              </Link>
+            {/* Analysis */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/adminreport" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faChartBar} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Analysis</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Analysis
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/auditlogs" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faFileLines} className="text-lg" />
-                <span>Audit Logs</span>
-              </Link>
+            {/* Audit Logs */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/auditlogs" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faFileLines} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Audit Logs</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Audit Logs
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/adminsetting" className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faGear} className="text-lg" />
-                <span>Settings</span>
-              </Link>
+            {/* Settings */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/adminsetting" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Settings</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Settings
+                </span>
+              </div>
             </li>
-            <li>
-              <Link to="/" className="flex items-center space-x-2 text-red-500">
-                <FontAwesomeIcon icon={faSignOutAlt} className="text-lg" />
-                <span>Logout</span>
-              </Link>
+            {/* Logout */}
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/" className={`
+                  flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
+                `}>
+                  Logout
+                </span>
+              </div>
             </li>
           </ul>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-4">
+        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
+          ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+        `}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Bursary Fund Details */}
-            <div className="bg-white p-6 shadow rounded-md">
+            <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.13)] rounded flex flex-col items-center">
               <h2 className="text-xl font-bold text-center">Bursary Fund Details</h2>
-              <div className="flex justify-around items-center mt-4">
-                <div className="text-center">
-                  <p>Total Funds Available:</p>
-                  <strong>{bursaryAmount}</strong>
+              <div className="flex flex-col md:flex-row justify-around items-center mt-4 w-full gap-4">
+                <div className="text-center bg-blue-100 p-3 rounded shadow w-full">
+                  <p className="font-medium">Total Funds Available:</p>
+                  <strong className="text-lg">{bursaryAmount}</strong>
                 </div>
-                <div className="text-center">
-                  <p>Amount Allocated to Students:</p>
-                  <strong>{allocatedAmount}</strong>
+                <div className="text-center bg-green-100 p-3 rounded shadow w-full">
+                  <p className="font-medium">Amount Allocated to Students:</p>
+                  <strong className="text-lg">{allocatedAmount}</strong>
                 </div>
-                <div className="text-center">
-                  <p>Remaining Funds:</p>
-                  <strong>{remainingAmount}</strong>
+                <div className="text-center bg-yellow-100 p-3 rounded shadow w-full">
+                  <p className="font-medium">Remaining Funds:</p>
+                  <strong className="text-lg">{remainingAmount}</strong>
                 </div>
               </div>
             </div>
-
             {/* Quick Statistics */}
-            <div className="bg-white p-6 shadow rounded-md">
+            <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.13)] rounded flex flex-col items-center">
               <h2 className="text-xl font-bold text-center">Quick Statistics</h2>
-              <div className="flex justify-between items-center mt-4">
-                <div className="text-center bg-green-500 text-white p-3 rounded shadow">
+              <div className="flex flex-col md:flex-row justify-between items-center mt-4 w-full gap-4">
+                <div className="text-center bg-green-500 text-white p-3 rounded shadow w-full">
                   <p>Total Applications:</p>
-                  <strong>{totalApplications}</strong>
+                  <strong className="text-lg">{totalApplications}</strong>
                 </div>
-                <div className="text-center bg-blue-500 text-white p-3 rounded shadow">
+                <div className="text-center bg-blue-500 text-white p-3 rounded shadow w-full">
                   <p>Approved Applications:</p>
-                  <strong>{approvedApplications}</strong>
+                  <strong className="text-lg">{approvedApplications}</strong>
                 </div>
-                <div className="text-center bg-red-500 text-white p-3 rounded shadow">
+                <div className="text-center bg-red-500 text-white p-3 rounded shadow w-full">
                   <p>Rejected Applications:</p>
-                  <strong>{rejectedApplications}</strong>
+                  <strong className="text-lg">{rejectedApplications}</strong>
                 </div>
               </div>
             </div>
@@ -240,46 +407,47 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
             {/* Existing Users */}
-            <div className="bg-white p-6 shadow rounded-md">
-              <h2 className="text-xl font-bold">Existing Users</h2>
-              <table className="table-auto w-full mt-4">
-                <thead>
-                  <tr>
-                    <th className="border px-4 py-2">ID</th>
-                    <th className="border px-4 py-2">Full Name</th>
-                    <th className="border px-4 py-2">Email</th>
-                    <th className="border px-4 py-2">Role</th>
-                    <th className="border px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td className="border px-4 py-2">{user.id}</td>
-                      <td className="border px-4 py-2">{user.name}</td>
-                      <td className="border px-4 py-2">{user.email}</td>
-                      <td className="border px-4 py-2">{user.role}</td>
-                      <td className="border px-4 py-2">
-                        <button
-                          className="bg-red-500 text-white px-2 py-1 rounded"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
+            <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.13)] rounded">
+              <h2 className="text-xl font-bold mb-3">Existing Users</h2>
+              <div className="overflow-x-auto">
+                <table className="table-auto w-full mt-4 text-sm md:text-base">
+                  <thead>
+                    <tr>
+                      <th className="border px-4 py-2">ID</th>
+                      <th className="border px-4 py-2">Full Name</th>
+                      <th className="border px-4 py-2">Email</th>
+                      <th className="border px-4 py-2">Role</th>
+                      <th className="border px-4 py-2">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id}>
+                        <td className="border px-4 py-2">{user.id}</td>
+                        <td className="border px-4 py-2">{user.name}</td>
+                        <td className="border px-4 py-2">{user.email}</td>
+                        <td className="border px-4 py-2">{user.role}</td>
+                        <td className="border px-4 py-2">
+                          <button
+                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-
             {/* Activity Logs */}
-            <div className="bg-white p-6 shadow rounded-md">
-              <h2 className="text-xl font-bold">Activity Logs</h2>
-              <ul className="mt-4 space-y-2">
+            <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.13)] rounded">
+              <h2 className="text-xl font-bold mb-3">Activity Logs</h2>
+              <ul className="mt-4 space-y-2 text-sm md:text-base">
                 {activityLogs.map((log, index) => (
                   <li key={index} className="border-b pb-2">
-                    {log.log_message} at {log.log_time}
+                    {log.log_message} <span className="text-gray-500">at {log.log_time}</span>
                   </li>
                 ))}
               </ul>
@@ -287,10 +455,12 @@ const AdminDashboard = () => {
           </div>
 
           {/* Approval Status Chart */}
-          <div className="bg-white p-6 shadow rounded-md mt-4">
+          <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.14)] rounded mt-4">
             <h2 className="text-xl font-bold text-center">Approval Status</h2>
-            <div className="mt-4">
-              <Pie data={chartData} options={chartOptions} />
+            <div className="mt-4 flex justify-center">
+              <div className="w-full md:w-2/3 lg:w-1/2">
+                <Pie data={chartData} options={chartOptions} />
+              </div>
             </div>
           </div>
         </div>
