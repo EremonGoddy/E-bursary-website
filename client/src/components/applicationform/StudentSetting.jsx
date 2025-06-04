@@ -317,6 +317,7 @@ Logout
 </li>
 </ul>
 </div>
+
 {/* Main Content Area */}
 <div className={`flex-1 ml-10 md:ml-30 p-4 transition-all duration-300`}>
 <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
