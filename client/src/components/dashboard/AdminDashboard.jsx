@@ -36,7 +36,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     axios
-      .get('http://e-bursary-backend.onrender.com/api/committee-count')
+      .get('https://e-bursary-backend.onrender.com/api/committee-count')
       .then((response) => {
         setBursaryAmount(response.data.amount);
         setAllocatedAmount(response.data.allocated);
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
       });
 
     axios
-      .get('http://e-bursary-backend.onrender.com/api/admin-details')
+      .get('https://e-bursary-backend.onrender.com/api/admin-details')
       .then((response) => {
         setAdminDetails({
           name: response.data.name,
@@ -57,7 +57,7 @@ const AdminDashboard = () => {
       .catch((error) => console.error('Error fetching admin details:', error));
 
     axios
-      .get('http://e-bursary-backend.onrender.com/api/quick-statistics')
+      .get('https://e-bursary-backend.onrender.com/api/quick-statistics')
       .then((response) => {
         const { total, approved, rejected } = response.data;
         setTotalApplications(total);
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await axios.get('http://e-bursary-backend.onrender.com/api/users');
+      const response = await axios.get('https://e-bursary-backend.onrender.com/api/users');
       setUsers(response.data);
     };
     fetchUsers();
@@ -79,17 +79,17 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchLogs = async () => {
-      const response = await axios.get('http://e-bursary-backend.onrender.com/api/activity-logs');
+      const response = await axios.get('https://e-bursary-backend.onrender.com/api/activity-logs');
       setActivityLogs(response.data);
     };
     fetchLogs();
   }, []);
 
   const handleDeleteUser = async (userId) => {
-    await axios.delete(`http://e-bursary-backend.onrender.com/api/users/${userId}`);
-    const usersResponse = await axios.get('http://e-bursary-backend.onrender.com/api/users');
+    await axios.delete(`https://e-bursary-backend.onrender.com/api/users/${userId}`);
+    const usersResponse = await axios.get('https://e-bursary-backend.onrender.com/api/users');
     setUsers(usersResponse.data);
-    const logsResponse = await axios.get('http://e-bursary-backend.onrender.com/api/activity-logs');
+    const logsResponse = await axios.get('https://e-bursary-backend.onrender.com/api/activity-logs');
     setActivityLogs(logsResponse.data);
   };
 
