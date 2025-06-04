@@ -440,6 +440,7 @@ app.put('/api/student/update', (req, res) => {
   });
 });
 
+// Committee Count Route
 app.get('/api/committee-count', async (req, res) => {
   const queryTotalFunds = 'SELECT amount FROM bursary_funds WHERE id = 1';
   const queryAllocatedFunds = 'SELECT SUM(bursary) AS total_allocated FROM personal_details';
@@ -467,6 +468,7 @@ app.get('/api/committee-count', async (req, res) => {
   }
 });
 
+// Quick Statistics Route
 app.get('/api/quick-statistics', async (req, res) => {
   const queryTotal = 'SELECT COUNT(*) AS total FROM personal_details';
   const queryApproved = "SELECT COUNT(*) AS approved FROM personal_details WHERE status = 'approved'";
@@ -487,6 +489,7 @@ app.get('/api/quick-statistics', async (req, res) => {
     res.status(500).json({ error: 'Error fetching statistics' });
   }
 });
+
 
 app.get("/api/personalInformation", async (req, res) => {
   try {
