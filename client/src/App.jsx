@@ -16,6 +16,7 @@ import StudentSetting from './components/applicationform/StudentSetting';
 import Documentupload from './components/applicationform/DocumentUpload';
 import StudentReport from './components/applicationform/StudentReport';
 import CommitteeReport from './components/committeeview/CommitteeReport';
+import PersonalInformation from './components/committeeview/PersonalInformation';
 
 
 function App() {
@@ -40,8 +41,9 @@ return (
 <Route path="/familydetails" element={<FamilyDetails/>} />
 <Route path="/studentsetting" element={<StudentSetting/>} />
 <Route path="/documentupload" element={<Documentupload/>} />
-<Route path="/studentreport" element={<StudentReport/>} />
+<Route path="/personalInformation/:id" element={<StudentReport/>} />
 <Route path="/committeereport" element={<CommitteeReport/>} />
+<Route path="/personalInfo" element={<PersonalInformation/>} />
 </Routes>
 </div>
 </Router>
