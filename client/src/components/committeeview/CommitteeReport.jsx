@@ -33,7 +33,7 @@ const CommitteeReport = () => {
       navigate('/signin');
     } else {
       axios
-        .get('http://localhost:5000/api/comreport', {
+        .get('http://e-bursary-backend.onrender.com/api/comreport', {
           headers: { Authorization: token },
         })
         .then((response) => {
@@ -43,7 +43,7 @@ const CommitteeReport = () => {
     }
 
     axios
-      .get('http://localhost:5000/api/committee-count')
+      .get('https://e-bursary-backend.onrender.com/api/committee-count')
       .then((response) => {
         setBursaryInfo({
           totalFunds: response.data.amount,
@@ -54,7 +54,7 @@ const CommitteeReport = () => {
       .catch((error) => console.error('Error fetching bursary info:', error));
 
     axios
-      .get('http://localhost:5000/api/quick-statistics')
+      .get('https://e-bursary-backend.onrender.com/api/quick-statistics')
       .then((response) => {
         setApplicationInfo({
           total: response.data.total,
@@ -162,7 +162,7 @@ const CommitteeReport = () => {
       navigate('/signin');
     } else {
       axios
-        .get('http://localhost:5000/api/profile-committee', {
+        .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -185,11 +185,11 @@ const CommitteeReport = () => {
               Welcome: {committeeDetails.fullname}
             </h2>
             <div className="flex items-center space-x-2">
-              <img
-                src={patient}
-                alt="Committee"
-                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
-              />
+             <img
+src="/images/patient.png"
+alt="User"
+className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
+/>
               <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
             </div>
           </div>
