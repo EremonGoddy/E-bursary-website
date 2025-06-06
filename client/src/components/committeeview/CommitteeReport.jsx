@@ -33,7 +33,7 @@ if (!token) {
 navigate('/signin');
 } else {
 axios
-.get('http://e-bursary-backend.onrender.com/api/comreport', {
+.get('https://e-bursary-backend.onrender.com/api/comreport', {
 headers: { Authorization: token },
 })
 .then((response) => {

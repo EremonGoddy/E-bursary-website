@@ -157,7 +157,7 @@ Dashboard
 {/* Profile */}
 <li className="relative group">
 <div className="flex items-center">
-<Link to="/profile" className={`
+<Link to="/committeeprofile" className={`
 flex items-center w-full space-x-2 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
@@ -229,7 +229,7 @@ Analysis
 {/* Settings */}
 <li className="relative group">
 <div className="flex items-center">
-<Link to="/settings" className={`
+<Link to="/committeesetting" className={`
 flex items-center w-full space-x-2 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}

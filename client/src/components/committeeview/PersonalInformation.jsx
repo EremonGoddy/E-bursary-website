@@ -3,27 +3,27 @@ import axios from 'axios';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faBars,
-  faHouse,
-  faUser,
-  faFileAlt,
-  faChartBar,
-  faCog,
-  faSignOutAlt,
-  faBell,
-  faUsers,
+faBars,
+faHouse,
+faUser,
+faFileAlt,
+faChartBar,
+faCog,
+faSignOutAlt,
+faBell,
+faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 
 const PersonalInformation = () => {
-  const { id } = useParams();
-  const [committeeDetails, setCommitteeDetails] = useState({});
-  const navigate = useNavigate();
-  const [personalData, setPersonalData] = useState([]);
-  const [amountData, setAmountData] = useState([]);
-  const [familyData, setFamilyData] = useState([]);
-  const [disclosureData, setDisclosureData] = useState([]);
-  const [documentData, setDocumentData] = useState([]);
-  const [sidebarActive, setSidebarActive] = useState(false);
+const { id } = useParams();
+const [committeeDetails, setCommitteeDetails] = useState({});
+const navigate = useNavigate();
+const [personalData, setPersonalData] = useState([]);
+const [amountData, setAmountData] = useState([]);
+const [familyData, setFamilyData] = useState([]);
+const [disclosureData, setDisclosureData] = useState([]);
+const [documentData, setDocumentData] = useState([]);
+const [sidebarActive, setSidebarActive] = useState(false);
 
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
