@@ -25,6 +25,7 @@ import BursaryFundManagement from './components/admincontrols/BursaryFundManagme
 import MonitoringApplication from './components/admincontrols/MonitoringApplication';
 import UserManagement from './components/admincontrols/UserManagement';
 import AdminSetting from './components/admincontrols/AdminSetting';
+import AuditLogs from './components/admincontrols/AuditLogs';
 
 
 function App() {
