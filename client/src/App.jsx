@@ -24,6 +24,7 @@ import AdminReport from './components/admincontrols/AdminReport';
 import BursaryFundManagement from './components/admincontrols/BursaryFundManagment';
 import MonitoringApplication from './components/admincontrols/MonitoringApplication';
 import UserManagement from './components/admincontrols/UserManagement';
+import AdminSetting from './components/admincontrols/AdminSetting';
 
 
 function App() {
