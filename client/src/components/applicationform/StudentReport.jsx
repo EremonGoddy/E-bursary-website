@@ -5,12 +5,12 @@ import autoTable from "jspdf-autotable";
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse,
-  faFileAlt,
-  faPaperclip,
-  faDownload,
-  faComments,
-  faCog,
+faHouse,
+faFileAlt,
+faPaperclip,
+faDownload,
+faComments,
+faCog,
   faSignOutAlt,
   faBars,
   faBell,

@@ -20,6 +20,10 @@ import PersonalInformation from './components/committeeview/PersonalInformation'
 import UserDetails from './components/committeeview/UserDetails';
 import CommitteeProfile from './components/committeeview/CommitteeProfile';
 import CommitteeSetting from './components/committeeview/CommitteeSetting';
+import AdminReport from './components/admincontrols/AdminReport';
+import BursaryFundManagement from './components/admincontrols/BursaryFundManagment';
+import MonitoringApplication from './components/admincontrols/MonitoringApplication';
+import UserManagement from './components/admincontrols/UserManagement';
 
 
 function App() {
@@ -44,12 +48,19 @@ return (
 <Route path="/familydetails" element={<FamilyDetails/>} />
 <Route path="/studentsetting" element={<StudentSetting/>} />
 <Route path="/documentupload" element={<Documentupload/>} />
-<Route path="/personalInformation/:id" element={<StudentReport/>} />
-<Route path="/committeereport" element={<CommitteeReport/>} />
-<Route path="/personalInfo" element={<PersonalInformation/>} />
+<Route path="/studentreport" element={<StudentReport/>} />
+<Route path="/committeereport" element={<CommitteeReport/>}/>
+<Route path="/personalInformation" element={<PersonalInformation/>}/>
+<Route path="/personalInformation/:id" element={<PersonalInformation/>} />
 <Route path="/userdetails" element={<UserDetails/>} />
 <Route path="/committeeprofile" element={<CommitteeProfile/>} />
 <Route path="/committeesetting" element={<CommitteeSetting/>} />
+<Route path="/adminreport" element={<AdminReport/>} />
+<Route path="/adminsetting" element={<AdminSetting/>} />
+<Route path="/auditlogs" element={<AuditLogs/>} />
+<Route path="/bursarymanagement" element={<BursaryFundManagement/>} />
+<Route path="/monitoring" element={<MonitoringApplication/>} />
+<Route path="/usermanagement" element={<UserManagement/>} />
 </Routes>
 </div>
 </Router>
