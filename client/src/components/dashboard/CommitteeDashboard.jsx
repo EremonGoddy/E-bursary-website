@@ -22,6 +22,7 @@ const [allocatedAmount, setAllocatedAmount] = useState(0);
 const [remainingAmount, setRemainingAmount] = useState(0);
 const [totalApplications, setTotalApplications] = useState(0);
 const [approvedApplications, setApprovedApplications] = useState(0);
+const [userName, setUserName] = useState('');
 const [rejectedApplications, setRejectedApplications] = useState(0);
 const [data, setData] = useState([]);
 const navigate = useNavigate();
@@ -29,6 +30,12 @@ const navigate = useNavigate();
 const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
 useEffect(() => {
+const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
+if (!token) {
+navigate('/signin');
+} else {
+setUserName(name);
 axios
 .get('https://e-bursary-backend.onrender.com/api/committee-count')
 .then((response) => {
@@ -51,7 +58,8 @@ setRejectedApplications(rejected);
 .catch((error) => {
 console.error('Error fetching application statistics:', error);
 });
-}, []);
+}
+}, [navigate]);
 
 const loadData = async () => {
 try {
@@ -92,7 +100,7 @@ return (
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
 <div className="flex items-center space-x-6">
 <h2 className="mr-2 md:mr-5 text-[1.1rem] md:text-[1.20rem] font-semibold">
-Welcome, {committeeDetails.fullname}
+Welcome: {userName}
 </h2>
 <div className="flex items-center space-x-2">
 <img
@@ -254,7 +262,7 @@ Settings
 <li className="relative group">
 <div className="flex items-center">
 <Link to="/" className={`
-flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
+flex items-center w-full space-x-2 mt-25 md:mt-50 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 `}>
@@ -262,7 +270,7 @@ ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
 </Link>
 <span className={`
-absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
+absolute left-[60px] top-1/2 mt-[0px] md:mt-[98px] -translate-y-1/2
 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
 text-center shadow-lg transition-all duration-300 ease-in-out
 opacity-0 group-hover:opacity-100
@@ -284,35 +292,35 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Bursary Fund Details & Statistics */}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div className="bg-white p-6 shadow rounded-md">
-<h2 className="text-center text-xl font-bold mb-4">Bursary Fund Details</h2>
+<div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<h2 className="text-center text-2xl font-bold mb-4">Bursary Fund Details</h2>
 <div className="flex justify-around">
-<div className="text-center">
+<div className="text-center text[1rem] font-bold">
 <p>Total Funds Available:</p>
 <strong>{bursaryAmount}</strong>
 </div>
-<div className="text-center">
+<div className="text-center text[1rem] font-bold">
 <p>Amount Allocated to Students:</p>
 <strong>{allocatedAmount}</strong>
 </div>
-<div className="text-center">
+<div className="text-center text[1rem] font-bold">
 <p>Remaining Funds:</p>
 <strong>{remainingAmount}</strong>
 </div>
 </div>
 </div>
-<div className="bg-white p-6 shadow rounded-md">
-<h2 className="text-center text-xl font-bold mb-4">Quick Statistics</h2>
+<div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<h2 className="text-center text-2xl font-bold mb-4">Quick Statistics</h2>
 <div className="flex justify-between items-center">
-<div className="text-center bg-green-500 text-white p-4 rounded shadow">
+<div className="text-center bg-green-500 text[1rem] font-bold text-white p-4 rounded shadow">
 <p>Total Applications:</p>
 <strong>{totalApplications}</strong>
 </div>
-<div className="text-center bg-blue-500 text-white p-4 rounded shadow">
+<div className="text-center bg-blue-500 text-white text[1rem] font-bold p-4 rounded shadow">
 <p>Approved Applications:</p>
 <strong>{approvedApplications}</strong>
 </div>
-<div className="text-center bg-red-500 text-white p-4 rounded shadow">
+<div className="text-center bg-red-500 text[1rem] font-bold text-white p-4 rounded shadow">
 <p>Rejected Applications:</p>
 <strong>{rejectedApplications}</strong>
 </div>
@@ -320,7 +328,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 </div>
 {/* Personal Information Table */}
-<div className="mt-6 bg-white p-6 shadow rounded-md">
+<div className="mt-6 bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
 <h2 className="text-center text-2xl font-bold mb-4">Personal Information</h2>
 <div className="overflow-x-auto">
 <table className="table-auto w-full border-collapse border border-gray-300">

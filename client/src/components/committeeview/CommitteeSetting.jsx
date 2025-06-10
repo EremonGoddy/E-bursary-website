@@ -26,6 +26,7 @@ const [currentPassword, setCurrentPassword] = useState('');
 const [newPassword, setNewPassword] = useState('');
 const [confirmPassword, setConfirmPassword] = useState('');
 const [message, setMessage] = useState('');
+const [userName, setUserName] = useState('');
 const [isError, setIsError] = useState(false);
 
 // State to manage visibility of password fields
@@ -85,9 +86,11 @@ setIsError(true);
 // Fetch profile data when component loads
 useEffect(() => {
 const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
 if (!token) {
 navigate('/signin');
 } else {
+setUserName(name);
 axios
 .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
 headers: { Authorization: `Bearer ${token}` },
@@ -102,14 +105,14 @@ console.error('Error fetching profile data:', error);
 }, [navigate]);
 
 return (
-<div className="w-full min-h-screen relative bg-gray-100">
+<div className="w-full min-h-screen relative bg-white-100">
 {/* Top Bar */}
 <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
 <div className="flex justify-between items-center">
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
 <div className="flex items-center space-x-6">
 <h2 className="mr-2 md:mr-5 text-[1.1rem] md:text-[1.20rem] font-semibold">
-Welcome, {committeeDetails.fullname}
+Welcome:{userName}
 </h2>
 <div className="flex items-center space-x-2">
 <img
@@ -271,7 +274,7 @@ Settings
 <li className="relative group">
 <div className="flex items-center">
 <Link to="/" className={`
-flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
+flex items-center w-full space-x-2 mt-25 md:mt-50 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 `}>
@@ -279,7 +282,7 @@ ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
 </Link>
 <span className={`
-absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
+absolute left-[60px] top-1/2 mt-[0px] md:mt-[98px] -translate-y-1/2
 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
 text-center shadow-lg transition-all duration-300 ease-in-out
 opacity-0 group-hover:opacity-100
@@ -298,7 +301,7 @@ Logout
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
-<div className="max-w-lg mx-auto bg-white p-8 shadow rounded-md mt-10">
+<div className="max-w-lg mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-10">
 <h2 className="text-center text-2xl font-bold mb-6">Change Password</h2>
 <form onSubmit={handleChangePassword}>
 <div className="mb-5">
@@ -311,6 +314,7 @@ type={showCurrentPassword ? 'text' : 'password'}
 id="currentPassword"
 className="form-input w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
 value={currentPassword}
+placeholder="Enter Current password"
 onChange={(e) => setCurrentPassword(e.target.value)}
 required
 />
@@ -332,6 +336,7 @@ type={showNewPassword ? 'text' : 'password'}
 id="newPassword"
 className="form-input w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
 value={newPassword}
+placeholder="Enter New password"
 onChange={(e) => setNewPassword(e.target.value)}
 required
 />
@@ -353,6 +358,7 @@ type={showConfirmPassword ? 'text' : 'password'}
 id="confirmPassword"
 className="form-input w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
 value={confirmPassword}
+placeholder="Enter Confirm password"
 onChange={(e) => setConfirmPassword(e.target.value)}
 required
 />

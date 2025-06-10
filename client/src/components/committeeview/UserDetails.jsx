@@ -18,6 +18,7 @@ faUsers
 const UserDetails = () => {
 const [data, setData] = useState([]);
 const [sidebarActive, setSidebarActive] = useState(false);
+const [userName, setUserName] = useState('');
 const [committeeDetails, setCommitteeDetails] = useState({});
 const navigate = useNavigate();
 
@@ -41,9 +42,11 @@ loadData();
 // Fetch profile data when component loads
 useEffect(() => {
 const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
 if (!token) {
 navigate('/signin');
 } else {
+setUserName(name);
 axios
 .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
 headers: { Authorization: `Bearer ${token}` },
@@ -58,7 +61,7 @@ console.error('Error fetching profile data:', error);
 }, [navigate]);
 
 return (
-<div className="w-full min-h-screen relative bg-gray-100">
+<div className="w-full min-h-screen relative bg-white-100">
 
 {/* Top Bar */}
 <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
@@ -66,7 +69,7 @@ return (
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
 <div className="flex items-center space-x-6">
 <h2 className="mr-2 md:mr-5 text-[1.1rem] md:text-[1.20rem] font-semibold">
-Welcome, {committeeDetails.fullname}
+Welcome:{userName}
 </h2>
 <div className="flex items-center space-x-2">
 <img
@@ -228,7 +231,7 @@ Settings
 <li className="relative group">
 <div className="flex items-center">
 <Link to="/" className={`
-flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
+flex items-center w-full space-x-2 mt-25 md:mt-50 text-white no-underline
 transition-all duration-200
 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 `}>
@@ -236,7 +239,7 @@ ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
 <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
 </Link>
 <span className={`
-absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
+absolute left-[60px] top-1/2 mt-[0px] md:mt-[98px] -translate-y-1/2
 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
 text-center shadow-lg transition-all duration-300 ease-in-out
 opacity-0 group-hover:opacity-100
@@ -255,7 +258,7 @@ Logout
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
-<div className="max-w-5xl mx-auto bg-white p-6 shadow rounded-md mt-10">
+<div className="max-w-5xl mx-auto bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]  rounded-md mt-10">
 <h1 className="text-2xl font-bold mb-6 text-center">Personal Information</h1>
 <div className="overflow-x-auto">
 <table className="table-auto w-full border-collapse border border-gray-300 mb-8">
