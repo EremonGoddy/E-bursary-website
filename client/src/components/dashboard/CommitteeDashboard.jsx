@@ -22,8 +22,10 @@ const [allocatedAmount, setAllocatedAmount] = useState(0);
 const [remainingAmount, setRemainingAmount] = useState(0);
 const [totalApplications, setTotalApplications] = useState(0);
 const [approvedApplications, setApprovedApplications] = useState(0);
-const [userName, setUserName] = useState('');
 const [rejectedApplications, setRejectedApplications] = useState(0);
+ const [pendingApplications, setPendingApplications] = useState(0);
+ const [incompleteApplications, setIncompleteApplications] = useState(0);
+const [userName, setUserName] = useState('');
 const [data, setData] = useState([]);
 const navigate = useNavigate();
 
@@ -50,10 +52,12 @@ console.error('Error fetching bursary data:', error);
 axios
 .get('https://e-bursary-backend.onrender.com/api/quick-statistics')
 .then((response) => {
-const { total, approved, rejected } = response.data;
+const { total, approved, rejected, pending, incomplete } = response.data;
 setTotalApplications(total);
 setApprovedApplications(approved);
 setRejectedApplications(rejected);
+setPendingApplications(pending || 0);
+setIncompleteApplications(incomplete || 0);
 })
 .catch((error) => {
 console.error('Error fetching application statistics:', error);
@@ -311,17 +315,25 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
 <h2 className="text-center text-2xl font-bold mb-4">Quick Statistics</h2>
-<div className="flex justify-between items-center">
-<div className="text-center bg-green-500 text[1rem] font-bold text-white p-4 rounded shadow">
-<p>Total Applications:</p>
+<div className="flex flex-wrap justify-between items-center gap-2">
+<div className="text-center bg-blue-500 text-[1rem] font-bold text-white p-2 rounded shadow max-w-[140px]">
+<p>Pending Application</p>
+<strong>{pendingApplications}</strong>
+</div>
+<div className="text-center bg-yellow-500 text-[1rem] font-bold text-white p-2 rounded shadow max-w-[140px]">
+<p>Incomplete Application</p>
+<strong>{incompleteApplications}</strong>
+</div>
+<div className="text-center bg-gray-700 text-white text-[1rem] font-bold p-2 rounded shadow max-w-[140px]">
+<p>Total Application</p>
 <strong>{totalApplications}</strong>
 </div>
-<div className="text-center bg-blue-500 text-white text[1rem] font-bold p-4 rounded shadow">
-<p>Approved Applications:</p>
+<div className="text-center bg-green-500 text-white text-[1rem] font-bold p-2 rounded shadow max-w-[140px]">
+<p>Approved Application</p>
 <strong>{approvedApplications}</strong>
 </div>
-<div className="text-center bg-red-500 text[1rem] font-bold text-white p-4 rounded shadow">
-<p>Rejected Applications:</p>
+<div className="text-center bg-red-500 text-[1rem] font-bold text-white p-2 rounded shadow max-w-[140px]">
+<p>Rejected Application</p>
 <strong>{rejectedApplications}</strong>
 </div>
 </div>
