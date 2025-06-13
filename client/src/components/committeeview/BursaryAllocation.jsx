@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import patient from '../../assets/patient.png';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -85,11 +84,11 @@ const Bursaryallocation = () => {
               Welcome: {committeeDetails.fullname}
             </h2>
             <div className="flex items-center space-x-2">
-              <img
-                src={patient}
-                alt="User"
-                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
-              />
+             <img
+src="/images/patient.png"
+alt="Committee"
+className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
+/>
               <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
             </div>
           </div>
