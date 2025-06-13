@@ -14,11 +14,12 @@ import {
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 
-const Bursaryallocation = () => {
+const BursaryAllocation = () => {
   const { id } = useParams(); // Get the user ID from the URL
   const [data, setData] = useState([]);
   const [committeeDetails, setCommitteeDetails] = useState({});
   const [selectedAmount, setSelectedAmount] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [sidebarActive, setSidebarActive] = useState(false);
 
@@ -29,8 +30,8 @@ const Bursaryallocation = () => {
   const loadData = useCallback(async () => {
     try {
       const url = id 
-        ? `http://localhost:5000/api/get-bursary/${id}`
-        : `http://localhost:5000/api/get-bursary`;
+        ? `https://e-bursary-backend.onrender.com/api/get-bursary/${id}`
+        : `https://e-bursary-backend.onrender.com/api/get-bursary`;
       const response = await axios.get(url);
       setData(response.data);
     } catch (error) {
@@ -42,16 +43,26 @@ const Bursaryallocation = () => {
     loadData();
   }, [loadData]);
 
-  // Function to handle allocation when a radio button is clicked
-  const handleAmountChange = async (userId, amount) => {
-    setSelectedAmount({ ...selectedAmount, [userId]: amount }); // Track selected amount for each user
+  // Track submitted status per user to disable button after submit
+  const [submitted, setSubmitted] = useState({});
+
+  // Function to handle allocation when "Allocate" button is clicked
+  const handleAllocate = async (userId) => {
+    const amount = selectedAmount[userId];
+    if (!amount) {
+      alert("Please select an amount before allocating.");
+      return;
+    }
+    setLoading(true);
     try {
-      await axios.put(`http://localhost:5000/api/update-bursary/${userId}`, { bursary: amount });
+      await axios.put(`https://e-bursary-backend.onrender.com/api/update-bursary/${userId}`, { bursary: amount });
       alert(`Allocated Ksh ${amount} to the application and updated allocation date.`);
+      setSubmitted((prev) => ({ ...prev, [userId]: true }));
       loadData(); // Refresh data after allocation
     } catch (error) {
       console.error('Error updating bursary:', error);
     }
+    setLoading(false);
   };
 
   // Fetch profile data when component loads
@@ -61,7 +72,7 @@ const Bursaryallocation = () => {
       navigate('/signin');
     } else {
       axios
-      .get('http://localhost:5000/api/profile-committee', {
+      .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -289,13 +300,24 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
                           name={`amount-${item.user_id}`}
                           value={amount}
                           checked={selectedAmount[item.user_id] === amount}
-                          onChange={() => handleAmountChange(item.user_id, amount)}
+                          onChange={() => setSelectedAmount((prev) => ({ ...prev, [item.user_id]: amount }))}
                           className="accent-blue-600"
                         />
                         <span className="text-sm">{amount.toLocaleString()} Ksh</span>
                       </label>
                     ))}
                   </div>
+                  <button
+                    onClick={() => handleAllocate(item.user_id)}
+                    disabled={loading || submitted[item.user_id]}
+                    className={`mt-4 px-4 py-2 rounded font-bold text-white 
+                      ${submitted[item.user_id]
+                        ? 'bg-green-600 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700'}
+                    `}
+                  >
+                    {submitted[item.user_id] ? 'Allocated' : 'Allocate'}
+                  </button>
                 </div>
               ))}
             </div>
@@ -306,4 +328,4 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
   );
 };
 
-export default Bursaryallocation;
+export default BursaryAllocation;
