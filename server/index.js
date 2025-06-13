@@ -473,17 +473,24 @@ app.get('/api/quick-statistics', async (req, res) => {
   const queryTotal = 'SELECT COUNT(*) AS total FROM personal_details';
   const queryApproved = "SELECT COUNT(*) AS approved FROM personal_details WHERE status = 'approved'";
   const queryRejected = "SELECT COUNT(*) AS rejected FROM personal_details WHERE status = 'rejected'";
+  const queryPending = "SELECT COUNT(*) AS pending FROM personal_details WHERE status = 'pending'";
+  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM personal_details WHERE status = 'incomplete'";
 
   try {
     const totalResult = await db.query(queryTotal);
     const approvedResult = await db.query(queryApproved);
     const rejectedResult = await db.query(queryRejected);
+    const pendingResult = await db.query(queryPending);
+    const incompleteResult = await db.query(queryIncomplete);
 
     const totalApplications = totalResult.rows[0].total;
     const approvedApplications = approvedResult.rows[0].approved;
     const rejectedApplications = rejectedResult.rows[0].rejected;
+    const pendingApplications = pendingResult.rows[0].pending;
+    const incompleteApplications = incompleteResult.rows[0].incomplete;
 
-    res.status(200).json({ total: totalApplications, approved: approvedApplications, rejected: rejectedApplications });
+    res.status(200).json({ total: totalApplications, approved: approvedApplications, 
+      rejected: rejectedApplications, pending: pendingApplications, incomplete: incompleteApplications });
   } catch (err) {
     console.error('Error fetching statistics:', err);
     res.status(500).json({ error: 'Error fetching statistics' });

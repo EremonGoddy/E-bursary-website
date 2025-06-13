@@ -416,7 +416,7 @@ View Document
 ))}
 </div>
 {/* Approval and Rejection Buttons */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 <button
 className="bg-green-500 hover:bg-green-700 text-white px-4 py-3 rounded font-bold"
 onClick={() => updateStatus(id, 'Approved')}
@@ -428,6 +428,12 @@ className="bg-red-500 hover:bg-red-700 text-white px-4 py-3 rounded font-bold"
 onClick={() => updateStatus(id, 'Rejected')}
 >
 Reject Application
+</button>
+<button
+className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-3 rounded font-bold"
+onClick={() => updateStatus(id, 'Incomplete')}
+>
+Incomplete Application
 </button>
 </div>
 </div>

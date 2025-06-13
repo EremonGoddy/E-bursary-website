@@ -26,6 +26,7 @@ import MonitoringApplication from './components/admincontrols/MonitoringApplicat
 import UserManagement from './components/admincontrols/UserManagement';
 import AdminSetting from './components/admincontrols/AdminSetting';
 import AuditLogs from './components/admincontrols/AuditLogs';
+import Bursaryallocation from './components/committeeview/BursaryAllocation';
 
 
 function App() {
@@ -63,6 +64,7 @@ return (
 <Route path="/bursarymanagement" element={<BursaryFundManagement/>} />
 <Route path="/monitoring" element={<MonitoringApplication/>} />
 <Route path="/usermanagement" element={<UserManagement/>} />
+<Route path="/bursaryallocation" element={<Bursaryallocation/>} />
 </Routes>
 </div>
 </Router>

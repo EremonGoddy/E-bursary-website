@@ -357,14 +357,17 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 <tbody>
 {data.map((item) => (
 <tr key={item.id} className="hover:bg-gray-100">
-<td className="border border-gray-300 px-4 py-2">{item.fullname}</td>
-<td className="border border-gray-300 px-4 py-2">{item.email}</td>
-<td className="border border-gray-300 px-4 py-2">{item.institution}</td>
-<td className="border border-gray-300 px-4 py-2">{item.admission}</td>
-<td className="border border-gray-300 px-4 py-2">{item.subcounty}</td>
-<td className="border border-gray-300 px-4 py-2 text-center">
-<Link to={`/PersonalInformation/${item.user_id}`}>
-<button className="bg-blue-500 text-white px-4 py-2 rounded">User Details</button>
+<td className="border border-gray-300 px-4 py-1">{item.fullname}</td>
+<td className="border border-gray-300 px-4 py-1">{item.email}</td>
+<td className="border border-gray-300 px-4 py-1">{item.institution}</td>
+<td className="border border-gray-300 px-4 py-1">{item.admission}</td>
+<td className="border border-gray-300 px-4 py-1">{item.subcounty}</td>
+<td className="border border-gray-300 px-4 py-1 text-center">
+<Link
+to={`/PersonalInformation/${item.user_id}`}
+className="text-blue-500 no-underline hover:text-blue-700 text-[1rem] font-bold"
+>
+User Details
 </Link>
 </td>
 </tr>
