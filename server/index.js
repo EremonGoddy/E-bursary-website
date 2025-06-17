@@ -1,6 +1,6 @@
 // Load environment variables
 require('dotenv').config();
-
+const pool = require("./db-config");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -12,8 +12,7 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 
-// ✅ Use the external PostgreSQL config
-const db = require("./db-config");
+
 
 // ✅ Middleware
 app.use(cors());
@@ -26,65 +25,65 @@ const secret = process.env.JWT_SECRET || "your_jwt_secret";
 
 // ✅ Authenticate JWT Token Middleware
 const authenticateToken = (req, res, next) => {
-const authHeader = req.headers["authorization"];
-const token = authHeader && authHeader.split(" ")[1];
-if (!token) return res.status(401).json({ message: "Token required" });
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Token required" });
 
-jwt.verify(token, secret, (err, user) => {
-if (err) return res.status(403).json({ message: "Invalid token" });
-req.user = user;
-next();
-});
+  jwt.verify(token, secret, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid token" });
+    req.user = user;
+    next();
+  });
 };
 
 // ✅ Example route to test DB and server
 app.get("/", (req, res) => {
-res.send("🚀 Backend is running and connected to PostgreSQL.");
+  res.send("🚀 Backend is running and connected to PostgreSQL.");
 });
 
 // ✅ Verify current password API
 app.get("/api/verify-password", authenticateToken, async (req, res) => {
-const { userId } = req.user;
-const { password } = req.query;
+  const { userId } = req.user;
+  const { password } = req.query;
 
-try {
-const result = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+  try {
+    const result = await pool.query("SELECT password FROM users WHERE id = $1", [userId]);
 
-if (result.rows.length === 0) {
-return res.status(404).json({ message: "User not found" });
-}
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-const hashedPassword = result.rows[0].password;
-const isMatch = await bcrypt.compare(password, hashedPassword);
+    const hashedPassword = result.rows[0].password;
+    const isMatch = await bcrypt.compare(password, hashedPassword);
 
-if (!isMatch) {
-return res.status(401).json({ message: "Invalid password" });
-}
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
 
-res.status(200).json({ message: "Password verified" });
-} catch (error) {
-console.error("Error verifying password:", error);
-res.status(500).json({ message: "Server error" });
-}
+    res.status(200).json({ message: "Password verified" });
+  } catch (error) {
+    console.error("Error verifying password:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ... rest of your code above
 
 // ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
-try {
-const { email, password } = req.body;
-const userQuery = "SELECT * FROM users WHERE email = $1";
-const userResult = await db.query(userQuery, [email]);
+  try {
+    const { email, password } = req.body;
+    const userQuery = "SELECT * FROM users WHERE email = $1";
+    const userResult = await pool.query(userQuery, [email]);
 
-if (userResult.rows.length === 0) {
-return res.status(404).json({ message: "User not found" });
-}
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-const user = userResult.rows[0];
-console.log('User from DB:', user);
-console.log('Password from request:', password);
-console.log('Password hash from DB:', user.password);
+    const user = userResult.rows[0];
+    console.log('User from DB:', user);
+    console.log('Password from request:', password);
+    console.log('Password hash from DB:', user.password);
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -92,8 +91,8 @@ console.log('Password hash from DB:', user.password);
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const studentResult = await db.query("SELECT * FROM personal_details WHERE email = $1", [email]);
-    const committeeResult = await db.query("SELECT * FROM profile_committee WHERE email = $1", [email]);
+    const studentResult = await pool.query("SELECT * FROM personal_details WHERE email = $1", [email]);
+    const committeeResult = await pool.query("SELECT * FROM profile_committee WHERE email = $1", [email]);
 
     const token = jwt.sign({ userId: user.id, email: user.email }, secret, { expiresIn: "1h" });
 
@@ -134,7 +133,7 @@ app.post("/api/post", async (req, res) => {
 
   try {
     // Check if user already exists
-    const existingUser = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+    const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -143,7 +142,7 @@ app.post("/api/post", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert the new user
-    const result = await db.query(
+    const result = await pool.query(
       "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *",
       [name, email, hashedPassword, role]
     );
@@ -162,7 +161,7 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
   try {
-    const result = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+    const result = await pool.query("SELECT password FROM users WHERE id = $1", [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -176,7 +175,7 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    await db.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
+    await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
@@ -198,7 +197,7 @@ app.post('/api/personal-details', async (req, res) => {
   `;
 
   try {
-    const result = await db.query(sql, [fullname, email, subcounty, ward, village, birth, gender, institution, year, admission]);
+    const result = await pool.query(sql, [fullname, email, subcounty, ward, village, birth, gender, institution, year, admission]);
     res.json({ message: 'Data inserted successfully', userId: result.rows[0].user_id });
   } catch (err) {
     console.error('Error inserting data:', err);
@@ -217,7 +216,7 @@ app.post('/api/amount-details', async (req, res) => {
   `;
 
   try {
-    await db.query(sql, [userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch]);
+    await pool.query(sql, [userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch]);
     res.send('Data inserted successfully');
   } catch (err) {
     console.error('Error inserting data:', err);
@@ -236,7 +235,7 @@ app.post('/api/family-details', async (req, res) => {
   `;
 
   try {
-    await db.query(sql, [userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income]);
+    await pool.query(sql, [userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income]);
     res.send('Data inserted successfully');
   } catch (err) {
     console.error('Error inserting data:', err);
@@ -255,7 +254,7 @@ app.post('/api/disclosure-details', async (req, res) => {
   `;
 
   try {
-    await db.query(sql, [userId, bursary, bursarysource, bursaryamount, helb, granted, noreason]);
+    await pool.query(sql, [userId, bursary, bursarysource, bursaryamount, helb, granted, noreason]);
     res.send('Data inserted successfully');
   } catch (err) {
     console.error('Error inserting data:', err);
@@ -268,7 +267,7 @@ app.get('/api/admin-details', async (req, res) => {
   const sql = 'SELECT name, email FROM users WHERE role = $1';
 
   try {
-    const result = await db.query(sql, [role]);
+    const result = await pool.query(sql, [role]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Admin not found' });
@@ -335,7 +334,7 @@ app.get('/api/student', (req, res) => {
     `;
 
     try {
-      const result = await db.query(sqlGet, [decoded.email]);
+      const result = await pool.query(sqlGet, [decoded.email]);
 
       if (result.rows.length === 0) {
         return res.status(404).send('Student not found');
@@ -376,7 +375,7 @@ app.get('/api/reports', (req, res) => {
     `;
 
     try {
-      const result = await db.query(sqlGet, [decoded.email]);
+      const result = await pool.query(sqlGet, [decoded.email]);
       if (result.rows.length === 0) {
         return res.status(404).send('Student not found');
       }
@@ -418,7 +417,7 @@ app.put('/api/student/update', (req, res) => {
     `;
 
     try {
-      await db.query(sqlUpdate, [
+      await pool.query(sqlUpdate, [
         fullname,
         email,
         subcounty,
@@ -440,208 +439,167 @@ app.put('/api/student/update', (req, res) => {
   });
 });
 
-// Committee Count Route
-app.get('/api/committee-count', async (req, res) => {
-  const queryTotalFunds = 'SELECT amount FROM bursary_funds WHERE id = 1';
-  const queryAllocatedFunds = 'SELECT SUM(bursary) AS total_allocated FROM personal_details';
+app.post('/api/forgot-password', async (req, res) => {
+  const { identifier } = req.body;
+
+  if (!identifier) {
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
-    const totalResult = await db.query(queryTotalFunds);
-    if (totalResult.rows.length === 0) {
-      return res.status(404).json({ error: 'No bursary fund found' });
-    }
-
-    const totalAmount = totalResult.rows[0].amount;
-
-    const allocatedResult = await db.query(queryAllocatedFunds);
-    const allocatedAmount = allocatedResult.rows[0].total_allocated || 0;
-    const remainingAmount = totalAmount - allocatedAmount;
-
-    res.status(200).json({
-      amount: totalAmount,
-      allocated: allocatedAmount,
-      remaining: remainingAmount
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
-  } catch (err) {
-    console.error('Error in fund calculations:', err);
-    res.status(500).json({ error: 'Server error calculating funds' });
-  }
-});
 
-// Quick Statistics Route
-app.get('/api/quick-statistics', async (req, res) => {
-  const queryTotal = 'SELECT COUNT(*) AS total FROM personal_details';
-  const queryApproved = "SELECT COUNT(*) AS approved FROM personal_details WHERE status = 'approved'";
-  const queryRejected = "SELECT COUNT(*) AS rejected FROM personal_details WHERE status = 'rejected'";
-  const queryPending = "SELECT COUNT(*) AS pending FROM personal_details WHERE status = 'pending'";
-  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM personal_details WHERE status = 'incomplete'";
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: identifier,
+      subject: 'Password Reset Code',
+      text: `Your password reset code is: ${resetCode}`,
+    };
 
-  try {
-    const totalResult = await db.query(queryTotal);
-    const approvedResult = await db.query(queryApproved);
-    const rejectedResult = await db.query(queryRejected);
-    const pendingResult = await db.query(queryPending);
-    const incompleteResult = await db.query(queryIncomplete);
+    await transporter.sendMail(mailOptions);
 
-    const totalApplications = totalResult.rows[0].total;
-    const approvedApplications = approvedResult.rows[0].approved;
-    const rejectedApplications = rejectedResult.rows[0].rejected;
-    const pendingApplications = pendingResult.rows[0].pending;
-    const incompleteApplications = incompleteResult.rows[0].incomplete;
+    console.log(`Reset code sent to ${identifier}: ${resetCode}`);
 
-    res.status(200).json({ total: totalApplications, approved: approvedApplications, 
-      rejected: rejectedApplications, pending: pendingApplications, incomplete: incompleteApplications });
-  } catch (err) {
-    console.error('Error fetching statistics:', err);
-    res.status(500).json({ error: 'Error fetching statistics' });
-  }
-});
+    // TODO: Save resetCode in DB with expiry timestamp for verification later
+    // Example (uncomment and adjust to fit your table/column names):
+    // await pool.query(
+    //   'UPDATE users SET reset_code = $1, reset_code_expiry = NOW() + INTERVAL \'15 minutes\' WHERE email = $2',
+    //   [resetCode, identifier]
+    // );
 
-
-app.get("/api/personalInformation", async (req, res) => {
-  try {
-    const result = await db.query("SELECT * FROM personal_details");
-    res.send(result.rows);
+    res.status(200).json({ message: 'Reset code sent successfully.' });
   } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).send("Error fetching data");
+    console.error('Error sending email:', error);
+    res.status(500).json({ error: 'Failed to send reset code. Please try again later.' });
   }
 });
 
-app.get("/api/personalInformation/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
+app.get('/api/student', (req, res) => {
+  const token = req.headers['authorization'];
+  if (!token) return res.status(403).send('Token is required');
 
-  const sqlGet = "SELECT * FROM personal_details WHERE user_id = $1";
+  jwt.verify(token, secret, async (err, decoded) => {
+    if (err) return res.status(401).send('Unauthorized access');
 
-  try {
-    const result = await db.query(sqlGet, [userId]);
-    res.send(result.rows);
-  } catch (error) {
-    console.error("Error fetching personal details:", error);
-    res.status(500).send("Error fetching data");
-  }
-});
+    const sqlGet = `
+      SELECT fullname, email, subcounty, ward, village, 
+      TO_CHAR(birth, 'YYYY-MM-DD') AS birth, 
+      gender, institution, year, admission, status, bursary
+      FROM personal_details 
+      WHERE email = $1
+    `;
 
-app.get("/api/amountInformation/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
+    try {
+      const result = await pool.query(sqlGet, [decoded.email]);
 
-  const sqlGet = `
-    SELECT 
-      ad.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      amount_details ad
-    JOIN 
-      personal_details pd 
-    ON 
-      ad.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
+      if (result.rows.length === 0) {
+        return res.status(404).send('Student not found');
+      }
 
-  try {
-    const result = await db.query(sqlGet, [userId]);
-    res.send(result.rows);
-  } catch (error) {
-    console.error("Error fetching amount and personal details:", error);
-    res.status(500).send("Error fetching data");
-  }
-});
-
-app.get("/api/familyInformation/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log("User ID:", userId);
-
-  const sqlGet = `
-    SELECT 
-      fd.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      family_details fd
-    JOIN 
-      personal_details pd 
-    ON 
-      fd.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  try {
-    const result = await db.query(sqlGet, [userId]);
-    res.send(result.rows);
-  } catch (error) {
-    console.error("Error fetching family and personal details:", error);
-    res.status(500).send("Error fetching data");
-  }
-});
-
-app.get("/api/disclosureInformation/:id", (req, res) => {
-  const userId = req.params.id;
-  console.log("User ID:", userId);
-
-  const sqlGet = `
-    SELECT 
-      dd.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      disclosure_details dd
-    JOIN 
-      personal_details pd 
-    ON 
-      dd.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  db.query(sqlGet, [userId], (error, result) => {
-    if (error) {
-      console.error("Error fetching disclosure details:", error);
-      res.status(500).send("Error fetching data");
-    } else {
-      res.send(result.rows);
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      res.status(500).send('Error fetching data');
     }
   });
 });
 
-// Use /tmp/uploads for cloud environments like Render
-const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+app.get('/api/reports', (req, res) => {
+  const token = req.headers['authorization'];
+  if (!token) return res.status(403).send('Token is required');
 
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
+  jwt.verify(token, secret, async (err, decoded) => {
+    if (err) return res.status(401).send('Unauthorized access');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
+    const sqlGet = `
+      SELECT 
+        'REFXE' || LPAD(user_id::text, 2, '0') AS reference_number,
+        fullname,
+        email,
+        subcounty,
+        ward,
+        village,
+        TO_CHAR(birth, 'YYYY-MM-DD') AS birth,
+        gender,
+        institution,
+        year,
+        admission,
+        status,
+        bursary
+      FROM personal_details 
+      WHERE email = $1
+    `;
+
+    try {
+      const result = await pool.query(sqlGet, [decoded.email]);
+      if (result.rows.length === 0) {
+        return res.status(404).send('Student not found');
+      }
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      res.status(500).send('Error fetching data');
+    }
+  });
 });
 
-const upload = multer({ storage });
+app.put('/api/student/update', (req, res) => {
+  const token = req.headers['authorization'];
+  if (!token) return res.status(403).send('Token is required');
 
-app.post('/api/upload', upload.single('document'), (req, res) => {
-  const { documentName } = req.body;
-  const document = req.file;
+  jwt.verify(token, secret, async (err, decoded) => {
+    if (err) return res.status(401).send('Unauthorized access');
 
-  if (!document) {
-    return res.status(400).send('No file uploaded');
-  }
+    const {
+      fullname,
+      email,
+      subcounty,
+      ward,
+      village,
+      birth,
+      gender,
+      institution,
+      year,
+      admission
+    } = req.body;
 
-  // Optionally: Only store file name or relative path in DB
-  const filePath = document.path.startsWith('/tmp/')
-    ? document.path // on Render
-    : path.relative(__dirname, document.path); // on local
+    const formattedBirth = birth ? new Date(birth).toISOString().split('T')[0] : null;
 
-  const query = `
-    INSERT INTO uploaded_document (document_name, file_path) 
-    VALUES ($1, $2)
-  `;
+    const sqlUpdate = `
+      UPDATE personal_details 
+      SET fullname = $1, email = $2, subcounty = $3, ward = $4, village = $5,
+          birth = $6, gender = $7, institution = $8, year = $9, admission = $10
+      WHERE email = $11
+    `;
 
-  db.query(query, [documentName, filePath], (err, result) => {
-    if (err) {
-      console.error('Error saving to database:', err);
-      return res.status(500).send('Database error');
+    try {
+      await pool.query(sqlUpdate, [
+        fullname,
+        email,
+        subcounty,
+        ward,
+        village,
+        formattedBirth,
+        gender,
+        institution,
+        year,
+        admission,
+        decoded.email
+      ]);
+
+      res.send({ message: 'Profile updated successfully', data: req.body });
+    } catch (err) {
+      console.error('Error updating data:', err);
+      res.status(500).send('Error updating data');
     }
-    res.status(200).send('File uploaded and saved to database successfully');
   });
 });
 
@@ -661,7 +619,7 @@ app.get("/api/get-document/:id", (req, res) => {
     WHERE pd.user_id = $1
   `;
 
-  db.query(sqlGet, [userId], (error, result) => {
+  pool.query(sqlGet, [userId], (error, result) => {
     if (error) {
       console.error("Error fetching uploaded document:", error);
       res.status(500).send("Error fetching data");
@@ -681,7 +639,7 @@ app.put('/api/update-status/:id', (req, res) => {
     WHERE user_id = $2
   `;
 
-  db.query(query, [status, userId], (error, result) => {
+  pool.query(query, [status, userId], (error, result) => {
     if (error) {
       return res.status(500).json({ error: 'Error updating status' });
     }
@@ -705,7 +663,7 @@ app.get("/api/get-bursary/:id", (req, res) => {
     WHERE pd.user_id = $1
   `;
 
-  db.query(sqlGet, [userId], (error, result) => {
+  pool.query(sqlGet, [userId], (error, result) => {
     if (error) {
       console.error("Error fetching bursary details:", error);
       res.status(500).send("Error fetching data");
@@ -727,7 +685,7 @@ app.get("/api/get-bursary", (req, res) => {
       ud.user_id = pd.user_id
   `;
 
-  db.query(sqlGetAll, (error, result) => {
+  pool.query(sqlGetAll, (error, result) => {
     if (error) {
       console.error("Error fetching all bursary details:", error);
       res.status(500).send("Error fetching data");
@@ -744,7 +702,7 @@ app.put('/api/update-bursary/:id', (req, res) => {
   console.log('REQ BODY:', req.body);
   console.log('REQ PARAMS:', req.params);
 
-    if (!bursary || isNaN(Number(bursary))) {
+  if (!bursary || isNaN(Number(bursary))) {
     return res.status(400).json({ error: 'Invalid bursary value.' });
   }
 
