@@ -47,24 +47,29 @@ const BursaryAllocation = () => {
   const [submitted, setSubmitted] = useState({});
 
   // Function to handle allocation when "Allocate" button is clicked
-  const handleAllocate = async (userId) => {
-    const amount = selectedAmount[userId];
-    if (!amount) {
-      alert("Please select an amount before allocating.");
-      return;
+ const handleAllocate = async (userId) => {
+  const amount = selectedAmount[userId];
+  if (!amount) {
+    alert("Please select an amount before allocating.");
+    return;
+  }
+  setLoading(true);
+  try {
+    await axios.put(`https://e-bursary-backend.onrender.com/api/update-bursary/${userId}`, { bursary: amount });
+    alert(`Allocated Ksh ${amount} to the application and updated allocation date.`);
+    setSubmitted((prev) => ({ ...prev, [userId]: true }));
+    loadData(); // Refresh data after allocation
+  } catch (error) {
+    console.error('Error updating bursary:', error);
+    // Show the error to the user
+    if (error.response && error.response.data && error.response.data.error) {
+      alert(`Error: ${error.response.data.error}`);
+    } else {
+      alert('Failed to update bursary. Please try again later.');
     }
-    setLoading(true);
-    try {
-      await axios.put(`https://e-bursary-backend.onrender.com/api/update-bursary/${userId}`, { bursary: amount });
-      alert(`Allocated Ksh ${amount} to the application and updated allocation date.`);
-      setSubmitted((prev) => ({ ...prev, [userId]: true }));
-      loadData(); // Refresh data after allocation
-    } catch (error) {
-      console.error('Error updating bursary:', error);
-    }
-    setLoading(false);
-  };
-
+  }
+  setLoading(false);
+};
   // Fetch profile data when component loads
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
@@ -307,17 +312,19 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
                       </label>
                     ))}
                   </div>
-                  <button
-                    onClick={() => handleAllocate(item.user_id)}
-                    disabled={loading || submitted[item.user_id]}
-                    className={`mt-4 px-4 py-2 rounded font-bold text-white 
-                      ${submitted[item.user_id]
-                        ? 'bg-green-600 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700'}
-                    `}
-                  >
-                    {submitted[item.user_id] ? 'Allocated' : 'Allocate'}
-                  </button>
+<button
+  onClick={() => {
+    if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
+  }}
+  className={`mt-4 px-4 py-2 rounded font-bold text-white transition-colors duration-200
+    ${submitted[item.user_id]
+      ? 'bg-green-600 hover:bg-green-700 cursor-not-allowed'
+      : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}
+  `}
+  aria-disabled={submitted[item.user_id] || loading}
+>
+  {submitted[item.user_id] ? 'Allocated' : 'Allocate'}
+</button>
                 </div>
               ))}
             </div>
