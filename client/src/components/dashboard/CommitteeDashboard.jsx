@@ -292,7 +292,7 @@ Logout
 
 {/* Main Content */}
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Bursary Fund Details & Statistics */}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
