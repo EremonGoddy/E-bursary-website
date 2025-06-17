@@ -296,7 +296,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Bursary Fund Details & Statistics */}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div className="bg-white w-full max-w-[335px]  mb:2 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<div className="bg-white w-full max-w-[320px]  mb:2 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
 <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
 <div className="flex justify-around">
 <div className="text-center text[0.8rem] md:text[1rem] font-semibold">
@@ -313,7 +313,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 </div>
 </div>
-<div className="bg-white w-full max-w-[335px] mb-4 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<div className="bg-white w-full max-w-[320px] mb-4 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
 <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Quick Statistics</h2>
 <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2">
 <div className="text-center bg-blue-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
@@ -340,7 +340,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 </div>
 {/* Personal Information Table */}
-<div className="bg-white w-full max-w-[335px] sm:max-w-[500px] md:max-w-none mx-auto p-2 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<div className="bg-white w-full max-w-[320px] sm:max-w-[500px] md:max-w-none mx-auto p-2 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
   <h2 className="text-center text-lg md:text-2xl font-bold mb-3 md:mb-4">Personal Information</h2>
   <div className="overflow-x-auto">
     <table className="min-w-[400px] md:min-w-full w-full border-collapse border border-gray-300 text-sm md:text-base">
