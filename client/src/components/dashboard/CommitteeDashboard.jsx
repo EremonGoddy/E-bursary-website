@@ -296,43 +296,43 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Bursary Fund Details & Statistics */}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
-<h2 className="text-center text-2xl font-bold mb-4">Bursary Fund Details</h2>
+<div className="bg-white w-full max-w-[335px]  mb:2 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
 <div className="flex justify-around">
-<div className="text-center text[1rem] font-bold">
+<div className="text-center text[0.8rem] md:text[1rem] font-semibold">
 <p>Total Funds Available:</p>
 <strong>{bursaryAmount}</strong>
 </div>
-<div className="text-center text[1rem] font-bold">
+<div className="text-center text[0.8rem]  text[1rem] font-semibold">
 <p>Amount Allocated to Students:</p>
 <strong>{allocatedAmount}</strong>
 </div>
-<div className="text-center text[1rem] font-bold">
+<div className="text-center  text[0.8rem]  text[1rem] font-semibold">
 <p>Remaining Funds:</p>
 <strong>{remainingAmount}</strong>
 </div>
 </div>
 </div>
-<div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
-<h2 className="text-center text-2xl font-bold mb-4">Quick Statistics</h2>
-<div className="flex flex-wrap justify-between items-center gap-2">
-<div className="text-center bg-blue-500 text-[1rem] font-bold text-white p-2 rounded shadow max-w-[140px]">
+<div className="bg-white w-full max-w-[335px] mb-4 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Quick Statistics</h2>
+<div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2">
+<div className="text-center bg-blue-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Pending Application</p>
 <strong>{pendingApplications}</strong>
 </div>
-<div className="text-center bg-yellow-500 text-[1rem] font-bold text-white p-2 rounded shadow max-w-[140px]">
+<div className="text-center bg-yellow-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Incomplete Application</p>
 <strong>{incompleteApplications}</strong>
 </div>
-<div className="text-center bg-gray-700 text-white text-[1rem] font-bold p-2 rounded shadow max-w-[140px]">
+<div className="text-center bg-gray-700 text-white text-[0.8rem] md:text-[1rem] font-semibold md:bold p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Total Application</p>
 <strong>{totalApplications}</strong>
 </div>
-<div className="text-center bg-green-500 text-white text-[1rem] font-bold p-2 rounded shadow max-w-[140px]">
+<div className="text-center bg-green-500 text-white text-[0.8rem] md:text-[1rem] font-semibold md:bold p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Approved Application</p>
 <strong>{approvedApplications}</strong>
 </div>
-<div className="text-center bg-red-500 text-[1rem] font-bold text-white p-2 rounded shadow max-w-[140px]">
+<div className="text-center bg-red-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Rejected Application</p>
 <strong>{rejectedApplications}</strong>
 </div>
@@ -340,41 +340,41 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 </div>
 {/* Personal Information Table */}
-<div className="mt-6 bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
-<h2 className="text-center text-2xl font-bold mb-4">Personal Information</h2>
-<div className="overflow-x-auto">
-<table className="table-auto w-full border-collapse border border-gray-300">
-<thead className="bg-gray-200">
-<tr>
-<th className="border border-gray-300 px-4 py-2">Full Name</th>
-<th className="border border-gray-300 px-4 py-2">Email</th>
-<th className="border border-gray-300 px-4 py-2">Institution</th>
-<th className="border border-gray-300 px-4 py-2">Admission</th>
-<th className="border border-gray-300 px-4 py-2">Sub County</th>
-<th className="border border-gray-300 px-4 py-2">Action</th>
-</tr>
-</thead>
-<tbody>
-{data.map((item) => (
-<tr key={item.id} className="hover:bg-gray-100">
-<td className="border border-gray-300 px-4 py-1">{item.fullname}</td>
-<td className="border border-gray-300 px-4 py-1">{item.email}</td>
-<td className="border border-gray-300 px-4 py-1">{item.institution}</td>
-<td className="border border-gray-300 px-4 py-1">{item.admission}</td>
-<td className="border border-gray-300 px-4 py-1">{item.subcounty}</td>
-<td className="border border-gray-300 px-4 py-1 text-center">
-<Link
-to={`/PersonalInformation/${item.user_id}`}
-className="text-blue-500 no-underline hover:text-blue-700 text-[1rem] font-bold"
->
-User Details
-</Link>
-</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
+<div className="bg-white w-full max-w-[335px] sm:max-w-[500px] md:max-w-none mx-auto p-2 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+  <h2 className="text-center text-lg md:text-2xl font-bold mb-3 md:mb-4">Personal Information</h2>
+  <div className="overflow-x-auto">
+    <table className="min-w-[400px] md:min-w-full w-full border-collapse border border-gray-300 text-sm md:text-base">
+      <thead className="bg-gray-200">
+        <tr>
+          <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Full Name</th>
+          <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Email</th>
+          <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Institution</th>
+          <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Admission</th>
+          <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Sub County</th>
+          <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item) => (
+          <tr key={item.id} className="hover:bg-gray-100">
+            <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.fullname}</td>
+            <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.email}</td>
+            <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.institution}</td>
+            <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.admission}</td>
+            <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.subcounty}</td>
+            <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 text-center">
+              <Link
+                to={`/PersonalInformation/${item.user_id}`}
+                className="text-blue-500 no-underline hover:text-blue-700 text-[0.95rem] font-bold"
+              >
+                User Details
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 </div>
 </div>
 </div>
