@@ -741,6 +741,13 @@ app.put('/api/update-bursary/:id', (req, res) => {
   const userId = req.params.id;
   const { bursary } = req.body;
 
+  console.log('REQ BODY:', req.body);
+  console.log('REQ PARAMS:', req.params);
+
+    if (!bursary || isNaN(Number(bursary))) {
+    return res.status(400).json({ error: 'Invalid bursary value.' });
+  }
+
   const query = `
     UPDATE personal_details 
     SET bursary = $1, allocation_date = CURRENT_TIMESTAMP 
