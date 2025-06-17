@@ -341,14 +341,14 @@ profileExists ? (
 </div>
 ) : (
 <div className="profile-box">
-<h2 className="text-2xl font-bold mb-4 text-center">Create Profile</h2>
+<h2 className=" text-[1.2rem] md:text-2xl font-bold mb-4 text-center">Create Profile</h2>
 <form onSubmit={handleSubmit}>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">Full name:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">Full name:</label>
 <input
 type="text"
 name="fullname"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
 value={formData.fullname}
 placeholder="Enter Fullname"
 onChange={handleChange}
@@ -356,11 +356,11 @@ required
 />
 </div>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">Email:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">Email:</label>
 <input
 type="email"
 name="email"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
 value={formData.email}
 placeholder="Enter Email"
 onChange={handleChange}
@@ -368,11 +368,11 @@ required
 />
 </div>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">Phone No:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">Phone No:</label>
 <input
 type="text"
 name="phone_no"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
 value={formData.phone_no}
 placeholder="Enter Phone No"
 onChange={handleChange}
@@ -380,11 +380,11 @@ required
 />
 </div>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">National ID:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">National ID:</label>
 <input
 type="text"
 name="national_id"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
 value={formData.national_id}
 placeholder="Enter National ID"
 onChange={handleChange}
@@ -392,11 +392,11 @@ required
 />
 </div>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">Sub County:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">Sub County:</label>
 <input
 type="text"
 name="subcounty"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
 value={formData.subcounty}
 placeholder="Enter Sub-county"
 onChange={handleChange}
@@ -404,11 +404,11 @@ required
 />
 </div>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">Ward:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">Ward:</label>
 <input
 type="text"
 name="ward"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
 value={formData.ward}
 placeholder="Enter Ward"
 onChange={handleChange}
@@ -416,11 +416,11 @@ required
 />
 </div>
 <div className="mb-3 flex items-center">
-<label className="block font-medium mb-1 w-32 mr-2">Position:</label>
+<label className="block font-medium mb-1 w-40 md:w-32 mr-1 md:mr-2">Position:</label>
 <input
 type="text"
 name="position"
-className="form-input w-full border rounded px-3 py-2"
+className="form-input w-full border rounded px-12 md:px-3 py-1.5 md:py-2"
 value={formData.position}
 placeholder="Enter Position"
 onChange={handleChange}
