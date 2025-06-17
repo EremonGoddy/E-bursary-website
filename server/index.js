@@ -927,6 +927,10 @@ app.post('/api/profile-form', (req, res) => {
 
     const email = decoded.email;
 
+    console.log('Insert data:', {
+      fullname, email, phone_no, national_id, subcounty, ward, position
+    });
+
     const sqlInsert = `
       INSERT INTO profile_committee (fullname, email, phone_no, national_id, subcounty, ward, position) 
       VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -943,6 +947,10 @@ app.post('/api/profile-form', (req, res) => {
     ], (err, result) => {
       if (err) {
         console.error('Error inserting committee data:', err);
+        if (err.code === '23505') {
+          // Unique violation
+          return res.status(409).send('Profile already exists with this email or national ID');
+        }
         return res.status(500).send('Error submitting data');
       }
 
@@ -961,7 +969,6 @@ app.post('/api/profile-form', (req, res) => {
     });
   });
 });
-
 // GET committee report with generated REFNO
 app.get('/api/comreport', (req, res) => {
   const token = req.headers['authorization'];
