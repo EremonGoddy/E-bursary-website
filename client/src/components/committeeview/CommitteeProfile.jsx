@@ -300,44 +300,44 @@ Logout
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
-<div className="max-w-lg mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-0">
+<div className="w-11/12 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-0">
 {isProfileFetched ? (
 profileExists ? (
-<div className="profile-info">
-<h2 className="text-2xl font-bold mb-4 text-center">Committee Profile</h2>
-<table className="table-auto w-full border-collapse border border-gray-300 mb-6">
-<tbody>
-<tr>
-<td className="border px-4 py-2 font-semibold">Full name:</td>
-<td className="border px-4 py-2">{formData.fullname}</td>
-</tr>
-<tr>
-<td className="border px-4 py-2 font-semibold">Email:</td>
-<td className="border px-4 py-2">{formData.email}</td>
-</tr>
-<tr>
-<td className="border px-4 py-2 font-semibold">Phone No:</td>
-<td className="border px-4 py-2">{formData.phone_no}</td>
-</tr>
-<tr>
-<td className="border px-4 py-2 font-semibold">National ID:</td>
-<td className="border px-4 py-2">{formData.national_id}</td>
-</tr>
-<tr>
-<td className="border px-4 py-2 font-semibold">Sub County:</td>
-<td className="border px-4 py-2">{formData.subcounty}</td>
-</tr>
-<tr>
-<td className="border px-4 py-2 font-semibold">Ward:</td>
-<td className="border px-4 py-2">{formData.ward}</td>
-</tr>
-<tr>
-<td className="border px-4 py-2 font-semibold">Position:</td>
-<td className="border px-4 py-2">{formData.position}</td>
-</tr>
-</tbody>
-</table>
-<p className="text-center text-green-600 font-semibold">Your profile has been successfully updated. You can edit it anytime.</p>
+<div className="">
+<h2 className="md:text-2xl text-[1.2rem] font-bold mb-4 text-center">Committee Profile</h2>
+<div className="w-full mb-6 space-y-4">
+<div className="flex ">
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-23 md:w-30">Full name:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.fullname}</span>
+    </div>
+    <div className="flex">
+      <span className="text-[1rem] md:text-[1.1rem]  font-semibold w-20 md:w-30">Email:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.email}</span>
+    </div>
+    <div className="flex">
+      <span className=" text-[1rem] md:text-[1.1rem]  font-semibold w-22 md:w-30">Phone No:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.phone_no}</span>
+    </div>
+    <div className="flex">
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-24 md:w-30">National ID:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.national_id}</span>
+    </div>
+    <div className="flex">
+      <span className=" text-[1rem] md:text-[1.1rem] font-semibold w-23 md:w-30">Sub County:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.subcounty}</span>
+    </div>
+    <div className="flex">
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-20 md:w-30">Ward:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.ward}</span>
+    </div>
+    <div className="flex">
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-20 md:w-30">Position:</span>
+      <span className="text-[1rem] md:text-[1.1rem] ">{formData.position}</span>
+    </div>
+  </div>
+  <p className="text-center text-green-600 font-semibold">
+    Your profile has been successfully updated. You can edit it anytime.
+  </p>
 </div>
 ) : (
 <div className="profile-box">
