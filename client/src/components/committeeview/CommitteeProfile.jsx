@@ -298,9 +298,9 @@ Logout
 
 {/* Main Content Area */}
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[30px] md:ml-[30px]'}
 `}>
-<div className="w-11/12 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-0">
+<div className="w-[95%] max-w-[500px] mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-0">
 {isProfileFetched ? (
 profileExists ? (
 <div className="">
@@ -311,15 +311,15 @@ profileExists ? (
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.fullname}</span>
     </div>
     <div className="flex">
-      <span className="text-[1rem] md:text-[1.1rem]  font-semibold w-20 md:w-30">Email:</span>
+      <span className="text-[1rem] md:text-[1.1rem]  font-semibold w-23 md:w-30">Email:</span>
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.email}</span>
     </div>
     <div className="flex">
-      <span className=" text-[1rem] md:text-[1.1rem]  font-semibold w-22 md:w-30">Phone No:</span>
+      <span className=" text-[1rem] md:text-[1.1rem]  font-semibold w-23 md:w-30">Phone No:</span>
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.phone_no}</span>
     </div>
     <div className="flex">
-      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-24 md:w-30">National ID:</span>
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-23 md:w-30">National ID:</span>
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.national_id}</span>
     </div>
     <div className="flex">
@@ -327,11 +327,11 @@ profileExists ? (
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.subcounty}</span>
     </div>
     <div className="flex">
-      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-20 md:w-30">Ward:</span>
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-23 md:w-30">Ward:</span>
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.ward}</span>
     </div>
     <div className="flex">
-      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-20 md:w-30">Position:</span>
+      <span className="text-[1rem] md:text-[1.1rem] font-semibold w-23 md:w-30">Position:</span>
       <span className="text-[1rem] md:text-[1.1rem] ">{formData.position}</span>
     </div>
   </div>
