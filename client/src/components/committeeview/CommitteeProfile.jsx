@@ -298,7 +298,7 @@ Logout
 
 {/* Main Content Area */}
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[30px] md:ml-[30px]'}
+${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[33px] md:ml-[30px]'}
 `}>
 <div className="w-[97%] max-w-[500px] mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-0">
 {isProfileFetched ? (
