@@ -348,7 +348,7 @@ profileExists ? (
 <input
 type="text"
 name="fullname"
-className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded px-3 py-1.5 md:py-2"
 value={formData.fullname}
 placeholder="Enter Fullname"
 onChange={handleChange}
@@ -360,7 +360,7 @@ required
 <input
 type="email"
 name="email"
-className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded px-3 py-1.5 md:py-2"
 value={formData.email}
 placeholder="Enter Email"
 onChange={handleChange}
@@ -372,7 +372,7 @@ required
 <input
 type="text"
 name="phone_no"
-className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded px-3 py-1.5 md:py-2"
 value={formData.phone_no}
 placeholder="Enter Phone No"
 onChange={handleChange}
@@ -384,7 +384,7 @@ required
 <input
 type="text"
 name="national_id"
-className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded px-3 py-1.5 md:py-2"
 value={formData.national_id}
 placeholder="Enter National ID"
 onChange={handleChange}
@@ -396,7 +396,7 @@ required
 <input
 type="text"
 name="subcounty"
-className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded  px-3 py-1.5 md:py-2"
 value={formData.subcounty}
 placeholder="Enter Sub-county"
 onChange={handleChange}
@@ -408,7 +408,7 @@ required
 <input
 type="text"
 name="ward"
-className="form-input w-full border rounded  px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded   px-3 py-1.5 md:py-2"
 value={formData.ward}
 placeholder="Enter Ward"
 onChange={handleChange}
@@ -420,7 +420,7 @@ required
 <input
 type="text"
 name="position"
-className="form-input w-full border rounded px-12 md:px-3 py-1.5 md:py-2"
+className="form-input w-full border rounded  px-3 py-1.5 md:py-2"
 value={formData.position}
 placeholder="Enter Position"
 onChange={handleChange}
