@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ProgressStepper from "./ProgressStepper";
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -289,6 +290,9 @@ return (
 
 {/* Main Content Area */}
 <div className={`flex-1 ml-10 md:ml-25 p-4 transition-all duration-300`}>
+ {/* ----------- Progress Stepper Added Here ----------- */}
+          <ProgressStepper currentStep={0} />
+          {/* --------------------------------------------------- */}
 <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
 <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
 <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Family Details</h2>
