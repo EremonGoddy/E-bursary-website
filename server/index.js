@@ -185,16 +185,19 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
 });
 
 
-// ✅ Insert into personal_details with duplicate name check
+// ✅ Insert into personal_details with duplicate name OR email check
 app.post('/api/personal-details', async (req, res) => {
   const { fullname, email, subcounty, ward, village, birth, gender, institution, year, admission } = req.body;
 
-  // Duplicate check (case-insensitive)
-  const checkSql = 'SELECT 1 FROM personal_details WHERE LOWER(fullname) = LOWER($1)';
+  // Duplicate check (case-insensitive for both name and email)
+  const checkSql = `
+    SELECT 1 FROM personal_details 
+    WHERE LOWER(fullname) = LOWER($1) OR LOWER(email) = LOWER($2)
+  `;
   try {
-    const checkResult = await pool.query(checkSql, [fullname]);
+    const checkResult = await pool.query(checkSql, [fullname, email]);
     if (checkResult.rows.length > 0) {
-      return res.status(409).json({ message: 'This full name is already registered.' });
+      return res.status(409).json({ message: 'This full name or email is already registered.' });
     }
 
     const sql = `
