@@ -185,23 +185,39 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
 });
 
 
-// ✅ Insert into personal_details
+// ✅ Insert into personal_details with duplicate name check
 app.post('/api/personal-details', async (req, res) => {
   const { fullname, email, subcounty, ward, village, birth, gender, institution, year, admission } = req.body;
 
-  const sql = `
-    INSERT INTO personal_details 
-    (fullname, email, subcounty, ward, village, birth, gender, institution, year, admission) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING user_id
-  `;
-
+  // Duplicate check (case-insensitive)
+  const checkSql = 'SELECT 1 FROM personal_details WHERE LOWER(fullname) = LOWER($1)';
   try {
+    const checkResult = await pool.query(checkSql, [fullname]);
+    if (checkResult.rows.length > 0) {
+      return res.status(409).json({ message: 'This full name is already registered.' });
+    }
+
+    const sql = `
+      INSERT INTO personal_details 
+      (fullname, email, subcounty, ward, village, birth, gender, institution, year, admission) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING user_id
+    `;
     const result = await pool.query(sql, [fullname, email, subcounty, ward, village, birth, gender, institution, year, admission]);
     res.json({ message: 'Data inserted successfully', userId: result.rows[0].user_id });
   } catch (err) {
     console.error('Error inserting data:', err);
     res.status(500).send('Server error');
+  }
+});
+
+// Get all fullnames from personal_details table (case-insensitive, optional)
+app.get('/students/all-names', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT fullname FROM personal_details');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 
