@@ -214,7 +214,7 @@ app.post('/api/personal-details', async (req, res) => {
 // Get all fullnames from personal_details table (case-insensitive, optional)
 app.get('/students/all-names', async (req, res) => {
   try {
-    const result = await pool.query('SELECT fullname FROM personal_details');
+    const result = await pool.query('SELECT fullname, email FROM personal_details');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
