@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ProgressStepper from './components/applicationform/ProgressStepper';
+import ProgressStepper from "./ProgressStepper";
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
