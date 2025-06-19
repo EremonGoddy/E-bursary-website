@@ -31,6 +31,7 @@ const PersonalDetails = () => {
     year: '',
     admission: ''
   });
+  const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
 
@@ -41,11 +42,14 @@ const PersonalDetails = () => {
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     setFormData({ ...formData, [name]: value });
+    setErrorMsg(""); // clear previous error as user types
   };
 
   // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
+    setErrorMsg(""); // clear error before submitting
+
     axios.post('https://e-bursary-backend.onrender.com/api/personal-details', formData)
       .then(response => {
         alert('Data inserted successfully');
@@ -54,6 +58,17 @@ const PersonalDetails = () => {
         navigate('/Amountdetails');
       })
       .catch(error => {
+        // Check if backend returns a 409 for duplicate or use error message from backend
+        if (
+          error.response &&
+          (error.response.status === 409 ||
+            (error.response.data &&
+              /already registered|duplicate/i.test(error.response.data.message || "")))
+        ) {
+          setErrorMsg("This email or full name is already registered.");
+        } else {
+          setErrorMsg("There was an error inserting the data!");
+        }
         console.error('There was an error inserting the data!', error);
       });
   };
@@ -303,6 +318,9 @@ const PersonalDetails = () => {
           <div className="bg-white rounded-lg max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
             <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Student Details</h2>
+            {errorMsg && (
+              <div className="mb-4 text-center text-red-600 font-semibold">{errorMsg}</div>
+            )}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div>
                 <label htmlFor="fullname" className="block font-medium mb-1">Full Name</label>
