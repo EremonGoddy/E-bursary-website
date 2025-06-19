@@ -321,16 +321,16 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Header Info */}
 {personalData.length > 0 && (
-<div className="mb-4 bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded">
+<div className="mb-4 bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded text-center">
 <h1 className="text-2xl font-bold">{personalData[0].fullname}</h1>
-<p className="font-semibold">Admission Number: {personalData[0].admission}</p>
-<p className="font-semibold">Institution: {personalData[0].institution}</p>
+<p className="font-semibold text-[1.2rem]">Admission Number: {personalData[0].admission}</p>
+<p className="font-semibold text-[1.2rem]">Institution: {personalData[0].institution}</p>
 </div>
 )}
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Personal Info */}
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-4">
+<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-0 md:mb-4">
 <h2 className="text-xl font-bold mb-2">Personal Information</h2>
 {personalData.map((item) => (
 <div key={item.user_id} className="mb-2">
@@ -364,7 +364,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Family Info */}
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-4">
+<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-0 md:mb-4">
 <h2 className="text-xl font-bold mb-2">Family Information</h2>
 {familyData.map((item) => (
 <div key={item.user_id} className="mb-2">

@@ -90,7 +90,7 @@ const BursaryAllocation = () => {
   }, [navigate]);
 
   return (
-    <div className="w-full min-h-screen relative bg-gray-100">
+    <div className="w-full min-h-screen relative bg-white-100">
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
@@ -284,51 +284,55 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
         </div>
 
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
+    <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 
           ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
         `}>
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Bursary Allocation</h1>
-            <div className="grid gap-6 md:grid-cols-2">
-              {data.map((item) => (
-                <div key={item.user_id} className="bg-white rounded-lg shadow p-5 flex flex-col gap-3">
-                  <div className="mb-2">
-                    <p className="font-semibold text-gray-800"><span className="text-gray-500">Full Name:</span> {item.fullname}</p>
-                    <p className="font-semibold text-gray-800"><span className="text-gray-500">Admission Number:</span> {item.admission}</p>
-                    <p className="font-semibold text-gray-800"><span className="text-gray-500">Institution:</span> {item.institution}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-4">
-                    {[10000, 20000, 30000, 40000, 50000].map((amount) => (
-                      <label key={amount} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`amount-${item.user_id}`}
-                          value={amount}
-                          checked={selectedAmount[item.user_id] === amount}
-                          onChange={() => setSelectedAmount((prev) => ({ ...prev, [item.user_id]: amount }))}
-                          className="accent-blue-600"
-                        />
-                        <span className="text-sm">{amount.toLocaleString()} Ksh</span>
-                      </label>
-                    ))}
-                  </div>
-<button
-  onClick={() => {
-    if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
-  }}
-  className={`mt-4 px-4 py-2 rounded font-bold text-white transition-colors duration-200
-    ${submitted[item.user_id]
-      ? 'bg-green-600 hover:bg-green-700 cursor-not-allowed'
-      : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}
-  `}
-  aria-disabled={submitted[item.user_id] || loading}
->
-  {submitted[item.user_id] ? 'Allocated' : 'Allocate'}
-</button>
-                </div>
-              ))}
-            </div>
-          </div>
+    <div className="max-w-2xl mx-auto shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] bg-white rounded-lg p-6">
+  <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Bursary Allocation</h1>
+  {data.map((item) => (
+    <div key={item.user_id} className="mb-3">
+      <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
+        <span className="text-gray-500">Full Name:</span> {item.fullname}
+      </p>
+      <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
+        <span className="text-gray-500">Admission Number:</span> {item.admission}
+      </p>
+      <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem] mb-8">
+        <span className="text-gray-500">Institution:</span> {item.institution}
+      </p>
+      <div className="flex flex-wrap gap-4 mt-2 mb-2">
+        {[10000, 20000, 30000, 40000, 50000].map((amount) => (
+          <label key={amount} className="flex items-center gap-2 cursor-pointer text-[1.6rem]">
+            <input
+              type="radio"
+              name={`amount-${item.user_id}`}
+              value={amount}
+              checked={selectedAmount[item.user_id] === amount}
+              onChange={() => setSelectedAmount((prev) => ({ ...prev, [item.user_id]: amount }))}
+              className="accent-blue-600 scale-125"
+            />
+            <span className="text-[1.1rem]">{amount.toLocaleString()} Ksh</span>
+          </label>
+        ))}
+      </div>
+      <div className='flex justify-center '>
+      <button
+        onClick={() => {
+          if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
+        }}
+        className={`mt-4 w-full px-4 py-2 rounded font-bold text-white transition-colors duration-200
+          ${submitted[item.user_id]
+            ? 'bg-green-600 hover:bg-green-700 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}
+        `}
+        aria-disabled={submitted[item.user_id] || loading}
+      >
+        {submitted[item.user_id] ? 'Allocated' : 'Allocate'}
+      </button>
+      </div>
+    </div>
+  ))}
+</div>
         </div>
       </div>
     </div>
