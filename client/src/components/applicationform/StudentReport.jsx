@@ -5,12 +5,12 @@ import autoTable from "jspdf-autotable";
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-faHouse,
-faFileAlt,
-faPaperclip,
-faDownload,
-faComments,
-faCog,
+  faHouse,
+  faFileAlt,
+  faPaperclip,
+  faDownload,
+  faComments,
+  faCog,
   faSignOutAlt,
   faBars,
   faBell,
@@ -20,12 +20,15 @@ const StudentReport = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [userName, setUserName] = useState('');
   const [studentDetails, setStudentDetails] = useState({});
+  // Step 1: Add studentProfile state
+  const [studentProfile, setStudentProfile] = useState({});
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
 
+  // Step 2: Update useEffect to fetch both report and student profile
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
@@ -33,6 +36,7 @@ const StudentReport = () => {
       navigate('/signin');
     } else {
       setUserName(name);
+      // Fetch report data
       axios
         .get('https://e-bursary-backend.onrender.com/api/reports', {
           headers: { Authorization: token },
@@ -40,7 +44,20 @@ const StudentReport = () => {
         .then((response) => {
           setStudentDetails(response.data);
         })
-        .catch((error) => console.error('Error fetching student data:', error));
+        .catch((error) =>
+          console.error('Error fetching student report data:', error)
+        );
+      // Fetch student profile data for Apply button logic
+      axios
+        .get('https://e-bursary-backend.onrender.com/api/student', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          setStudentProfile(response.data);
+        })
+        .catch((error) => {
+          setStudentProfile({});
+        });
     }
   }, [navigate]);
 
@@ -84,7 +101,7 @@ const StudentReport = () => {
     });
 
     // Render Bursary Info Table
-    autoTable(doc,{
+    autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 10,
       head: [['Bursary Information', 'Details']],
       body: bursaryInfo,
@@ -102,7 +119,7 @@ const StudentReport = () => {
       ['Date', '________________________'],
     ];
 
-    autoTable(doc,{
+    autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 20,
       head: [['Declaration', '']],
       body: declarationInfo,
@@ -209,16 +226,33 @@ const StudentReport = () => {
               </div>
             </li>
             {/* Apply */}
+            {/* Step 3: Use the provided Apply button logic for disabling */}
             <li className="relative group">
               <div className="flex items-center">
-                <Link to="/personaldetails" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
-                </Link>
+                {(Object.keys(studentProfile).length > 0) ? (
+                  // Disabled Apply button (user already applied)
+                  <span
+                    className={`
+                      flex items-center w-full space-x-2 text-gray-400 no-underline
+                      transition-all duration-200 cursor-not-allowed
+                      ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                    `}
+                    title="You have already applied"
+                  >
+                    <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                    <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
+                  </span>
+                ) : (
+                  // Active Apply link
+                  <Link to="/personaldetails" className={`
+                    flex items-center w-full space-x-2 text-white no-underline
+                    transition-all duration-200
+                    ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                  `}>
+                    <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                    <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
+                  </Link>
+                )}
                 <span className={`
                   absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
                   rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
@@ -229,30 +263,6 @@ const StudentReport = () => {
                   ${sidebarActive ? 'hidden' : 'block'}
                 `}>
                   Apply
-                </span>
-              </div>
-            </li>
-            {/* File attached */}
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/documentupload" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faPaperclip} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>File attached</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  File attached
                 </span>
               </div>
             </li>
@@ -416,4 +426,3 @@ const StudentReport = () => {
 };
 
 export default StudentReport;
-

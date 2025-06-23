@@ -157,30 +157,6 @@ const Documentupload = () => {
                                 </span>
                               </div>
                             </li>
-                            {/* File attached */}
-                            <li className="relative group">
-                              <div className="flex items-center">
-                                <Link to="/documentupload" className={`
-                                  flex items-center w-full space-x-2 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faPaperclip} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>File attached</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[35px] h-[35px] block
-                                  ${sidebarActive ? 'hidden' : 'block'}
-                                `}>
-                                  File attached
-                                </span>
-                              </div>
-                            </li>
                             {/* Download Report */}
                             <li className="relative group">
                               <div className="flex items-center">
