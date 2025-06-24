@@ -49,9 +49,13 @@ const FamilyDetails = () => {
     axios
       .get(`https://e-bursary-backend.onrender.com/api/familyInformation/${userId}`)
       .then((response) => {
-        // Backend returns an array; check if not empty
         const data = response.data;
-        if (Array.isArray(data) && data.length > 0) {
+        // Only redirect if data is present and not just an empty object/array
+        if (
+          data &&
+          ((Array.isArray(data) && data.length > 0) ||
+            (typeof data === 'object' && Object.keys(data).length > 0 && Object.values(data).some(v => v !== "" && v !== null && v !== undefined)))
+        ) {
           localStorage.setItem('familyDetailsCompleted', 'true');
           navigate('/Disclosuredetails');
         } else {

@@ -46,14 +46,9 @@ const AmountDetails = () => {
     axios
       .get(`https://e-bursary-backend.onrender.com/api/amountInformation/${userId}`)
       .then((response) => {
-        // response.data is an array from your backend, so check if there is any row/object in it
-        const data = response.data;
-        if (Array.isArray(data) && data.length > 0) {
-          localStorage.setItem('amountDetailsCompleted', 'true');
-          navigate('/Familydetails');
-        } else {
-          setLoading(false); // No record, allow to fill form
-        }
+        // If data found, set flag and redirect
+        localStorage.setItem('amountDetailsCompleted', 'true');
+        navigate('/Familydetails');
       })
       .catch((error) => {
         if (error.response && (error.response.status === 404 || error.response.status === 400)) {

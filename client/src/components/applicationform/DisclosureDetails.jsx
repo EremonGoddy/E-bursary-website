@@ -4,8 +4,15 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse, faFileAlt, faPaperclip, faDownload, faComments, faCog,
-  faSignOutAlt, faBars, faBell,
+  faHouse,
+  faFileAlt,
+  faPaperclip,
+  faDownload,
+  faComments,
+  faCog,
+  faSignOutAlt,
+  faBars,
+  faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 const DisclosureDetails = () => {
@@ -45,14 +52,9 @@ const DisclosureDetails = () => {
     axios
       .get(`https://e-bursary-backend.onrender.com/api/disclosureInformation/${userId}`)
       .then((response) => {
-        // Backend returns an array; check if not empty
-        const data = response.data;
-        if (Array.isArray(data) && data.length > 0) {
-          localStorage.setItem('disclosureDetailsCompleted', 'true');
-          navigate('/documentupload');
-        } else {
-          setLoading(false); // No disclosure details yet, show form
-        }
+        // If data found, set flag and redirect
+        localStorage.setItem('disclosureDetailsCompleted', 'true');
+        navigate('/documentupload');
       })
       .catch((error) => {
         if (error.response && (error.response.status === 404 || error.response.status === 400)) {
