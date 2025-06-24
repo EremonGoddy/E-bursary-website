@@ -26,6 +26,7 @@ const PersonalDetails = () => {
   });
   const [errorMsg, setErrorMsg] = useState("");
   const [allStudents, setAllStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -54,6 +55,43 @@ const PersonalDetails = () => {
       })
       .catch(() => setAllStudents([]));
   }, []);
+
+  // On mount, get token and student details, and check if personal details already exist
+  useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    const name = sessionStorage.getItem('userName');
+    const userId = sessionStorage.getItem('userId'); // Ensure userId is set at login
+
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
+    setUserName(name);
+
+    // Check if personal details already exist for this userId
+    if (userId) {
+      axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`)
+        .then(res => {
+          if (res.data) {
+            navigate('/Amountdetails');
+          } else {
+            setLoading(false);
+          }
+        })
+        .catch(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+
+    // Optionally fetch student details for display
+    axios.get('https://e-bursary-backend.onrender.com/api/student', {
+      headers: { Authorization: token },
+    })
+      .then((response) => {
+        setStudentDetails(response.data);
+      })
+      .catch(error => console.error('Error fetching student data:', error));
+  }, [navigate]);
 
   // Submit form
   const handleSubmit = (e) => {
@@ -95,24 +133,7 @@ const PersonalDetails = () => {
       });
   };
 
-  // On mount, get token and student details
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const name = sessionStorage.getItem('userName');
-    if (!token) {
-      navigate('/signin');
-    } else {
-      setUserName(name);
-
-      axios.get('https://e-bursary-backend.onrender.com/api/student', {
-        headers: { Authorization: token },
-      })
-        .then((response) => {
-          setStudentDetails(response.data);
-        })
-        .catch(error => console.error('Error fetching student data:', error));
-    }
-  }, [navigate]);
+  if (loading) return null; // Prevent flash before redirect or loading complete
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
@@ -137,176 +158,170 @@ const PersonalDetails = () => {
       </div>
 
       <div className="flex pt-20 min-h-screen">
-              <div
-                          className={`
-                            fixed top-0 left-0 z-30 bg-[#1F2937] 
-                            h-screen 
-                            ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
-                            mt-10
-                            text-white p-4 
-                            flex flex-col
-                            transition-all duration-300
-                            min-h-screen
-                            md:min-h-screen
-                          `}
-                        >
-                          <FontAwesomeIcon
-                            icon={faBars}
-                            className={`
-                              text-white 
-                              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
-                              text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
-                            `}
-                            onClick={toggleSidebar}
-                          />
-                          <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
-                            {/* Dashboard */}
-                            <li className="list-none mt-[30px] text-center relative group">
-                              <div className="flex items-center">
-                                <Link to="/student" className={`
-                                  flex items-center w-full space-x-2 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[40px] h-[40px] block
-                                  ${sidebarActive ? 'hidden' : 'block'}
-                                `}>
-                                  Dashboard
-                                </span>
-                              </div>
-                            </li>
-                            {/* Apply */}
-                            <li className="relative group">
-                              <div className="flex items-center">
-                                <Link to="/personaldetails" className={`
-                                  flex items-center w-full space-x-2 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[35px] h-[35px] block
-                                  ${sidebarActive ? 'hidden' : 'block'}
-                                `}>
-                                  Apply
-                                </span>
-                              </div>
-                            </li>
-                           
-                            {/* Download Report */}
-                            <li className="relative group">
-                              <div className="flex items-center">
-                                <Link to="/studentreport" className={`
-                                  flex items-center w-full space-x-2 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[35px] h-[35px] block
-                                  ${sidebarActive ? 'hidden' : 'block'}
-                                `}>
-                                  Report
-                                </span>
-                              </div>
-                            </li>
-                            {/* Messages */}
-                            <li className="relative group">
-                              <div className="flex items-center">
-                                <Link to="#" className={`
-                                  flex items-center w-full space-x-2 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[35px] h-[35px] block
-                                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                                `}>
-                                  Messages
-                                </span>
-                              </div>
-                            </li>
-                            {/* Settings */}
-                            <li className="relative group">
-                              <div className="flex items-center">
-                                <Link to="/studentsetting" className={`
-                                  flex items-center w-full space-x-2 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[2px] md:ml-[10px]' : 'hidden'}`}>Settings</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[35px] h-[35px] block
-                                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                                `}>
-                                  Settings
-                                </span>
-                              </div>
-                            </li>
-                            {/* Logout */}
-                            <li className="relative group">
-                              <div className="flex items-center">
-                                <Link to="/" className={`
-                                  flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
-                                  transition-all duration-200
-                                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                                `}>
-                                  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
-                                </Link>
-                                <span className={`
-                                  absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
-                                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                                  text-center shadow-lg transition-all duration-300 ease-in-out
-                                  opacity-0 group-hover:opacity-100
-                                  pointer-events-none group-hover:pointer-events-auto
-                                  leading-[35px] h-[35px] block
-                                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                                `}>
-                                  Logout
-                                </span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
+        {/* Sidebar */}
+        <div
+          className={`
+            fixed top-0 left-0 z-30 bg-[#1F2937] 
+            h-screen 
+            ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
+            mt-10
+            text-white p-4 
+            flex flex-col
+            transition-all duration-300
+            min-h-screen
+            md:min-h-screen
+          `}
+        >
+          <FontAwesomeIcon
+            icon={faBars}
+            className={`
+              text-white 
+              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
+              text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
+            `}
+            onClick={toggleSidebar}
+          />
+          <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
+            <li className="list-none mt-[30px] text-center relative group">
+              <div className="flex items-center">
+                <Link to="/student" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[40px] h-[40px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Dashboard
+                </span>
+              </div>
+            </li>
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/personaldetails" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Apply
+                </span>
+              </div>
+            </li>
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/studentreport" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'hidden' : 'block'}
+                `}>
+                  Report
+                </span>
+              </div>
+            </li>
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="#" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
+                `}>
+                  Messages
+                </span>
+              </div>
+            </li>
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/studentsetting" className={`
+                  flex items-center w-full space-x-2 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[2px] md:ml-[10px]' : 'hidden'}`}>Settings</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
+                `}>
+                  Settings
+                </span>
+              </div>
+            </li>
+            <li className="relative group">
+              <div className="flex items-center">
+                <Link to="/" className={`
+                  flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
+                  transition-all duration-200
+                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                `}>
+                  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
+                </Link>
+                <span className={`
+                  absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
+                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
+                  text-center shadow-lg transition-all duration-300 ease-in-out
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none group-hover:pointer-events-auto
+                  leading-[35px] h-[35px] block
+                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
+                `}>
+                  Logout
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
         {/* Main Content Area */}
         <div className={`flex-1 ml-10 md:ml-25 transition-all duration-300`}>
           <ProgressStepper currentStep={0} />
