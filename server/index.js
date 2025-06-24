@@ -309,6 +309,22 @@ app.post('/api/family-details', async (req, res) => {
   }
 });
 
+// ✅ Get disclosure details by user ID (for frontend check/redirect)
+app.get('/api/disclosure-details/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const sql = `SELECT * FROM disclosure_details WHERE user_id = $1 LIMIT 1`;
+  try {
+    const result = await pool.query(sql, [userId]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "Not found" });
+    }
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
 // ✅ Insert into disclosure_details
 app.post('/api/disclosure-details', async (req, res) => {
   const { userId, bursary, bursarysource, bursaryamount, helb, granted, noreason } = req.body;
