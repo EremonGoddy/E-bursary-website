@@ -49,9 +49,14 @@ const FamilyDetails = () => {
     axios
       .get(`https://e-bursary-backend.onrender.com/api/familyInformation/${userId}`)
       .then((response) => {
-        // If data found, set flag and redirect
-        localStorage.setItem('familyDetailsCompleted', 'true');
-        navigate('/Disclosuredetails');
+        // Backend returns an array; check if not empty
+        const data = response.data;
+        if (Array.isArray(data) && data.length > 0) {
+          localStorage.setItem('familyDetailsCompleted', 'true');
+          navigate('/Disclosuredetails');
+        } else {
+          setLoading(false); // No family details yet, show form
+        }
       })
       .catch((error) => {
         if (error.response && (error.response.status === 404 || error.response.status === 400)) {
