@@ -202,8 +202,8 @@ app.post('/api/personal-details', async (req, res) => {
 
     const sql = `
       INSERT INTO personal_details 
-      (fullname, email, subcounty, ward, village, birth, gender, institution, year, admission) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (fullname, email, subcounty, ward, village, birth, gender, institution, year, admission, status) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')
       RETURNING user_id
     `;
     const result = await pool.query(sql, [fullname, email, subcounty, ward, village, birth, gender, institution, year, admission]);
