@@ -274,6 +274,22 @@ app.post('/api/amount-details', async (req, res) => {
   }
 });
 
+// ✅ Get family details by user ID (for frontend check/redirect)
+app.get('/api/family-details/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const sql = `SELECT * FROM family_details WHERE user_id = $1 LIMIT 1`;
+  try {
+    const result = await pool.query(sql, [userId]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "Not found" });
+    }
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
 // ✅ Insert into family_details
 app.post('/api/family-details', async (req, res) => {
   const { userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income } = req.body;
