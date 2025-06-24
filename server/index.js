@@ -239,6 +239,22 @@ app.get('/students/all-names', async (req, res) => {
   }
 });
 
+// GET /api/amount-details/user/:userId
+app.get('/api/amount-details/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const sql = `SELECT * FROM amount_details WHERE user_id = $1 LIMIT 1`;
+  try {
+    const result = await pool.query(sql, [userId]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "Not found" });
+    }
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
 // ✅ Insert into amount_details
 app.post('/api/amount-details', async (req, res) => {
   const { userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch } = req.body;
