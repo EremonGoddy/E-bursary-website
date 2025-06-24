@@ -347,9 +347,13 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 {/* Bursary Funds & Status */}
 <div className="flex flex-col gap-4">
 <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center mb-2">
-<h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1">Bursary funds allocated:</h2>
-<p className="mb-2">{studentDetails.bursary}</p>
-<FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-3xl" />
+  <h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1">Bursary funds allocated:</h2>
+  <p className="mb-2">
+    {studentDetails.bursary
+      ? `${studentDetails.bursary} shillings`
+      : "0.00 shillings"}
+  </p>
+  <FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-3xl" />
 </div>
 <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center">
 <h2 className="text-[1.2rem] md:text-[1.2rem]  font-bold mb-1">Status of the application:</h2>
