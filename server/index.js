@@ -184,14 +184,14 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
   }
 });
 
-// GET personal details by user_id
+// GET personal details by user_id (PostgreSQL version with pool)
 app.get('/api/personal-details/user/:userId', async (req, res) => {
   const userId = req.params.userId;
   const sql = `SELECT * FROM personal_details WHERE user_id = $1 LIMIT 1`;
   try {
     const result = await pool.query(sql, [userId]);
     if (result.rows.length > 0) {
-      res.json(result.rows[0]);
+      res.json(result.rows[0]); // returns the row including user_id
     } else {
       res.status(404).json({ message: "Not found" });
     }
@@ -199,7 +199,6 @@ app.get('/api/personal-details/user/:userId', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
-
 // ✅ Insert into personal_details with duplicate name OR email check
 app.post('/api/personal-details', async (req, res) => {
   const { fullname, email, subcounty, ward, village, birth, gender, institution, year, admission } = req.body;

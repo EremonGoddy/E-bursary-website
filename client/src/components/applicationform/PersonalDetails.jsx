@@ -10,7 +10,6 @@ import {
 
 const PersonalDetails = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
-  const [studentDetails, setStudentDetails] = useState({});
   const [userName, setUserName] = useState('');
   const [formData, setFormData] = useState({
     fullname: '',
@@ -33,19 +32,11 @@ const PersonalDetails = () => {
   // Toggle sidebar
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrorMsg(""); // clear previous error as user types
-  };
-
   // Fetch all student names and emails on mount for duplicate check
   useEffect(() => {
     axios
       .get('https://e-bursary-backend.onrender.com/api/students/all-names')
       .then((res) => {
-        // Expecting [{fullname, email}, ...]
         setAllStudents(
           (res.data || []).map(stu => ({
             fullname: stu.fullname?.trim().toLowerCase(),
@@ -56,52 +47,56 @@ const PersonalDetails = () => {
       .catch(() => setAllStudents([]));
   }, []);
 
-  // On mount, get token and student details, and check if personal details already exist
+  // On mount, check if personal details already exist for this user_id
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
-    const userId = sessionStorage.getItem('userId'); // Ensure userId is set at login
-
+    const userId = sessionStorage.getItem('userId');
     if (!token) {
       navigate('/signin');
       return;
     }
     setUserName(name);
 
-    // Check if personal details already exist for this userId
+    // Use the backend endpoint that returns 404 if not found
     if (userId) {
       axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`)
         .then(res => {
-          if (res.data) {
+          // If the API returns a row with user_id, skip this page
+          if (res.data && res.data.user_id) {
             navigate('/Amountdetails');
           } else {
             setLoading(false);
           }
         })
-        .catch(() => setLoading(false));
+        .catch(error => {
+          // If the backend returns 404, stay on this page
+          if (error.response && error.response.status === 404) {
+            setLoading(false);
+          } else {
+            // For any other error, also stay but you can log or notify
+            setLoading(false);
+            // Optionally: setErrorMsg("Error confirming personal details.");
+          }
+        });
     } else {
       setLoading(false);
     }
-
-    // Optionally fetch student details for display
-    axios.get('https://e-bursary-backend.onrender.com/api/student', {
-      headers: { Authorization: token },
-    })
-      .then((response) => {
-        setStudentDetails(response.data);
-      })
-      .catch(error => console.error('Error fetching student data:', error));
   }, [navigate]);
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrorMsg("");
+  };
 
   // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrorMsg(""); // clear error before submitting
-
-    // Check for a duplicate full name or email (case-insensitive, trimmed)
+    setErrorMsg("");
     const enteredName = (formData.fullname || "").trim().toLowerCase();
     const enteredEmail = (formData.email || "").trim().toLowerCase();
-
     const duplicate = allStudents.find(
       stu => stu.fullname === enteredName || stu.email === enteredEmail
     );
@@ -118,7 +113,6 @@ const PersonalDetails = () => {
         navigate('/Amountdetails');
       })
       .catch(error => {
-        // Check if backend returns a 409 for duplicate or use error message from backend
         if (
           error.response &&
           (error.response.status === 409 ||
@@ -133,7 +127,7 @@ const PersonalDetails = () => {
       });
   };
 
-  if (loading) return null; // Prevent flash before redirect or loading complete
+  if (loading) return null;
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
@@ -156,7 +150,6 @@ const PersonalDetails = () => {
           </div>
         </div>
       </div>
-
       <div className="flex pt-20 min-h-screen">
         {/* Sidebar */}
         <div

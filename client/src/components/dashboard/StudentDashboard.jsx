@@ -27,8 +27,30 @@ const StudentDashboard = () => {
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [documentUploaded, setDocumentUploaded] = useState(false); // <-- New state
+  const [documentUploaded, setDocumentUploaded] = useState(false);
   const navigate = useNavigate();
+
+  // Ensures the proper step navigation on sidebar 'Apply' click
+  const handleApplyClick = async (e) => {
+    e.preventDefault();
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+      navigate('/personaldetails');
+      return;
+    }
+    try {
+      const res = await axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`);
+      if (res.data && res.data.user_id) {
+        // Details exist, go to Amountdetails
+        navigate('/Amountdetails');
+      } else {
+        // No details, force personal details page
+        navigate('/personaldetails');
+      }
+    } catch {
+      navigate('/personaldetails');
+    }
+  };
 
   // Toggle sidebar
   const toggleSidebar = () => {
@@ -130,7 +152,6 @@ const StudentDashboard = () => {
       });
   };
 
-  // Application is fully complete if document is uploaded
   const applicationCompleted = documentUploaded;
 
   return (
@@ -207,8 +228,9 @@ const StudentDashboard = () => {
             {/* Apply */}
             <li className="relative group">
               <div className="flex items-center">
-                <Link
-                  to="/personaldetails"
+                <a
+                  href="#"
+                  onClick={handleApplyClick}
                   className={`
                     flex items-center w-full space-x-2 text-white no-underline
                     transition-all duration-200
@@ -220,7 +242,7 @@ const StudentDashboard = () => {
                 >
                   <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
                   <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
-                </Link>
+                </a>
                 <span className={`
                   absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
                   rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
@@ -332,7 +354,6 @@ const StudentDashboard = () => {
             </li>
           </ul>
         </div>
-
         {/* Main Content */}
         <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
           ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
