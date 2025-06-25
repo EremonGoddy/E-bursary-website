@@ -27,6 +27,7 @@ const StudentDashboard = () => {
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [documentUploaded, setDocumentUploaded] = useState(false); // <-- New state
   const navigate = useNavigate();
 
   // Toggle sidebar
@@ -34,10 +35,11 @@ const StudentDashboard = () => {
     setSidebarActive(!sidebarActive);
   };
 
-  // Fetch student info
+  // Fetch student info and document upload status
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
+    const userId = sessionStorage.getItem('userId');
     if (!token) {
       navigate('/signin');
     } else {
@@ -59,7 +61,6 @@ const StudentDashboard = () => {
         })
         .catch((error) => {
           setLoading(false);
-          // Only clear state if auth truly failed
           if (error.response && error.response.status === 401) {
             setStudentDetails({});
             setFormData({});
@@ -67,6 +68,16 @@ const StudentDashboard = () => {
           }
           console.error('Error fetching student data:', error);
         });
+
+      // Check if document has been uploaded for this user
+      if (userId) {
+        axios
+          .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`)
+          .then((res) => {
+            setDocumentUploaded(res.data.uploaded === true);
+          })
+          .catch(() => setDocumentUploaded(false));
+      }
     }
   }, [navigate]);
 
@@ -78,7 +89,6 @@ const StudentDashboard = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Update and force refetch for always-fresh data display
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('authToken');
@@ -93,7 +103,6 @@ const StudentDashboard = () => {
         headers: { Authorization: token },
       })
       .then((response) => {
-        // Refetch data from backend to guarantee latest info
         axios
           .get('https://e-bursary-backend.onrender.com/api/student', {
             headers: {
@@ -121,11 +130,8 @@ const StudentDashboard = () => {
       });
   };
 
-  // Don't disable the "Apply" button unless the application is *fully* complete.
-  // As an example, you can check a status flag from the backend, e.g. studentDetails.applicationCompleted.
-  // For now, we never disable the Apply button so students can resume at any point.
-  // If you want to disable after full completion, use:
-  // const applicationCompleted = studentDetails.applicationCompleted;
+  // Application is fully complete if document is uploaded
+  const applicationCompleted = documentUploaded;
 
   return (
     <div className="w-full min-h-screen relative">
@@ -207,7 +213,10 @@ const StudentDashboard = () => {
                     flex items-center w-full space-x-2 text-white no-underline
                     transition-all duration-200
                     ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+                    ${applicationCompleted ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}
                   `}
+                  tabIndex={applicationCompleted ? -1 : undefined}
+                  aria-disabled={applicationCompleted ? "true" : "false"}
                 >
                   <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
                   <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
