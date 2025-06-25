@@ -710,12 +710,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/api/upload', upload.single('document'), (req, res) => {
-  const { documentName } = req.body;
+app.post('/api/upload', upload.single('document'), async (req, res) => {
+  const { documentName, userId } = req.body; // <--- userId REQUIRED!
   const document = req.file;
 
   if (!document) {
     return res.status(400).send('No file uploaded');
+  }
+  if (!userId) {
+    return res.status(400).send('userId is required');
   }
 
   // Optionally: Only store file name or relative path in DB
@@ -723,18 +726,19 @@ app.post('/api/upload', upload.single('document'), (req, res) => {
     ? document.path // on Render
     : path.relative(__dirname, document.path); // on local
 
+  // Save userId as well!
   const query = `
-    INSERT INTO uploaded_document (document_name, file_path) 
-    VALUES ($1, $2)
+    INSERT INTO uploaded_document (user_id, document_name, file_path) 
+    VALUES ($1, $2, $3)
   `;
 
-  pool.query(query, [documentName, filePath], (err, result) => {
-    if (err) {
-      console.error('Error saving to database:', err);
-      return res.status(500).send('Database error');
-    }
+  try {
+    await pool.query(query, [userId, documentName, filePath]);
     res.status(200).send('File uploaded and saved to database successfully');
-  });
+  } catch (err) {
+    console.error('Error saving to database:', err);
+    res.status(500).send('Database error');
+  }
 });
 
 app.get("/api/get-document/:id", (req, res) => {
