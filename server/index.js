@@ -343,6 +343,70 @@ app.post('/api/disclosure-details', async (req, res) => {
   }
 });
 
+
+
+
+app.get('/api/upload/status/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    // Updated table name to uploaded_document
+    const result = await pool.query('SELECT 1 FROM uploaded_document WHERE user_id = $1 LIMIT 1', [userId]);
+    res.json({ uploaded: result.rows.length > 0 });
+  } catch (err) {
+    res.status(500).json({ uploaded: false });
+  }
+});
+
+// Use /tmp/uploads for cloud environments like Render
+const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+// ...existing imports and setup...
+
+app.post('/api/upload', upload.single('document'), async (req, res) => {
+  const { documentName, userId } = req.body;
+  const document = req.file;
+
+  if (!document) {
+    return res.status(400).send('No file uploaded');
+  }
+  if (!userId) {
+    return res.status(400).send('userId is required');
+  }
+
+  const filePath = document.path.startsWith('/tmp/')
+    ? document.path
+    : path.relative(__dirname, document.path);
+
+  const query = `
+    INSERT INTO uploaded_document (user_id, document_name, file_path) 
+    VALUES ($1, $2, $3)
+  `;
+
+  try {
+    await pool.query(query, [userId, documentName, filePath]);
+    res.send('File uploaded and saved to database successfully');
+  } catch (err) {
+    console.error('Error saving to database:', err);
+    res.status(500).send('Database error');
+  }
+});
+
 app.get('/api/admin-details', async (req, res) => {
   const role = 'Admin';
   const sql = 'SELECT name, email FROM users WHERE role = $1';
@@ -677,67 +741,6 @@ app.get("/api/disclosureInformation/:id", (req, res) => {
       res.send(result.rows);
     }
   });
-});
-
-app.get('/api/upload/status/:userId', async (req, res) => {
-  const { userId } = req.params;
-  try {
-    // Updated table name to uploaded_document
-    const result = await pool.query('SELECT 1 FROM uploaded_document WHERE user_id = $1 LIMIT 1', [userId]);
-    res.json({ uploaded: result.rows.length > 0 });
-  } catch (err) {
-    res.status(500).json({ uploaded: false });
-  }
-});
-
-// Use /tmp/uploads for cloud environments like Render
-const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');
-
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
-
-const upload = multer({ storage });
-
-app.post('/api/upload', upload.single('document'), async (req, res) => {
-  const { documentName, userId } = req.body; // <--- userId REQUIRED!
-  const document = req.file;
-
-  if (!document) {
-    return res.status(400).send('No file uploaded');
-  }
-  if (!userId) {
-    return res.status(400).send('userId is required');
-  }
-
-  // Optionally: Only store file name or relative path in DB
-  const filePath = document.path.startsWith('/tmp/')
-    ? document.path // on Render
-    : path.relative(__dirname, document.path); // on local
-
-  // Save userId as well!
-  const query = `
-    INSERT INTO uploaded_document (user_id, document_name, file_path) 
-    VALUES ($1, $2, $3)
-  `;
-
-  try {
-    await pool.query(query, [userId, documentName, filePath]);
-    res.status(200).send('File uploaded and saved to database successfully');
-  } catch (err) {
-    console.error('Error saving to database:', err);
-    res.status(500).send('Database error');
-  }
 });
 
 app.get("/api/get-document/:id", (req, res) => {

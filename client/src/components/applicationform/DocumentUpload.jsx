@@ -16,28 +16,31 @@ const Documentupload = () => {
     document: null,
   });
   const [uploadStatus, setUploadStatus] = useState('');
+  const [existingDocument, setExistingDocument] = useState(null);
+  const [documentList, setDocumentList] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const disclosureData = location.state || {}; // Data passed from DisclosureDetails
 
   // Add userId from session
   const userId = sessionStorage.getItem('userId');
 
+  // Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setFormData({
-        ...formData,
-        documentName: file.name,
-        document: file,
-      });
-    }
+    setFormData({
+      ...formData,
+      documentName: file ? file.name : '',
+      document: file || null,
+    });
+    setUploadStatus('');
   };
 
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
-  const handleSubmit = (e) => {
+  // Handle file upload submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setUploadStatus('');
     if (!formData.document || !formData.documentName) {
       setUploadStatus('Please select a document to upload.');
       return;
@@ -49,31 +52,95 @@ const Documentupload = () => {
     const formDataToSend = new FormData();
     formDataToSend.append('documentName', formData.documentName);
     formDataToSend.append('document', formData.document);
-    formDataToSend.append('userId', userId); // <-- IMPORTANT
+    formDataToSend.append('userId', userId);
 
-    axios.post('https://e-bursary-backend.onrender.com/api/upload', formDataToSend, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
-    .then(response => {
-      setUploadStatus('File uploaded successfully!');
-      // On success, go to dashboard
-      setTimeout(() => navigate('/studentdashboard'), 800);
-    })
-    .catch(error => {
+    try {
+      const response = await axios.post(
+        'https://e-bursary-backend.onrender.com/api/upload',
+        formDataToSend,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      if (
+        typeof response.data === 'string' &&
+        response.data.toLowerCase().includes('success')
+      ) {
+        setUploadStatus('File uploaded successfully!');
+        setFormData({ documentName: '', document: null });
+        // Refresh list after upload
+        fetchDocuments();
+        // Optionally redirect after a delay
+        setTimeout(() => navigate('/studentdashboard'), 800);
+      } else {
+        setUploadStatus('File upload failed!');
+      }
+    } catch (error) {
       console.error('Error uploading file:', error);
       setUploadStatus('File upload failed!');
-    });
+    }
   };
 
+  // Fetch all uploaded documents for this user
+  const fetchDocuments = async () => {
+    if (!userId) return;
+    try {
+      const res = await axios.get(`https://e-bursary-backend.onrender.com/api/upload/list/${userId}`);
+      if (Array.isArray(res.data)) {
+        setDocumentList(res.data);
+      } else {
+        setDocumentList([]);
+      }
+    } catch (err) {
+      setDocumentList([]);
+    }
+  };
+
+  // On mount: check login, fetch user and documents, or redirect if already uploaded (single upload scenario)
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
+    const userId = sessionStorage.getItem('userId');
     if (!token) {
       navigate('/signin');
-    } else {
-      setUserName(name);
+      return;
     }
+    setUserName(name);
+
+    // Check if document already uploaded (single-upload scenario)
+    if (userId) {
+      axios.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`)
+        .then(res => {
+          // If a document is already uploaded, redirect or show existing
+          if (res.data && res.data.user_id) {
+            setExistingDocument(res.data);
+            // Optionally, to allow multiple uploads, fetch all documents instead of redirecting
+            fetchDocuments();
+            // Uncomment if you want to redirect on first upload
+            // navigate('/studentdashboard');
+          }
+        })
+        .catch(err => {
+          // If 404, user can upload; if other error, handle as needed
+          if (err.response && err.response.status !== 404) {
+            setUploadStatus('Error checking upload status!');
+          }
+        });
+      // Always fetch all documents for the user (for list view)
+      fetchDocuments();
+    }
+    // eslint-disable-next-line
   }, [navigate]);
+
+  // Delete document handler (optional, if you want users to remove their uploads)
+  const handleDelete = async (docId) => {
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
+    try {
+      await axios.delete(`https://e-bursary-backend.onrender.com/api/upload/${docId}`);
+      setUploadStatus('Document deleted!');
+      fetchDocuments();
+    } catch (err) {
+      setUploadStatus('Error deleting document.');
+    }
+  };
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
@@ -98,6 +165,7 @@ const Documentupload = () => {
       </div>
 
       <div className="flex pt-20 min-h-screen">
+        {/* Sidebar */}
         <div
           className={`
             fixed top-0 left-0 z-30 bg-[#1F2937] 
@@ -273,6 +341,41 @@ const Documentupload = () => {
           <div className="bg-white rounded-lg max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
             <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Document Upload Form</h2>
+
+            {/* Display all uploaded documents */}
+            {documentList.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2 text-center text-blue-700">Your Uploaded Documents</h3>
+                <ul className="space-y-2">
+                  {documentList.map(doc => (
+                    <li key={doc.id || doc.file_path} className="border rounded p-2 flex justify-between items-center">
+                      <span>
+                        <FontAwesomeIcon icon={faPaperclip} className="mr-2 text-blue-500" />
+                        {doc.document_name}
+                      </span>
+                      <span className="flex items-center gap-3">
+                        <a
+                          href={`https://e-bursary-backend.onrender.com/${doc.file_path.replace(/^(\.\/)?uploads\//, 'uploads/')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-700 underline text-sm"
+                        >
+                          View
+                        </a>
+                        {/* Optional: delete button */}
+                        {/* <button
+                          className="text-red-600 text-xs underline"
+                          onClick={() => handleDelete(doc.id)}
+                        >
+                          Delete
+                        </button> */}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
               <div>
                 <label htmlFor="documentName" className="block font-medium mb-2">Document Name</label>
