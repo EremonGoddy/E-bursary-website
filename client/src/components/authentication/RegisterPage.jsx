@@ -39,21 +39,40 @@ const RegisterPage = () => {
         alert('Registration successful');
         navigate('/login');
       })
-      .catch((err) => {
-        if (err.response && err.response.data && typeof err.response.data === 'string') {
-          const msg = err.response.data.toLowerCase();
-          if (msg.includes('email')) {
-            setErrors({ email: '*This email is already registered. Please use another.' });
-          } else if (msg.includes('name')) {
-            setErrors({ name: '*This name is already registered. Please use another.' });
-          } else {
-            alert(err.response.data);
-          }
-        } else {
-          alert('An error occurred. Please try again.');
-        }
-      });
-  };
+    .catch((err) => {
+  let errorMsg = '';
+
+  if (err.response && err.response.data) {
+    // If backend sends { message: "..." }
+    if (typeof err.response.data === 'object' && err.response.data.message) {
+      errorMsg = err.response.data.message.toLowerCase();
+    }
+    // If backend sends { error: "..." }
+    else if (typeof err.response.data === 'object' && err.response.data.error) {
+      errorMsg = err.response.data.error.toLowerCase();
+    }
+    // If backend sends a string
+    else if (typeof err.response.data === 'string') {
+      errorMsg = err.response.data.toLowerCase();
+    }
+    // If backend sends an array of messages
+    else if (Array.isArray(err.response.data) && err.response.data.length > 0) {
+      errorMsg = String(err.response.data[0]).toLowerCase();
+    }
+  }
+
+  if (errorMsg.includes('email')) {
+    setErrors({ email: '*This email is already registered. Please use another.' });
+  } else if (errorMsg.includes('name') || errorMsg.includes('username')) {
+    setErrors({ name: '*This name is already registered. Please use another.' });
+  } else if (errorMsg.includes('password')) {
+    setErrors({ password: '*This password is already used. Please use another.' }); // just in case your backend does this
+  } else if (errorMsg) {
+    alert(errorMsg);
+  } else {
+    alert('An error occurred. Please try again.');
+  }
+});
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
