@@ -190,6 +190,54 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
   }
 });
 
+// Helper functions for each step
+async function hasPersonalDetails(userId) {
+  const res = await pool.query('SELECT 1 FROM personal_details WHERE user_id = $1', [userId]);
+  return res.rows.length > 0;
+}
+async function hasAmountDetails(userId) {
+  const res = await pool.query('SELECT 1 FROM amount_details WHERE user_id = $1', [userId]);
+  return res.rows.length > 0;
+}
+async function hasFamilyDetails(userId) {
+  const res = await pool.query('SELECT 1 FROM family_details WHERE user_id = $1', [userId]);
+  return res.rows.length > 0;
+}
+async function hasDisclosureDetails(userId) {
+  const res = await pool.query('SELECT 1 FROM disclosure_details WHERE user_id = $1', [userId]);
+  return res.rows.length > 0;
+}
+async function hasUploadedDocuments(userId) {
+  const res = await pool.query('SELECT 1 FROM documents WHERE user_id = $1', [userId]);
+  return res.rows.length > 0;
+}
+
+// The progress endpoint
+app.get('/api/application-progress/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const steps = [
+      await hasPersonalDetails(userId),
+      await hasAmountDetails(userId),
+      await hasFamilyDetails(userId),
+      await hasDisclosureDetails(userId),
+      await hasUploadedDocuments(userId)
+    ];
+    const completedSteps = [];
+    let currentStep = 0;
+    for (let i = 0; i < steps.length; i++) {
+      if (steps[i]) {
+        completedSteps.push(i);
+        currentStep = i + 1;
+      } else break;
+    }
+    res.json({ currentStep, completedSteps });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // GET personal details by user_id (PostgreSQL version with pool)
 app.get('/api/personal-details/user/:userId', async (req, res) => {
   const userId = req.params.userId;
