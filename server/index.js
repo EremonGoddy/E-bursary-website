@@ -127,15 +127,21 @@ console.log('Password hash from DB:', user.password);
   }
 });
 
-// ✅ Register a new user (PostgreSQL)
+// ✅ Register a new user (PostgreSQL, checks for duplicate email and name)
 app.post("/api/post", async (req, res) => {
   const { name, email, password, role } = req.body;
 
   try {
-    // Check if user already exists
-    const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: "User already exists" });
+    // Check if email already exists
+    const existingEmail = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (existingEmail.rows.length > 0) {
+      return res.status(400).json({ message: "Email is already registered" });
+    }
+
+    // Check if name already exists
+    const existingName = await pool.query("SELECT * FROM users WHERE name = $1", [name]);
+    if (existingName.rows.length > 0) {
+      return res.status(400).json({ message: "Name is already registered" });
     }
 
     // Hash the password
