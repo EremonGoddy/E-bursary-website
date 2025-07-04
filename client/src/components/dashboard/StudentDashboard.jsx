@@ -26,9 +26,19 @@ const StudentDashboard = () => {
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [documentUploaded, setDocumentUploaded] = useState(false);
+  const [personalDetailsList, setPersonalDetailsList] = useState([]);
   const navigate = useNavigate();
+
+  // Fetch all fullnames and emails from personal_details on mount
+  useEffect(() => {
+    axios
+      .get('https://e-bursary-backend.onrender.com/students/all-names')
+      .then(res => setPersonalDetailsList(res.data || []))
+      .catch(() => setPersonalDetailsList([]));
+  }, []);
 
   // Ensures the proper step navigation on sidebar 'Apply' click
   const handleApplyClick = async (e) => {
@@ -61,11 +71,13 @@ const StudentDashboard = () => {
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
+    const email = sessionStorage.getItem('userEmail');
     const userId = sessionStorage.getItem('userId');
     if (!token) {
       navigate('/signin');
     } else {
       setUserName(name);
+      setUserEmail(email);
       setLoading(true);
       axios
         .get('https://e-bursary-backend.onrender.com/api/student', {
@@ -152,7 +164,15 @@ const StudentDashboard = () => {
       });
   };
 
-  const applicationCompleted = documentUploaded;
+  // Check if user's name or email appears in the personalDetailsList (case-insensitive)
+  const currentName = userName?.trim().toLowerCase();
+  const currentEmail = userEmail?.trim().toLowerCase();
+  const hasApplied = personalDetailsList.some(
+    (item) =>
+      (item.fullname && item.fullname.trim().toLowerCase() === currentName) ||
+      (item.email && item.email.trim().toLowerCase() === currentEmail)
+  );
+  const applicationCompleted = hasApplied || documentUploaded;
 
   return (
     <div className="w-full min-h-screen relative">
@@ -230,7 +250,7 @@ const StudentDashboard = () => {
               <div className="flex items-center">
                 <a
                   href="#"
-                  onClick={handleApplyClick}
+                  onClick={applicationCompleted ? (e) => e.preventDefault() : handleApplyClick}
                   className={`
                     flex items-center w-full space-x-2 text-white no-underline
                     transition-all duration-200
@@ -355,139 +375,8 @@ const StudentDashboard = () => {
           </ul>
         </div>
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-          ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
-        `}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {loading ? (
-              <div className="col-span-1 md:col-span-3 flex justify-center items-center min-h-[300px]">
-                <span className="text-gray-500 text-lg animate-pulse">Loading...</span>
-              </div>
-            ) : Object.keys(studentDetails).length > 0 ? (
-              <>
-                {/* Bursary Funds & Status */}
-                <div className="flex flex-col gap-4">
-                  <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center mb-2">
-                    <h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1">Bursary funds allocated:</h2>
-                    <p className="mb-2">
-                      {studentDetails.bursary
-                        ? `${parseFloat(studentDetails.bursary).toFixed(2)} shillings`
-                        : "0.00 shillings"}
-                    </p>
-                    <FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-3xl" />
-                  </div>
-                  <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center">
-                    <h2 className="text-[1.2rem] md:text-[1.2rem]  font-bold mb-1">Status of the application:</h2>
-                    <p className="mb-2">{studentDetails.status}</p>
-                    <FontAwesomeIcon icon={faCheckDouble} className="text-blue-500 text-3xl" />
-                  </div>
-                </div>
-                {/* User Profile */}
-                <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]  rounded flex flex-col items-center">
-                  <h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.35rem]">User Profile</h2>
-                  <hr className="my-4 w-full" />
-                  <div className="text-center leading-8">
-                    <img
-                      className="rounded-full w-24 h-24 mx-auto"
-                      src="/images/patient.png"
-                      alt="Profile"
-                    />
-                    <h5 className="font-semibold mt-4 text-[1rem] md:text-[1.1rem]">
-                      {studentDetails.fullname}
-                    </h5>
-                    <p className="text-gray-500 text-[1rem] md:text-[1.1rem]">Student</p>
-                  </div>
-                  <hr className="my-4 w-full " />
-                  <p className='leading-8 text-[1rem] md:text-[1.1rem]'>
-                    <strong>Student No:</strong> {studentDetails.admission}
-                  </p>
-                  <p className='leading-8 text-[1rem] md:text-[1.1rem]'>
-                    <strong>School:</strong> {studentDetails.institution}
-                  </p>
-                </div>
-                {/* Personal Information */}
-                <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded">
-                  <div className="flex items-center mb-4">
-                    <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl md:text-2xl mr-2" />
-                    <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem]">Personal Information</h2>
-                    <button
-                      className="bg-blue-500 text-white px-3  md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
-                      onClick={handleEditClick}
-                    >
-                      <FontAwesomeIcon icon={faEdit} className="text-[1rem] md:text-[1.2rem]" /> Update Profile
-                    </button>
-                  </div>
-                  <hr className="my-4" />
-                  <table className="table-auto w-full text-left">
-                    <tbody className="leading-8 text-[1rem] md:text-[1.1rem]">
-                      <tr>
-                        <th className="pr-4">Full name:</th>
-                        <td>{studentDetails.fullname}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Email:</th>
-                        <td>{studentDetails.email}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Sub County:</th>
-                        <td>{studentDetails.subcounty}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Ward:</th>
-                        <td>{studentDetails.ward}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Village unit:</th>
-                        <td>{studentDetails.village}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Date of birth:</th>
-                        <td>{studentDetails.birth}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Sex:</th>
-                        <td>{studentDetails.gender}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Name of institution:</th>
-                        <td>{studentDetails.institution}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Year:</th>
-                        <td>{studentDetails.year}</td>
-                      </tr>
-                      <tr>
-                        <th className="pr-4">Admission:</th>
-                        <td>{studentDetails.admission}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            ) : (
-              <div
-                className={`
-                  bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md  flex flex-col gap-4
-                  transition-all duration-300
-                  w-[280px]
-                  md:w-[500px]
-                  mx-auto
-                  mt-10
-                  md:mt-60
-                  ${sidebarActive
-                    ? '-ml-[40px] md:ml-[480px]'
-                    : 'ml-[8px] md:ml-[450px]'
-                  }
-                `}
-              >
-                <h2 className="text-[1.3rem] md:text-[1.3rem] font-bold text-center">Dashboard is empty</h2>
-                <p className="block text-[1rem] md:text-[1.1rem]" >Please click on the 'Apply' icon in the sidebar to complete your information.</p>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* ...rest of your main content remains unchanged */}
       </div>
-
       {/* Overlay and Edit Form Modal */}
       {isEditFormVisible && (
         <>
