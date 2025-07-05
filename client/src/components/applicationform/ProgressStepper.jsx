@@ -38,7 +38,8 @@ const ProgressStepper = () => {
           data.personal_details &&
           data.amount_details &&
           data.family_details &&
-          data.disclosure_details
+          data.disclosure_details &&
+          data.document_upload
         ) step = 5;
 
         setCurrentStep(step);

@@ -190,7 +190,6 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
   }
 });
 
-// API to check application status per user
 app.get('/api/application-status/:userId', async (req, res) => {
   const userId = req.params.userId;
   try {
@@ -198,12 +197,14 @@ app.get('/api/application-status/:userId', async (req, res) => {
     const [amount] = await pool.query('SELECT user_id FROM amount_details WHERE user_id = ?', [userId]);
     const [family] = await pool.query('SELECT user_id FROM family_details WHERE user_id = ?', [userId]);
     const [disclosure] = await pool.query('SELECT user_id FROM disclosure_table WHERE user_id = ?', [userId]);
+    const [documents] = await pool.query('SELECT user_id FROM documents WHERE user_id = ?', [userId]);
 
     res.json({
       personal_details: personal.length > 0,
       amount_details: amount.length > 0,
       family_details: family.length > 0,
       disclosure_details: disclosure.length > 0,
+      document_upload: documents.length > 0,
     });
   } catch (err) {
     console.error(err);
