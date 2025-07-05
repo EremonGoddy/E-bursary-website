@@ -235,13 +235,8 @@ const StudentDashboard = () => {
 <a
   href="#"
   onClick={handleApplyClick}
-  className={`
-    flex items-center w-full space-x-2 text-white no-underline
-    transition-all duration-200
-    ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-    ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}
-  `}
-  tabIndex={documentUploaded ? -1 : undefined}
+  className={`flex items-center w-full ... ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
+  disabled={documentUploaded}  // <-- Add this for extra safety
   aria-disabled={documentUploaded ? "true" : "false"}
 >
   <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
@@ -339,7 +334,7 @@ const StudentDashboard = () => {
             {/* Logout */}
             <li className="relative group">
               <div className="flex items-center">
-                <Link to="/" onClick={() => {sessionStorage.clear();  setDocumentUploaded(false);}}  className={`
+                <Link to="/" onClick={() => {sessionStorage.clear(); setDocumentUploaded(false);navigate('/');}}  className={`
                   flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
                   transition-all duration-200
                   ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
