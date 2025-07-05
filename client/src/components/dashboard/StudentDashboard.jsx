@@ -92,14 +92,18 @@ const StudentDashboard = () => {
         });
 
       // Check if document has been uploaded for this user
-      if (userId) {
-        axios
-          .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`)
-          .then((res) => {
-            setDocumentUploaded(res.data.uploaded === true);
-          })
-          .catch(() => setDocumentUploaded(false));
-      }
+    if (userId) {
+  axios
+    .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`)
+    .then((res) => {
+      // If file_path is null → Keep Apply active (setDocumentUploaded = false)
+      // If file_path is not null → Disable Apply (setDocumentUploaded = true)
+      const isUploaded = res.data && res.data.uploaded === true;
+      setDocumentUploaded(isUploaded);
+    })
+    .catch(() => setDocumentUploaded(false));
+}
+
     }
   }, [navigate]);
 
@@ -228,21 +232,25 @@ const StudentDashboard = () => {
             {/* Apply */}
             <li className="relative group">
               <div className="flex items-center">
-                <a
-                  href="#"
-                  onClick={handleApplyClick}
-                  className={`
-                    flex items-center w-full space-x-2 text-white no-underline
-                    transition-all duration-200
-                    ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                    ${applicationCompleted ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}
-                  `}
-                  tabIndex={applicationCompleted ? -1 : undefined}
-                  aria-disabled={applicationCompleted ? "true" : "false"}
-                >
-                  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
-                </a>
+<a
+  href="#"
+  onClick={handleApplyClick}
+  className={`
+    flex items-center w-full space-x-2 text-white no-underline
+    transition-all duration-200
+    ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+    ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}
+  `}
+  tabIndex={documentUploaded ? -1 : undefined}
+  aria-disabled={documentUploaded ? "true" : "false"}
+>
+  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+  <span className={`
+    transition-all duration-200 
+    ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}
+  `}>Apply</span>
+</a>
+
                 <span className={`
                   absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
                   rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
