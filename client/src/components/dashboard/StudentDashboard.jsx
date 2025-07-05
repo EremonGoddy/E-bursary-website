@@ -59,52 +59,52 @@ const StudentDashboard = () => {
 
   // Fetch student info and document upload status
   useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const name = sessionStorage.getItem('userName');
-    const userId = sessionStorage.getItem('userId');
-    if (!token) {
+   const token = sessionStorage.getItem('authToken');
+  const name = sessionStorage.getItem('userName');
+  const userId = sessionStorage.getItem('userId');
+
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
+
+  setUserName(name);
+  setLoading(true);
+
+  // ✅ Fetch student details only if token is present
+  axios.get('https://e-bursary-backend.onrender.com/api/student', {
+    headers: {
+      Authorization: token,
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+      Expires: '0',
+    },
+  })
+  .then((response) => {
+    setStudentDetails(response.data);
+    setFormData(response.data);
+    setLoading(false);
+  })
+  .catch((error) => {
+    setLoading(false);
+    if (error.response && error.response.status === 401) {
       navigate('/signin');
-    } else {
-      setUserName(name);
-      setLoading(true);
-      axios
-        .get('https://e-bursary-backend.onrender.com/api/student', {
-          headers: {
-            Authorization: token,
-            'Cache-Control': 'no-cache',
-            Pragma: 'no-cache',
-            Expires: '0',
-          },
-        })
-        .then((response) => {
-          setStudentDetails(response.data);
-          setFormData(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setLoading(false);
-          if (error.response && error.response.status === 401) {
-            setStudentDetails({});
-            setFormData({});
-            navigate('/signin');
-          }
-          console.error('Error fetching student data:', error);
-        });
-
-      // Check if document has been uploaded for this user
-    if (userId) {
-  axios
-    .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`)
-    .then((res) => {
-      // If file_path is null → Keep Apply active (setDocumentUploaded = false)
-      // If file_path is not null → Disable Apply (setDocumentUploaded = true)
-      const isUploaded = res.data && res.data.uploaded === true;
-      setDocumentUploaded(isUploaded);
-    })
-    .catch(() => setDocumentUploaded(false));
-}
-
     }
+  });
+
+  // ✅ Only call document status API if both token and userId exist
+  if (token && userId) {
+    axios
+      .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
+        headers: { Authorization: token }  // Optional but recommended for security
+      })
+      .then((res) => {
+        const isUploaded = res.data && res.data.uploaded === true;
+        setDocumentUploaded(isUploaded);
+      })
+      .catch(() => setDocumentUploaded(false));
+  }
+
   }, [navigate]);
 
   const handleEditClick = () => setEditFormVisible(true);

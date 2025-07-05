@@ -400,17 +400,19 @@ app.post('/api/disclosure-details', async (req, res) => {
 
 
 
-app.get('/api/upload/status/:userId', async (req, res) => {
+app.get('/upload/status/:userId', async (req, res) => {
   const { userId } = req.params;
-  try {
-    const result = await pool.query(
-      'SELECT file_path FROM uploaded_document WHERE user_id = $1 AND file_path IS NOT NULL AND file_path <> \'\' LIMIT 1',
-      [userId]
-    );
 
-    const documentExists = result.rows.length > 0;
-    res.json({ uploaded: documentExists });
-  } catch (err) {
+  try {
+    const [rows] = await pool.query('SELECT file_path FROM uploaded_document WHERE user_id = ?', [userId]);
+
+    if (rows.length > 0 && rows[0].file_path) {
+      res.json({ uploaded: true });
+    } else {
+      res.json({ uploaded: false });
+    }
+  } catch (error) {
+    console.error('Error checking upload status:', error);
     res.status(500).json({ uploaded: false });
   }
 });

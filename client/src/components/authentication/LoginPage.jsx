@@ -26,10 +26,13 @@ axios
 .post('https://e-bursary-backend.onrender.com/api/signin', { email, password })
 .then((response) => {
 const { token, student, role, name } = response.data;
+const userId = sessionStorage.getItem('userId');
 const storage = rememberMe ? localStorage : sessionStorage;
 storage.setItem('authToken', token);
 storage.setItem('student', JSON.stringify(student));
 storage.setItem('userName', name); // Save user's name in session storage
+storage.setItem('userId', student.user_id);
+
 
 if (role === 'Student') navigate('/studentdashboard');
 else if (role === 'Admin') navigate('/admindashboard');
