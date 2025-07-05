@@ -339,7 +339,7 @@ const StudentDashboard = () => {
             {/* Logout */}
             <li className="relative group">
               <div className="flex items-center">
-                <Link to="/" onClick={() => {sessionStorage.clear();}}  className={`
+                <Link to="/" onClick={() => {sessionStorage.clear();  setDocumentUploaded(false);}}  className={`
                   flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
                   transition-all duration-200
                   ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
