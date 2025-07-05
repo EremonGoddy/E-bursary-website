@@ -34,10 +34,32 @@ storage.setItem('userName', name); // Save user's name in session storage
 storage.setItem('userId', student.user_id);
 
 
-if (role === 'Student') navigate('/studentdashboard');
-else if (role === 'Admin') navigate('/admindashboard');
-else if (role === 'Committee') navigate('/committeedashboard');
-else alert('Role not recognized');
+if (role === 'Student'){
+      // 🔑 NEW: Check uploaded document status immediately after login
+      axios.get(`https://e-bursary-backend.onrender.com/api/upload/status/${student.user_id}`, {
+        headers: { Authorization: token }  // Pass token if your backend requires it
+      })
+      .then((uploadRes) => {
+        const uploaded = uploadRes.data.uploaded;
+        storage.setItem('documentUploaded', uploaded ? 'true' : 'false');
+        navigate('/studentdashboard');
+      })
+      .catch((err) => {
+        console.error('Failed to fetch document status:', err);
+        storage.setItem('documentUploaded', 'false');
+        navigate('/studentdashboard');
+      });
+    } 
+else if (role === 'Admin'){
+      navigate('/admindashboard');
+    }
+else if (role === 'Committee'){
+      navigate('/committeedashboard');
+    } 
+else {
+      alert('Role not recognized');
+    }
+
 })
 .catch((err) => alert(err.response.data.message));
 };

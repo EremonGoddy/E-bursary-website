@@ -93,7 +93,7 @@ const StudentDashboard = () => {
   });
 
   // ✅ Only call document status API if both token and userId exist
-  if (token && userId) {
+  if (userId) {
     axios
       .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
         headers: { Authorization: token }  // Optional but recommended for security
@@ -101,6 +101,7 @@ const StudentDashboard = () => {
       .then((res) => {
         const isUploaded = res.data && res.data.uploaded === true;
         setDocumentUploaded(isUploaded);
+        
       })
       .catch(() => setDocumentUploaded(false));
   }
@@ -234,16 +235,14 @@ const StudentDashboard = () => {
               <div className="flex items-center">
 <a
   href="#"
-  onClick={handleApplyClick}
-  className={`flex items-center w-full ... ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
-  disabled={documentUploaded}  // <-- Add this for extra safety
+  onClick={documentUploaded ? undefined : handleApplyClick}   // Disable click handler safely
+  className={`flex items-center w-full ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
   aria-disabled={documentUploaded ? "true" : "false"}
 >
   <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-  <span className={`
-    transition-all duration-200 
-    ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}
-  `}>Apply</span>
+  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>
+    Apply
+  </span>
 </a>
 
                 <span className={`
