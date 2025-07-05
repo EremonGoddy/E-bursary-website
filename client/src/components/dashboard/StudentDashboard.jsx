@@ -31,51 +31,23 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
 
   // Ensures the proper step navigation on sidebar 'Apply' click
-    useEffect(() => {
-    const storedUserId = sessionStorage.getItem('userId');
-    setUserId(storedUserId);
-  }, []);
-
-  const handleApplyClick = async () => {
+  const handleApplyClick = async (e) => {
+    e.preventDefault();
+    const userId = sessionStorage.getItem('userId');
     if (!userId) {
       navigate('/personaldetails');
       return;
     }
-
     try {
-      const personal = await axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`);
-      if (!personal.data || !personal.data.user_id) {
+      const res = await axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`);
+      if (res.data && res.data.user_id) {
+        // Details exist, go to Amountdetails
+        navigate('/Amountdetails');
+      } else {
+        // No details, force personal details page
         navigate('/personaldetails');
-        return;
       }
-
-      const amount = await axios.get(`https://e-bursary-backend.onrender.com/api/amount-details/user/${userId}`);
-      if (!amount.data || !amount.data.user_id) {
-        navigate('/amountdetails');
-        return;
-      }
-
-      const family = await axios.get(`https://e-bursary-backend.onrender.com/api/family-details/user/${userId}`);
-      if (!family.data || !family.data.user_id) {
-        navigate('/familydetails');
-        return;
-      }
-
-      const disclosure = await axios.get(`https://e-bursary-backend.onrender.com/api/disclosure-details/user/${userId}`);
-      if (!disclosure.data || !disclosure.data.user_id) {
-        navigate('/disclosuredetails');
-        return;
-      }
-
-      const document = await axios.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`);
-      if (!document.data.uploaded) {
-        navigate('/uploaddocument');
-        return;
-      }
-
-      navigate('/studentdashboard');
-    } catch (error) {
-      console.error('Error checking application steps:', error);
+    } catch {
       navigate('/personaldetails');
     }
   };
