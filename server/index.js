@@ -194,10 +194,10 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
 app.get('/api/application-status/:userId', async (req, res) => {
   const userId = req.params.userId;
   try {
-    const [personal] = await db.query('SELECT user_id FROM personal_details WHERE user_id = ?', [userId]);
-    const [amount] = await db.query('SELECT user_id FROM amount_details WHERE user_id = ?', [userId]);
-    const [family] = await db.query('SELECT user_id FROM family_details WHERE user_id = ?', [userId]);
-    const [disclosure] = await db.query('SELECT user_id FROM disclosure_table WHERE user_id = ?', [userId]);
+    const [personal] = await pool.query('SELECT user_id FROM personal_details WHERE user_id = ?', [userId]);
+    const [amount] = await pool.query('SELECT user_id FROM amount_details WHERE user_id = ?', [userId]);
+    const [family] = await pool.query('SELECT user_id FROM family_details WHERE user_id = ?', [userId]);
+    const [disclosure] = await pool.query('SELECT user_id FROM disclosure_table WHERE user_id = ?', [userId]);
 
     res.json({
       personal_details: personal.length > 0,

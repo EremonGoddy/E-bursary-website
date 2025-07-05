@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse, faFileAlt, faPaperclip, faDownload, faComments, faCog,
+  faHouse, faFileAlt, faDownload, faComments, faCog,
   faSignOutAlt, faBars, faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -75,13 +75,11 @@ const FamilyDetails = () => {
     }
     setUserName(name);
 
-    // Check if family details already exist for this userId
     if (userId) {
       axios
         .get(`https://e-bursary-backend.onrender.com/api/family-details/user/${userId}`)
         .then(res => {
           if (res.data && res.data.user_id) {
-            // Family details already exist, go to next step
             navigate('/Disclosuredetails');
           } else {
             setLoading(false);
@@ -93,11 +91,10 @@ const FamilyDetails = () => {
     }
   }, [navigate]);
 
-  if (loading) return null; // Prevent flash before redirect or loading complete
+  if (loading) return null;
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
-      {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
@@ -106,11 +103,7 @@ const FamilyDetails = () => {
               Welcome: {userName}
             </h2>
             <div className="flex items-center space-x-2">
-              <img
-                src="/images/patient.png"
-                alt="User"
-                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
-              />
+              <img src="/images/patient.png" alt="User" className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20" />
               <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
             </div>
           </div>
@@ -118,175 +111,51 @@ const FamilyDetails = () => {
       </div>
 
       <div className="flex pt-20 min-h-screen">
-        {/* Sidebar */}
-        <div
-          className={`
-            fixed top-0 left-0 z-30 bg-[#1F2937] 
-            h-screen 
-            ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
-            mt-10
-            text-white p-4 
-            flex flex-col
-            transition-all duration-300
-            min-h-screen
-            md:min-h-screen
-          `}
-        >
-          <FontAwesomeIcon
-            icon={faBars}
-            className={`
-              text-white 
-              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
-              text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
-            `}
-            onClick={toggleSidebar}
-          />
+        <div className={`fixed top-0 left-0 z-30 bg-[#1F2937] h-screen ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} mt-10 text-white p-4 flex flex-col transition-all duration-300 min-h-screen md:min-h-screen`}>
+          <FontAwesomeIcon icon={faBars} className={`text-white ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''} text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start`} onClick={toggleSidebar} />
           <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
-            {/* Sidebar links... (unchanged) */}
             <li className="list-none mt-[30px] text-center relative group">
-              <div className="flex items-center">
-                <Link to="/student" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[40px] h-[40px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Dashboard
-                </span>
-              </div>
+              <Link to="/student" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}`}>
+                <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
+                <span className={`${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
+              </Link>
             </li>
             <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/personaldetails" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Apply
-                </span>
-              </div>
+              <Link to="/personaldetails" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}`}>
+                <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                <span className={`${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
+              </Link>
             </li>
             <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/studentreport" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Report
-                </span>
-              </div>
+              <Link to="/studentreport" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}`}>
+                <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
+                <span className={`${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
+              </Link>
             </li>
             <li className="relative group">
-              <div className="flex items-center">
-                <Link to="#" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Messages
-                </span>
-              </div>
+              <Link to="#" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}`}>
+                <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
+                <span className={`${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
+              </Link>
             </li>
             <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/studentsetting" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[2px] md:ml-[10px]' : 'hidden'}`}>Settings</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Settings
-                </span>
-              </div>
+              <Link to="/studentsetting" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}`}>
+                <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
+                <span className={`${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Settings</span>
+              </Link>
             </li>
             <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/" className={`
-                  flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Logout
-                </span>
-              </div>
+              <Link to="/" className={`flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}`}>
+                <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+                <span className={`${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
+              </Link>
             </li>
           </ul>
         </div>
-        {/* Main Content Area */}
+
         <div className={`flex-1 ml-10 md:ml-25 p-4 transition-all duration-300`}>
           <ProgressStepper currentStep={2} />
-          <div className="bg-white rounded-lg  max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto  -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
+          <div className="bg-white rounded-lg max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-center">Bursary Application Form</h1>
             <h2 className="text-lg font-semibold mb-6 text-center text-gray-700">Family Details</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
@@ -358,11 +227,7 @@ const FamilyDetails = () => {
               </div>
             </form>
             <div className="flex justify-end mt-8">
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                className="bg-blue-600 text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-blue-700 transition duration-200"
-              >
+              <button type="submit" onClick={handleSubmit} className="bg-blue-600 text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-blue-700 transition duration-200">
                 Next
               </button>
             </div>
