@@ -403,13 +403,19 @@ app.post('/api/disclosure-details', async (req, res) => {
 app.get('/api/upload/status/:userId', async (req, res) => {
   const { userId } = req.params;
   try {
-    // Updated table name to uploaded_document
-    const result = await pool.query('SELECT 1 FROM uploaded_document WHERE user_id = $1 LIMIT 1', [userId]);
-    res.json({ uploaded: result.rows.length > 0 });
+    const result = await pool.query(
+      'SELECT file_path FROM uploaded_document WHERE user_id = $1 AND file_path IS NOT NULL AND file_path <> \'\' LIMIT 1',
+      [userId]
+    );
+
+    const documentExists = result.rows.length > 0;
+    res.json({ uploaded: documentExists });
   } catch (err) {
     res.status(500).json({ uploaded: false });
   }
 });
+
+
 
 // Use /tmp/uploads for cloud environments like Render
 const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');

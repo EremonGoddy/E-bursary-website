@@ -3,73 +3,87 @@ import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUser,
-  faCoins,
   faUsers,
   faExclamationTriangle,
-  faPaperclip
+  faPaperclip,
+  faCoins
 } from '@fortawesome/free-solid-svg-icons';
 
-// Step configuration (fixed order)
+// Step configuration
 const steps = [
-  { label: "Personal Details", icon: faUser, path: "/personaldetails" },
-  { label: "Amount Details", icon: faCoins, path: "/amountdetails" },
-  { label: "Family Details", icon: faUsers, path: "/familydetails" },
-  { label: "Disclosure Details", icon: faExclamationTriangle, path: "/disclosuredetails" },
-  { label: "Upload Documents", icon: faPaperclip, path: "/documentupload" }
+  { label: "Personal Details", icon: faUser, path: "/personaldetails", color: "text-blue-600" },
+  { label: "Amount Details", icon: faCoins, path: "/amountdetails", color: "text-yellow-500" },
+  { label: "Family Details", icon: faUsers, path: "/familydetails", color: "text-pink-600" },
+  { label: "Disclosure Details", icon: faExclamationTriangle, path: "/disclosuredetails", color: "text-red-500" },
+  { label: "Upload Documents", icon: faPaperclip, path: "/documentupload", color: "text-green-600" }
 ];
 
+/**
+ * ProgressStepper
+ * Fetches user progress from backend and displays the application stepper.
+ */
 const ProgressStepper = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState({ currentStep: 0, completedSteps: [] });
 
   useEffect(() => {
+    // Get the current user's userId from session storage (must be set on login)
     const userId = sessionStorage.getItem('userId');
-    if (!userId) return;
-
-    axios.get(`https://e-bursary-backend.onrender.com/api/application-status/${userId}`)
-      .then(res => {
-        const data = res.data;
-
-        let step = 0;
-        if (data.personal_details) step = 1;
-        if (data.amount_details) step = 2;
-        if (data.family_details) step = 3;
-        if (data.disclosure_details) step = 4;
-        if (
-          data.personal_details &&
-          data.amount_details &&
-          data.family_details &&
-          data.disclosure_details
-        ) step = 5;
-
-        setCurrentStep(step);
-      })
-      .catch(err => {
-        console.error(err);
-        setCurrentStep(0);
-      });
+    if (userId) {
+      axios
+        .get(`https://e-bursary-backend.onrender.com/api/application-progress/${userId}`)
+        .then(res => {
+          setProgress({
+            currentStep: res.data.currentStep,
+            completedSteps: res.data.completedSteps
+          });
+        })
+        .catch(() => {
+          setProgress({ currentStep: 0, completedSteps: [] });
+        });
+    }
   }, []);
 
+  const { currentStep, completedSteps } = progress;
+
   return (
-    <div className="flex items-center justify-center mb-6 mt-1 w-full max-w-6xl mx-auto">
+    <div className="flex items-center justify-center mb-6 mt-1 w-full max-w-8xl mx-auto">
       {steps.map((step, idx) => {
-        const isCompleted = idx < currentStep;
+        // Consider step completed if in completedSteps or before currentStep
+        const isCompleted = completedSteps.includes(idx) || idx < currentStep;
         const isActive = idx === currentStep;
 
-        const bgColor = isCompleted ? "bg-green-500" : isActive ? "bg-blue-600" : "bg-gray-200";
-        const iconColor = isCompleted || isActive ? "text-white" : "text-gray-500";
+        // Icon color: white for completed or active, else the color in the step
+        const iconColorClass = isCompleted || isActive ? "text-white" : step.color;
+
+        // Step circle background
+        let bgColor = "bg-gray-200";
+        if (isCompleted) bgColor = "bg-green-500";
+        else if (isActive) bgColor = "bg-blue-600";
 
         return (
           <React.Fragment key={step.label}>
-            <div className="flex flex-col items-center min-w-[90px]">
-              <div className={`rounded-full w-10 h-10 flex items-center justify-center text-xl ${bgColor}`}>
-                <FontAwesomeIcon icon={step.icon} className={iconColor} />
+            <div className="flex flex-col items-center min-w-[100px]">
+              <div className={`rounded-full w-11 h-11 flex items-center justify-center text-2xl ${bgColor} transition-colors duration-300`}>
+                <FontAwesomeIcon icon={step.icon} className={iconColorClass} />
               </div>
-              <span className={`text-[0.75rem] mt-2 text-center w-24 ${isActive ? 'text-blue-700 font-semibold' : isCompleted ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className={`text-sm mt-2 text-center w-28 break-words ${
+                isActive ? 'font-semibold text-blue-700'
+                  : isCompleted ? 'text-green-600'
+                  : 'text-gray-400'
+              }`}>
                 {step.label}
               </span>
             </div>
+            {/* Connector line */}
             {idx !== steps.length - 1 && (
-              <div className={`flex-1 h-1.5 mx-2 rounded ${idx < currentStep - 1 ? 'bg-green-500' : idx === currentStep - 1 ? 'bg-blue-500' : 'bg-gray-200'}`} />
+              <div className={
+                "flex-1 h-1.5 mx-4 rounded transition-colors duration-300 " +
+                (isCompleted
+                  ? "bg-green-500"
+                  : isActive
+                    ? "bg-blue-500"
+                    : "bg-gray-200")
+              } />
             )}
           </React.Fragment>
         );
