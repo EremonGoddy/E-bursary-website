@@ -196,8 +196,8 @@ app.get('/api/application-status/:userId', async (req, res) => {
     const [personal] = await pool.query('SELECT user_id FROM personal_details WHERE user_id = ?', [userId]);
     const [amount] = await pool.query('SELECT user_id FROM amount_details WHERE user_id = ?', [userId]);
     const [family] = await pool.query('SELECT user_id FROM family_details WHERE user_id = ?', [userId]);
-    const [disclosure] = await pool.query('SELECT user_id FROM disclosure_table WHERE user_id = ?', [userId]);
-    const [documents] = await pool.query('SELECT user_id FROM documents WHERE user_id = ?', [userId]);
+    const [disclosure] = await pool.query('SELECT user_id FROM disclosure_details WHERE user_id = ?', [userId]);
+    const [documents] = await pool.query('SELECT user_id FROM uploaded_document WHERE user_id = ?', [userId]);
 
     res.json({
       personal_details: personal.length > 0,
