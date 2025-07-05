@@ -29,10 +29,8 @@ const PersonalDetails = () => {
 
   const navigate = useNavigate();
 
-  // Toggle sidebar
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
-  // Fetch all student names and emails on mount for duplicate check
   useEffect(() => {
     axios
       .get('https://e-bursary-backend.onrender.com/api/students/all-names')
@@ -47,7 +45,6 @@ const PersonalDetails = () => {
       .catch(() => setAllStudents([]));
   }, []);
 
-  // On mount, check if personal details already exist for this user_id
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
@@ -58,11 +55,9 @@ const PersonalDetails = () => {
     }
     setUserName(name);
 
-    // Use the backend endpoint that returns 404 if not found
     if (userId) {
       axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`)
         .then(res => {
-          // If the API returns a row with user_id, skip this page
           if (res.data && res.data.user_id) {
             navigate('/Amountdetails');
           } else {
@@ -70,13 +65,10 @@ const PersonalDetails = () => {
           }
         })
         .catch(error => {
-          // If the backend returns 404, stay on this page
           if (error.response && error.response.status === 404) {
             setLoading(false);
           } else {
-            // For any other error, also stay but you can log or notify
             setLoading(false);
-            // Optionally: setErrorMsg("Error confirming personal details.");
           }
         });
     } else {
@@ -84,14 +76,34 @@ const PersonalDetails = () => {
     }
   }, [navigate]);
 
-  // Handle input change
+  useEffect(() => {
+    const userId = sessionStorage.getItem('userId');
+    if (userId) {
+      axios.get(`https://e-bursary-backend.onrender.com/api/application-status/${userId}`)
+        .then(res => {
+          const { personal_details, amount_details, family_details, disclosure_details } = res.data;
+          if (personal_details && amount_details && family_details && disclosure_details) {
+            navigate('/documentupload');
+          } else if (personal_details && amount_details && family_details) {
+            navigate('/disclosuredetails');
+          } else if (personal_details && amount_details) {
+            navigate('/familydetails');
+          } else if (personal_details) {
+            navigate('/amountdetails');
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching application progress', err);
+        });
+    }
+  }, [navigate]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrorMsg("");
   };
 
-  // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMsg("");
@@ -131,7 +143,6 @@ const PersonalDetails = () => {
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
-      {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
@@ -140,182 +151,36 @@ const PersonalDetails = () => {
               Welcome: {userName}
             </h2>
             <div className="flex items-center space-x-2">
-              <img
-                src="/images/patient.png"
-                alt="User"
-                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
-              />
+              <img src="/images/patient.png" alt="User" className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20" />
               <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
             </div>
           </div>
         </div>
       </div>
       <div className="flex pt-20 min-h-screen">
-        {/* Sidebar */}
-        <div
-          className={`
-            fixed top-0 left-0 z-30 bg-[#1F2937] 
-            h-screen 
-            ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
-            mt-10
-            text-white p-4 
-            flex flex-col
-            transition-all duration-300
-            min-h-screen
-            md:min-h-screen
-          `}
-        >
-          <FontAwesomeIcon
-            icon={faBars}
-            className={`
-              text-white 
-              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
-              text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
-            `}
-            onClick={toggleSidebar}
-          />
+        <div className={`fixed top-0 left-0 z-30 bg-[#1F2937] h-screen ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} mt-10 text-white p-4 flex flex-col transition-all duration-300 min-h-screen md:min-h-screen`}>
+          <FontAwesomeIcon icon={faBars} className={`text-white ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''} text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start`} onClick={toggleSidebar} />
           <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
             <li className="list-none mt-[30px] text-center relative group">
               <div className="flex items-center">
-                <Link to="/student" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
-                `}>
+                <Link to="/student" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}`}>
                   <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
                   <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
                 </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[40px] h-[40px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Dashboard
-                </span>
+                <span className={`absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold text-center shadow-lg transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto leading-[40px] h-[40px] block ${sidebarActive ? 'hidden' : 'block'}`}>Dashboard</span>
               </div>
             </li>
             <li className="relative group">
               <div className="flex items-center">
-                <Link to="/personaldetails" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
+                <Link to="/personaldetails" className={`flex items-center w-full space-x-2 text-white no-underline transition-all duration-200 ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}`}>
                   <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
                   <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Apply</span>
                 </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Apply
-                </span>
-              </div>
-            </li>
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/studentreport" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Report
-                </span>
-              </div>
-            </li>
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="#" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Messages
-                </span>
-              </div>
-            </li>
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/studentsetting" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[2px] md:ml-[10px]' : 'hidden'}`}>Settings</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Settings
-                </span>
-              </div>
-            </li>
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/" className={`
-                  flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Logout
-                </span>
+                <span className={`absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2 rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold text-center shadow-lg transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto leading-[35px] h-[35px] block ${sidebarActive ? 'hidden' : 'block'}`}>Apply</span>
               </div>
             </li>
           </ul>
         </div>
-        {/* Main Content Area */}
         <div className={`flex-1 ml-10 md:ml-25 transition-all duration-300`}>
           <ProgressStepper currentStep={0} />
           <div className="bg-white rounded-lg max-w-[300px] md:max-w-[600px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
@@ -327,156 +192,56 @@ const PersonalDetails = () => {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div>
                 <label htmlFor="fullname" className="block font-medium mb-1">Full Name</label>
-                <input
-                  type="text"
-                  id="fullname"
-                  name="fullname"
-                  value={formData.fullname}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Full Name"
-                  required
-                />
+                <input type="text" id="fullname" name="fullname" value={formData.fullname} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter Full Name" required />
               </div>
               <div>
                 <label htmlFor="email" className="block font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Email"
-                  required
-                />
+                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter Email" required />
               </div>
               <div>
                 <label htmlFor="subcounty" className="block font-medium mb-1">Sub County</label>
-                <input
-                  type="text"
-                  id="subcounty"
-                  name="subcounty"
-                  value={formData.subcounty}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Sub County"
-                  required
-                />
+                <input type="text" id="subcounty" name="subcounty" value={formData.subcounty} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter Sub County" required />
               </div>
               <div>
                 <label htmlFor="ward" className="block font-medium mb-1">Ward</label>
-                <input
-                  type="text"
-                  id="ward"
-                  name="ward"
-                  value={formData.ward}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Ward"
-                  required
-                />
+                <input type="text" id="ward" name="ward" value={formData.ward} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter Ward" required />
               </div>
               <div>
                 <label htmlFor="village" className="block font-medium mb-1">Village Unit</label>
-                <input
-                  type="text"
-                  id="village"
-                  name="village"
-                  value={formData.village}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter your village"
-                  required
-                />
+                <input type="text" id="village" name="village" value={formData.village} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter your village" required />
               </div>
               <div>
                 <label htmlFor="birth" className="block font-medium mb-1">Date of Birth</label>
-                <input
-                  type="date"
-                  id="birth"
-                  name="birth"
-                  value={formData.birth}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  required
-                />
+                <input type="date" id="birth" name="birth" value={formData.birth} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" required />
               </div>
               <div>
                 <label className="block font-medium mb-1">Gender</label>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Male"
-                      checked={formData.gender === 'Male'}
-                      onChange={handleChange}
-                      className="form-radio text-blue-600"
-                      required
-                    />
+                    <input type="radio" name="gender" value="Male" checked={formData.gender === 'Male'} onChange={handleChange} className="form-radio text-blue-600" required />
                     <span className="ml-2">Male</span>
                   </label>
                   <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Female"
-                      checked={formData.gender === 'Female'}
-                      onChange={handleChange}
-                      className="form-radio text-blue-600"
-                      required
-                    />
+                    <input type="radio" name="gender" value="Female" checked={formData.gender === 'Female'} onChange={handleChange} className="form-radio text-blue-600" required />
                     <span className="ml-2">Female</span>
                   </label>
                 </div>
               </div>
               <div>
                 <label htmlFor="institution" className="block font-medium mb-1">Name of Institution</label>
-                <input
-                  type="text"
-                  id="institution"
-                  name="institution"
-                  value={formData.institution}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter institution"
-                  required
-                />
+                <input type="text" id="institution" name="institution" value={formData.institution} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter institution" required />
               </div>
               <div>
                 <label htmlFor="year" className="block font-medium mb-1">Year</label>
-                <input
-                  type="number"
-                  id="year"
-                  name="year"
-                  value={formData.year}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter year of education"
-                  required
-                />
+                <input type="number" id="year" name="year" value={formData.year} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter year of education" required />
               </div>
               <div>
                 <label htmlFor="admission" className="block font-medium mb-1">Admission</label>
-                <input
-                  type="text"
-                  id="admission"
-                  name="admission"
-                  value={formData.admission}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Admission"
-                  required
-                />
+                <input type="text" id="admission" name="admission" value={formData.admission} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500" placeholder="Enter Admission" required />
               </div>
             </form>
             <div className="flex justify-end mt-8">
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                className="bg-blue-600 text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-blue-700 transition duration-200"
-              >
+              <button type="submit" onClick={handleSubmit} className="bg-blue-600 text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-blue-700 transition duration-200">
                 Next
               </button>
             </div>
