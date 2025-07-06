@@ -398,11 +398,11 @@ app.post('/api/disclosure-details', async (req, res) => {
 });
 
 // ✅ Check Upload Status Route for PostgreSQL
-app.get('/upload/status/:userId', async (req, res) => {
+app.get('/api/upload/status/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const result = await pool.query('SELECT file_path FROM uploaded_document WHERE user_id = $1', [userId]);
+    const result = await pool.query('SELECT * FROM uploaded_document WHERE user_id = $1', [userId]);
 
     console.log('Checking document for userId:', userId);
     console.log('Query result:', result.rows);
