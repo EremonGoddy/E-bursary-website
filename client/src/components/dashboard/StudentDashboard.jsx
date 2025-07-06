@@ -21,7 +21,7 @@ import {
 import "./Dashboard.css";
 
 const StudentDashboard = () => {
-    const [sidebarActive, setSidebarActive] = useState(false);
+  const [sidebarActive, setSidebarActive] = useState(false);
   const [studentDetails, setStudentDetails] = useState({});
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({});
@@ -30,6 +30,7 @@ const StudentDashboard = () => {
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const navigate = useNavigate();
 
+  // Ensures the proper step navigation on sidebar 'Apply' click
   const handleApplyClick = async (e) => {
     e.preventDefault();
     const userId = sessionStorage.getItem('userId');
@@ -40,8 +41,10 @@ const StudentDashboard = () => {
     try {
       const res = await axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`);
       if (res.data && res.data.user_id) {
+        // Details exist, go to Amountdetails
         navigate('/Amountdetails');
       } else {
+        // No details, force personal details page
         navigate('/personaldetails');
       }
     } catch {
@@ -49,68 +52,60 @@ const StudentDashboard = () => {
     }
   };
 
+  // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
 
+  // Fetch student info and document upload status
   useEffect(() => {
-    const storedStatus = sessionStorage.getItem('documentUploaded') || localStorage.getItem('documentUploaded');
+   const token = sessionStorage.getItem('authToken');
+  const name = sessionStorage.getItem('userName');
+  const userId = sessionStorage.getItem('userId');
 
-    if (storedStatus === 'true') {
-      setDocumentUploaded(true);
-    } else {
-      const userId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
-      const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
 
-      if (!token) {
-        navigate('/signin');
-        return;
-      }
+  setUserName(name);
+  setLoading(true);
 
-      setUserName(sessionStorage.getItem('userName') || localStorage.getItem('userName'));
-      setLoading(true);
-
-      axios.get('https://e-bursary-backend.onrender.com/api/student', {
-        headers: {
-          Authorization: token,
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-          Expires: '0',
-        },
-      })
-      .then((response) => {
-        setStudentDetails(response.data);
-        setFormData(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        if (error.response && error.response.status === 401) {
-          navigate('/signin');
-        }
-      });
-
-      if (userId && token) {
-        axios.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
-          headers: { Authorization: token }
-        })
-        .then((response) => {
-          const isUploaded = response.data.uploaded;
-          setDocumentUploaded(isUploaded);
-
-          if (isUploaded) {
-            sessionStorage.setItem('documentUploaded', 'true');
-            localStorage.setItem('documentUploaded', 'true');
-          } else {
-            sessionStorage.setItem('documentUploaded', 'false');
-            localStorage.setItem('documentUploaded', 'false');
-          }
-        })
-        .catch(() => {
-          setDocumentUploaded(false);
-        });
-      }
+  // ✅ Fetch student details only if token is present
+  axios.get('https://e-bursary-backend.onrender.com/api/student', {
+    headers: {
+      Authorization: token,
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+      Expires: '0',
+    },
+  })
+  .then((response) => {
+    setStudentDetails(response.data);
+    setFormData(response.data);
+    setLoading(false);
+  })
+  .catch((error) => {
+    setLoading(false);
+    if (error.response && error.response.status === 401) {
+      navigate('/signin');
     }
+  });
+
+  // ✅ Only call document status API if both token and userId exist
+  if (userId) {
+    axios
+      .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
+        headers: { Authorization: token }  // Optional but recommended for security
+      })
+      .then((res) => {
+        const isUploaded = res.data && res.data.uploaded === true;
+        setDocumentUploaded(isUploaded);
+        
+      })
+      .catch(() => setDocumentUploaded(false));
+  }
+
   }, [navigate]);
 
   const handleEditClick = () => setEditFormVisible(true);
@@ -130,36 +125,40 @@ const StudentDashboard = () => {
     }
     setEditFormVisible(false);
     setLoading(true);
-
-    axios.put('https://e-bursary-backend.onrender.com/api/student/update', formData, {
-      headers: { Authorization: token },
-    })
-    .then(() => {
-      axios.get('https://e-bursary-backend.onrender.com/api/student', {
-        headers: {
-          Authorization: token,
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-          Expires: '0',
-        },
+    axios
+      .put('https://e-bursary-backend.onrender.com/api/student/update', formData, {
+        headers: { Authorization: token },
       })
       .then((response) => {
-        setStudentDetails(response.data);
-        setFormData(response.data);
-        setLoading(false);
+        axios
+          .get('https://e-bursary-backend.onrender.com/api/student', {
+            headers: {
+              Authorization: token,
+              'Cache-Control': 'no-cache',
+              Pragma: 'no-cache',
+              Expires: '0',
+            },
+          })
+          .then((getResponse) => {
+            setStudentDetails(getResponse.data);
+            setFormData(getResponse.data);
+            setLoading(false);
+          })
+          .catch((fetchError) => {
+            setLoading(false);
+            alert('Error fetching updated student data.');
+            console.error('Error fetching updated student data:', fetchError);
+          });
       })
-      .catch(() => {
+      .catch((error) => {
         setLoading(false);
-        alert('Error fetching updated student data.');
+        alert('Error updating student data. Please try again.');
+        console.error('Error updating student data:', error);
       });
-    })
-    .catch(() => {
-      setLoading(false);
-      alert('Error updating student data. Please try again.');
-    });
   };
 
   const applicationCompleted = documentUploaded;
+
   return (
     <div className="w-full min-h-screen relative">
       {/* Top Bar */}
@@ -236,7 +235,7 @@ const StudentDashboard = () => {
               <div className="flex items-center">
 <a
   href="#"
-  onClick={documentUploaded ? undefined : handleApplyClick}
+  onClick={documentUploaded ? undefined : handleApplyClick}   // Disable click handler safely
   className={`flex items-center w-full ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
   aria-disabled={documentUploaded ? "true" : "false"}
 >

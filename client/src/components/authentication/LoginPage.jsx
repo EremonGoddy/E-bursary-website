@@ -42,7 +42,7 @@ if (role === 'Student'){
       .then((uploadRes) => {
         const uploaded = uploadRes.data.uploaded;
         storage.setItem('documentUploaded', uploaded ? 'true' : 'false');
-        navigate('/studentdashboard', { state: { documentUploaded: uploaded } });
+        navigate('/studentdashboard');
       })
       .catch((err) => {
         console.error('Failed to fetch document status:', err);
