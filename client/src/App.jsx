@@ -1,6 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import HomePage from "./components/pages/HomePage";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from "./components/pages/HomePage"
 import AboutPage from './components/pages/AboutPage';
 import ServicesPage from './components/pages/ServicesPage';
 import ContactPage from './components/pages/ContactPage';
@@ -30,67 +29,49 @@ import AuditLogs from './components/admincontrols/AuditLogs';
 import BursaryAllocation from './components/committeeview/BursaryAllocation';
 import ProgressStepper from './components/applicationform/ProgressStepper';
 
-function AppRoutes() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-    const student = localStorage.getItem('student') || sessionStorage.getItem('student');
-    const committee = localStorage.getItem('committee') || sessionStorage.getItem('committee');
-    const admin = localStorage.getItem('admin') || sessionStorage.getItem('admin');
-
-    if (token && student) {
-      navigate('/studentdashboard');
-    } else if (token && committee) {
-      navigate('/committeedashboard');
-    } else if (token && admin) {
-      navigate('/admindashboard');
-    }
-  }, [navigate]);
-
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/services" element={<ServicesPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/admindashboard" element={<AdminDashboard />} />
-      <Route path="/committeedashboard" element={<CommitteeDashboard />} />
-      <Route path="/studentdashboard" element={<StudentDashboard />} />
-      <Route path="/personaldetails" element={<PersonalDetails />} />
-      <Route path="/amountdetails" element={<AmountDetails />} />
-      <Route path="/disclosuredetails" element={<DisclosureDetails />} />
-      <Route path="/familydetails" element={<FamilyDetails />} />
-      <Route path="/studentsetting" element={<StudentSetting />} />
-      <Route path="/documentupload" element={<Documentupload />} />
-      <Route path="/studentreport" element={<StudentReport />} />
-      <Route path="/committeereport" element={<CommitteeReport />} />
-      <Route path="/personalInformation" element={<PersonalInformation />} />
-      <Route path="/personalInformation/:id" element={<PersonalInformation />} />
-      <Route path="/userdetails" element={<UserDetails />} />
-      <Route path="/committeeprofile" element={<CommitteeProfile />} />
-      <Route path="/committeesetting" element={<CommitteeSetting />} />
-      <Route path="/adminreport" element={<AdminReport />} />
-      <Route path="/adminsetting" element={<AdminSetting />} />
-      <Route path="/auditlogs" element={<AuditLogs />} />
-      <Route path="/bursarymanagement" element={<BursaryFundManagement />} />
-      <Route path="/monitoring" element={<MonitoringApplication />} />
-      <Route path="/usermanagement" element={<UserManagement />} />
-      <Route path="/bursaryallocation" element={<BursaryAllocation />} />
-      <Route path="/bursaryallocation/:id" element={<BursaryAllocation />} />
-      <Route path="/progress" element={<ProgressStepper />} />
-    </Routes>
-  );
-}
 
 function App() {
-  return (
-    <Router>
-      <AppRoutes />
-    </Router>
-  );
+
+
+return (
+<Router>
+<div className="App">
+<Routes>
+<Route path="/" element={<HomePage/>} />
+<Route path="/about" element={<AboutPage/>} />
+ <Route path="/services" element={<ServicesPage/>} />
+<Route path="/contact" element={<ContactPage/>} />
+<Route path="/login" element={<LoginPage/>} />
+<Route path="/register" element={<RegisterPage/>} />
+<Route path="/admindashboard" element={<AdminDashboard/>} />
+<Route path="/committeedashboard" element={<CommitteeDashboard/>} />
+<Route path="/studentdashboard" element={<StudentDashboard/>} />
+<Route path="/personaldetails" element={<PersonalDetails/>} />
+<Route path="/amountdetails" element={<AmountDetails/>} />
+<Route path="/disclosuredetails" element={<DisclosureDetails/>} />
+<Route path="/familydetails" element={<FamilyDetails/>} />
+<Route path="/studentsetting" element={<StudentSetting/>} />
+<Route path="/documentupload" element={<Documentupload/>} />
+<Route path="/studentreport" element={<StudentReport/>} />
+<Route path="/committeereport" element={<CommitteeReport/>}/>
+<Route path="/personalInformation" element={<PersonalInformation/>}/>
+<Route path="/personalInformation/:id" element={<PersonalInformation/>} />
+<Route path="/userdetails" element={<UserDetails/>} />
+<Route path="/committeeprofile" element={<CommitteeProfile/>} />
+<Route path="/committeesetting" element={<CommitteeSetting/>} />
+<Route path="/adminreport" element={<AdminReport/>} />
+<Route path="/adminsetting" element={<AdminSetting/>} />
+<Route path="/auditlogs" element={<AuditLogs/>} />
+<Route path="/bursarymanagement" element={<BursaryFundManagement/>} />
+<Route path="/monitoring" element={<MonitoringApplication/>} />
+<Route path="/usermanagement" element={<UserManagement/>} />
+<Route path="/bursaryallocation" element={<BursaryAllocation/>} />
+<Route path="/bursaryallocation/:id" element={<BursaryAllocation/>}/>
+<Route path="/progress" element={<ProgressStepper/>}/>
+</Routes>
+</div>
+</Router>
+)
 }
 
-export default App;
+export default App
