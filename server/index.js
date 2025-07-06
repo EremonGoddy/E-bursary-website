@@ -208,7 +208,7 @@ async function hasDisclosureDetails(userId) {
   return res.rows.length > 0;
 }
 async function hasUploadedDocuments(userId) {
-  const res = await pool.query('SELECT 1 FROM documents WHERE user_id = $1', [userId]);
+  const res = await pool.query('SELECT 1 FROM uploaded_document WHERE user_id = $1', [userId]);
   return res.rows.length > 0;
 }
 
