@@ -67,7 +67,49 @@ res.status(500).json({ message: "Server error" });
 }
 });
 
-// ... rest of your code above
+
+// POST route to send OTP to user's email
+app.post('/api/send-otp', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  try {
+    // Check if user email exists in the database
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Configure Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'eremon.godwin@gmail.com',            // Your real Gmail
+        pass: 'wvobbwumiliwbfdg',                    // Your App Password (no spaces)
+      },
+    });
+
+    // Send the OTP email
+    await transporter.sendMail({
+      from: 'Your App <eremon.godwin@gmail.com>',
+      to: email,
+      subject: 'Your OTP Code',
+      text: `Your OTP code is: ${otp}`,
+    });
+
+    res.json({ message: 'OTP sent successfully' });
+  } catch (err) {
+    console.error('Error sending OTP:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
