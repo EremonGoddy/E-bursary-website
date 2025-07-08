@@ -77,39 +77,48 @@ app.post('/api/send-otp', async (req, res) => {
   }
 
   try {
-    // Check if user email exists in the database
+    // 1️⃣ Check if user exists by email
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Generate 6-digit OTP
+    // 2️⃣ Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
 
-    // Configure Nodemailer transporter
+    // 3️⃣ Update OTP and expiry in database
+    await pool.query(
+      'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE email = $3',
+      [otp, expiresAt, email]
+    );
+
+    // 4️⃣ Configure Nodemailer
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'eremon.godwin@gmail.com',            // Your real Gmail
-        pass: 'wvobbwumiliwbfdg',                    // Your App Password (no spaces)
+        user: 'eremon.godwin@gmail.com',          // ✅ Your Gmail
+        pass: 'wvobbwumiliwbfdg',                 // ✅ Your App Password
       },
     });
 
-    // Send the OTP email
+    // 5️⃣ Send OTP Email
     await transporter.sendMail({
       from: 'Your App <eremon.godwin@gmail.com>',
       to: email,
       subject: 'Your OTP Code',
-      text: `Your OTP code is: ${otp}`,
+      text: `Your OTP code is: ${otp}\n\nThis code will expire in 5 minutes.`,
     });
 
     res.json({ message: 'OTP sent successfully' });
+
   } catch (err) {
     console.error('Error sending OTP:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 // ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
@@ -171,7 +180,7 @@ console.log('Password hash from DB:', user.password);
 
 // ✅ Register a new user (PostgreSQL, checks for duplicate email and name)
 app.post("/api/post", async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, phoneNumber } = req.body;
 
   try {
     // Check if email already exists
@@ -186,12 +195,18 @@ app.post("/api/post", async (req, res) => {
       return res.status(400).json({ message: "Name is already registered" });
     }
 
+     // Check if name already exists
+    const existingphoneNumber = await pool.query("SELECT * FROM users WHERE phone_number = $1", [phoneNumber]);
+    if (existingphoneNumber.rows.length > 0) {
+      return res.status(400).json({ message: "Phone Number is already registered" });
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert the new user
     const result = await pool.query(
-      "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO users (name, email, password, role, phone_number) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [name, email, hashedPassword, role]
     );
 

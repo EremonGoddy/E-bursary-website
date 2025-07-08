@@ -9,6 +9,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: '',
     role: 'Student',
@@ -23,6 +24,7 @@ const RegisterPage = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = '*Please provide your full name';
     if (!formData.email) newErrors.email = '*Please provide an email';
+    if (!formData.phoneNumber) newErrors.phoneNumber = '*Please provide an phone number';
     if (!formData.password) newErrors.password = '*Please provide a password';
     if (!formData.confirmPassword) newErrors.confirmPassword = '*Please confirm your password';
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = '*Passwords do not match';
@@ -96,6 +98,18 @@ const RegisterPage = () => {
               placeholder="Enter your email"
             />
             {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
+          </div>
+
+           <div className="mb-4">
+            <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Phone Number</label>
+            <input
+              type="text"
+              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              placeholder="Enter your Phone Number"
+            />
+            {errors.phoneNumber && <div className="text-red-500 text-sm mt-1">{errors.phoneNumber}</div>}
           </div>
 
           <div className="mb-4 relative">
