@@ -68,7 +68,79 @@ res.status(500).json({ message: "Server error" });
 });
 
 
-// POST route to verify OTP
+// ✅ SEND OTP ROUTE (send-otp)
+app.post('/api/send-otp', async (req, res) => {
+  const { email, phoneNumber } = req.body;
+
+  if (!email && !phoneNumber) {
+    return res.status(400).json({ message: 'Please provide either email or phone number' });
+  }
+
+  try {
+    let user;
+
+    if (email) {
+      const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'User with this email not found' });
+      }
+      user = result.rows[0];
+    }
+
+    if (phoneNumber) {
+      const result = await pool.query('SELECT * FROM users WHERE phone_number = $1', [phoneNumber]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'User with this phone number not found' });
+      }
+      user = result.rows[0];
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    if (email) {
+      await pool.query(
+        'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE email = $3',
+        [otp, expiresAt, email]
+      );
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'eremon.godwin@gmail.com',
+          pass: 'wvobbwumiliwbfdg',
+        },
+      });
+
+      await transporter.sendMail({
+        from: 'Your App <eremon.godwin@gmail.com>',
+        to: email,
+        subject: 'Your OTP Code',
+        text: `Your OTP code is: ${otp}\n\nIt expires in 5 minutes.`,
+      });
+
+      return res.json({ message: 'OTP sent to email successfully' });
+    }
+
+    if (phoneNumber) {
+      await pool.query(
+        'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE phone_number = $3',
+        [otp, expiresAt, phoneNumber]
+      );
+
+      console.log(`OTP ${otp} would be sent via SMS to phone: ${phoneNumber}`);
+
+      return res.json({ message: 'OTP sent to phone successfully (simulated)' });
+    }
+
+  } catch (err) {
+    console.error('Error sending OTP:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// ✅ VERIFY OTP ROUTE (verify-otp)
 app.post('/api/verify-otp', async (req, res) => {
   const { email, phoneNumber, otp } = req.body;
 
@@ -79,7 +151,6 @@ app.post('/api/verify-otp', async (req, res) => {
   try {
     let userResult;
 
-    // 1️⃣ Fetch user by email or phone number
     if (email) {
       userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     } else if (phoneNumber) {
@@ -92,12 +163,10 @@ app.post('/api/verify-otp', async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // 2️⃣ Check if OTP matches
     if (user.otp_code !== otp) {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
 
-    // 3️⃣ Check if OTP has expired
     const currentTime = new Date();
     const expiryTime = new Date(user.otp_expires);
 
@@ -105,7 +174,6 @@ app.post('/api/verify-otp', async (req, res) => {
       return res.status(400).json({ message: 'OTP has expired' });
     }
 
-    // 4️⃣ If valid and not expired — success
     return res.json({ message: 'OTP verified successfully' });
 
   } catch (err) {
@@ -113,6 +181,9 @@ app.post('/api/verify-otp', async (req, res) => {
     res.status(500).json({ message: 'Server error while verifying OTP' });
   }
 });
+
+
+
 
 // ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
