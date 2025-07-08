@@ -68,57 +68,51 @@ res.status(500).json({ message: "Server error" });
 });
 
 
-// POST route to send OTP to user's email
-app.post('/api/send-otp', async (req, res) => {
-  const { email } = req.body;
+// POST route to verify OTP
+app.post('/api/verify-otp', async (req, res) => {
+  const { email, phoneNumber, otp } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ message: 'Email is required' });
+  if (!otp || (!email && !phoneNumber)) {
+    return res.status(400).json({ message: 'OTP and either email or phone number are required' });
   }
 
   try {
-    // 1️⃣ Check if user exists by email
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    let userResult;
 
-    if (result.rows.length === 0) {
+    // 1️⃣ Fetch user by email or phone number
+    if (email) {
+      userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    } else if (phoneNumber) {
+      userResult = await pool.query('SELECT * FROM users WHERE phone_number = $1', [phoneNumber]);
+    }
+
+    if (!userResult || userResult.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // 2️⃣ Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
+    const user = userResult.rows[0];
 
-    // 3️⃣ Update OTP and expiry in database
-    await pool.query(
-      'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE email = $3',
-      [otp, expiresAt, email]
-    );
+    // 2️⃣ Check if OTP matches
+    if (user.otp_code !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
 
-    // 4️⃣ Configure Nodemailer
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'eremon.godwin@gmail.com',          // ✅ Your Gmail
-        pass: 'wvobbwumiliwbfdg',                 // ✅ Your App Password
-      },
-    });
+    // 3️⃣ Check if OTP has expired
+    const currentTime = new Date();
+    const expiryTime = new Date(user.otp_expires);
 
-    // 5️⃣ Send OTP Email
-    await transporter.sendMail({
-      from: 'Your App <eremon.godwin@gmail.com>',
-      to: email,
-      subject: 'Your OTP Code',
-      text: `Your OTP code is: ${otp}\n\nThis code will expire in 5 minutes.`,
-    });
+    if (currentTime > expiryTime) {
+      return res.status(400).json({ message: 'OTP has expired' });
+    }
 
-    res.json({ message: 'OTP sent successfully' });
+    // 4️⃣ If valid and not expired — success
+    return res.json({ message: 'OTP verified successfully' });
 
   } catch (err) {
-    console.error('Error sending OTP:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error verifying OTP:', err);
+    res.status(500).json({ message: 'Server error while verifying OTP' });
   }
 });
-
 
 // ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
