@@ -19,7 +19,7 @@ const ForgotPassword = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/send-otp', { email });
+      const response = await axios.post('https://e-bursary-backend.onrender.com/api/send-otp', { email });
       if (response.status === 200) {
         setOtpSent(true);
         alert('OTP has been sent to your email.');
