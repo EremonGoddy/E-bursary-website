@@ -9,6 +9,7 @@ const ForgotPassword = () => {
   const [error, setError] = useState('');
   const [otpExpireTimer, setOtpExpireTimer] = useState(null);
   const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(0);
 
   const handleSendOTP = async () => {
     if (!contactValue) {
@@ -21,7 +22,6 @@ const ForgotPassword = () => {
 
     try {
       const payload = contactMethod === 'email' ? { email: contactValue } : { phoneNumber: contactValue };
-
       const response = await axios.post('https://e-bursary-backend.onrender.com/api/send-otp', payload);
 
       if (response.status === 200) {
@@ -30,12 +30,21 @@ const ForgotPassword = () => {
         alert(`OTP has been sent to your ${contactMethod === 'email' ? 'email' : 'phone number'}.`);
 
         if (otpExpireTimer) {
-          clearTimeout(otpExpireTimer);
+          clearInterval(otpExpireTimer);
         }
 
-        const timer = setTimeout(() => {
-          setIsOtpExpired(true);
-        }, 5 * 60 * 1000); // 5 minutes expiry
+        setRemainingTime(5 * 60); // 5 minutes in seconds
+
+        const timer = setInterval(() => {
+          setRemainingTime(prev => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              setIsOtpExpired(true);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
 
         setOtpExpireTimer(timer);
       }
@@ -50,10 +59,16 @@ const ForgotPassword = () => {
   useEffect(() => {
     return () => {
       if (otpExpireTimer) {
-        clearTimeout(otpExpireTimer);
+        clearInterval(otpExpireTimer);
       }
     };
   }, [otpExpireTimer]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -70,7 +85,8 @@ const ForgotPassword = () => {
               setOtpSent(false);
               setError('');
               setIsOtpExpired(false);
-              if (otpExpireTimer) clearTimeout(otpExpireTimer);
+              setRemainingTime(0);
+              if (otpExpireTimer) clearInterval(otpExpireTimer);
             }}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -97,23 +113,30 @@ const ForgotPassword = () => {
           {loading ? 'Sending OTP...' : otpSent && isOtpExpired ? 'Resend OTP' : 'Send OTP'}
         </button>
 
+        {otpSent && remainingTime > 0 && !isOtpExpired && (
+          <div className="mt-4 text-sm text-gray-600">
+            OTP expires in: <span className="font-semibold">{formatTime(remainingTime)}</span>
+          </div>
+        )}
+
         {otpSent && !isOtpExpired && (
-          <div className="mt-4 text-green-600 text-sm">
+          <div className="mt-2 text-green-600 text-sm">
             OTP has been sent to your {contactMethod === 'email' ? 'email' : 'phone number'}.
           </div>
         )}
 
         {isOtpExpired && (
-          <div className="mt-4 text-yellow-600 text-sm">
+          <div className="mt-2 text-yellow-600 text-sm">
             OTP expired. Please click "Resend OTP".
           </div>
         )}
 
         {error && (
-          <div className="mt-4 text-red-600 text-sm">
+          <div className="mt-2 text-red-600 text-sm">
             {error}
           </div>
         )}
+
       </div>
     </div>
   );
