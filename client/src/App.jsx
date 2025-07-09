@@ -29,6 +29,8 @@ import AuditLogs from './components/admincontrols/AuditLogs';
 import BursaryAllocation from './components/committeeview/BursaryAllocation';
 import ProgressStepper from './components/applicationform/ProgressStepper';
 import ForgotPassword from './components/authentication/ForgotPassword';
+import OTPVerification from './components/authentication/VerifyOtp';
+import PasswordReset from './components/authentication/ResetPassword';
 
 
 function App() {
@@ -70,6 +72,8 @@ return (
 <Route path="/bursaryallocation/:id" element={<BursaryAllocation/>}/>
 <Route path="/progress" element={<ProgressStepper/>}/>
 <Route path="/forgotpassword" element={<ForgotPassword/>}/>
+<Route path="/otpverify" element={<OTPVerification/>}/>
+<Route path="/resetpassword" element={<PasswordReset/>}/>
 </Routes>
 </div>
 </Router>
