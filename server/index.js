@@ -283,6 +283,40 @@ app.post("/api/post", async (req, res) => {
   }
 });
 
+app.post('/api/reset-password', async (req, res) => {
+  const { contactValue, newPassword } = req.body;
+
+  if (!contactValue || !newPassword) {
+    return res.status(400).json({ message: 'Both contact and new password are required' });
+  }
+
+  try {
+    // Check if the user exists by email or phone number
+    const result = await pool.query(
+      'SELECT * FROM users WHERE email = $1 OR phone_number = $1',
+      [contactValue]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found with provided email or phone number' });
+    }
+
+    const userId = result.rows[0].id;
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'Server error while resetting password' });
+  }
+});
+
+
 // ✅ Change password API
 app.post("/api/change-password", authenticateToken, async (req, res) => {
   const { userId } = req.user;

@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 
 const PasswordReset = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const contactValue = location.state?.contactValue || '';  // Get contactValue from navigation state
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -22,21 +32,27 @@ const PasswordReset = () => {
       return;
     }
 
+    if (!contactValue) {
+      setErrorMessage('Missing user contact information. Please restart the process.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');  // Make sure this token is stored after OTP verification/login
-
       const response = await axios.post(
-        'https://e-bursary-backend.onrender.com/api/change-password',
-        { newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
+        'https://e-bursary-backend.onrender.com/api/reset-password',
+        { contactValue, newPassword }
       );
 
       if (response.status === 200) {
         setSuccessMessage('Password reset successfully. You can now log in.');
         setNewPassword('');
         setConfirmPassword('');
+
+        setTimeout(() => {
+          navigate('/login');  // Optional: Redirect to login after success
+        }, 3000);
       }
     } catch (err) {
       console.error(err);
@@ -51,26 +67,38 @@ const PasswordReset = () => {
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Reset Password</h2>
 
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <label className="block mb-2 text-sm text-gray-700">New Password</label>
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Enter new password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <span
+            className="absolute right-3 top-9 cursor-pointer text-gray-500"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+          </span>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <label className="block mb-2 text-sm text-gray-700">Confirm New Password</label>
           <input
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm new password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <span
+            className="absolute right-3 top-9 cursor-pointer text-gray-500"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <FontAwesomeIcon icon={showConfirmPassword ? faEye : faEyeSlash} />
+          </span>
         </div>
 
         <button
