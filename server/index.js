@@ -185,21 +185,25 @@ app.post('/api/verify-otp', async (req, res) => {
 
 
 
-// ✅ Signin route (FIXED catch block and debug logs)
 app.post("/api/signin", async (req, res) => {
-try {
-const { email, password } = req.body;
-const userQuery = "SELECT * FROM users WHERE email = $1";
-const userResult = await pool.query(userQuery, [email]);
+  try {
+    const { email, password } = req.body;
 
-if (userResult.rows.length === 0) {
-return res.status(404).json({ message: "User not found" });
-}
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
 
-const user = userResult.rows[0];
-console.log('User from DB:', user);
-console.log('Password from request:', password);
-console.log('Password hash from DB:', user.password);
+    const userQuery = "SELECT * FROM users WHERE email = $1";
+    const userResult = await pool.query(userQuery, [email]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = userResult.rows[0];
+    console.log('User from DB:', user);
+    console.log('Password from request:', password);
+    console.log('Password hash from DB:', user.password);
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -217,6 +221,8 @@ console.log('Password hash from DB:', user.password);
       token,
       role: user.role,
       name: user.name,
+      student: null,
+      committee: null
     };
 
     if (studentResult.rows.length > 0) {
@@ -236,12 +242,14 @@ console.log('Password hash from DB:', user.password);
       };
     }
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
+
   } catch (error) {
     console.error("Error in /api/signin:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // ✅ Register a new user (PostgreSQL, checks for duplicate email and name)
 app.post("/api/post", async (req, res) => {
