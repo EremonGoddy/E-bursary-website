@@ -250,6 +250,24 @@ app.post("/api/signin", async (req, res) => {
   }
 });
 
+
+app.post('/api/send-message', async (req, res) => {
+const { user_id, sender_role, message_content } = req.body;
+
+try {
+const result = await pool.query(
+      'INSERT INTO user_messages (user_id, sender_role, message_content) VALUES ($1, $2, $3) RETURNING *',
+      [user_id, sender_role, message_content]
+    );
+
+    res.status(201).json({ message: 'Message sent', data: result.rows[0] });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 app.post("/api/approve-student", async (req, res) => {
   try {
     const { studentUserId, committeeName } = req.body;

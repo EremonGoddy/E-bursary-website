@@ -84,21 +84,35 @@ loadDocumentData();
 
 // Approval/Rejection
 const updateStatus = async (userId, status) => {
-try {
-await axios.put(`https://e-bursary-backend.onrender.com/api/update-status/${userId}`, { status });
-alert(`Application ${status}`);
-if (status === 'Approved') {
-navigate(`/bursaryallocation/${userId}`);
-} else {
-loadPersonalData();
-loadAmountData();
-loadFamilyData();
-loadDisclosureData();
-loadDocumentData();
-}
-} catch (error) {
-console.error('Error updating status:', error);
-}
+  try {
+    // 1️⃣ Update the status in the personal_details table
+    await axios.put(`https://e-bursary-backend.onrender.com/api/update-status/${userId}`, { status });
+
+    // 2️⃣ Send status message to the user_messages table
+    const senderRole = 'Committee';  // Or whatever you want to identify as
+    const messageContent = `Your bursary application has been ${status}.`;
+
+    await axios.post('https://e-bursary-backend.onrender.com/api/send-message', {
+      user_id: userId,
+      sender_role: senderRole,
+      message_content: messageContent
+    });
+
+    alert(`Application ${status}`);
+    
+    if (status === 'Approved') {
+      navigate(`/bursaryallocation/${userId}`);
+    } else {
+      loadPersonalData();
+      loadAmountData();
+      loadFamilyData();
+      loadDisclosureData();
+      loadDocumentData();
+    }
+  } catch (error) {
+    console.error('Error updating status or sending message:', error);
+    alert('Failed to update status or send message.');
+  }
 };
 
 // Fetch profile data when component loads
@@ -121,6 +135,14 @@ console.error('Error fetching profile data:', error);
 });
 }
 }, [navigate]);
+
+const isAllDataAvailable =
+    personalData.length > 0 &&
+    amountData.length > 0 &&
+    familyData.length > 0 &&
+    disclosureData.length > 0 &&
+    documentData.length > 0;
+
 
 return (
 <div className="w-full min-h-screen relative bg-white-100">
@@ -417,25 +439,28 @@ View Document
 </div>
 {/* Approval and Rejection Buttons */}
 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-<button
-className="bg-green-500 hover:bg-green-700 text-white px-4 py-3 rounded font-bold"
-onClick={() => updateStatus(id, 'Approved')}
->
-Approve Application
-</button>
-<button
-className="bg-red-500 hover:bg-red-700 text-white px-4 py-3 rounded font-bold"
-onClick={() => updateStatus(id, 'Rejected')}
->
-Reject Application
-</button>
-<button
-className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-3 rounded font-bold"
-onClick={() => updateStatus(id, 'Incomplete')}
->
-Incomplete Application
-</button>
-</div>
+          <button
+            className={`px-4 py-3 rounded font-bold text-white ${isAllDataAvailable ? 'bg-green-500 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'}`}
+            onClick={() => updateStatus(id, 'Approved')}
+            disabled={!isAllDataAvailable}
+          >
+            Approve Application
+          </button>
+
+          <button
+            className="bg-red-500 hover:bg-red-700 text-white px-4 py-3 rounded font-bold"
+            onClick={() => updateStatus(id, 'Rejected')}
+          >
+            Reject Application
+          </button>
+
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-3 rounded font-bold"
+            onClick={() => updateStatus(id, 'Incomplete')}
+          >
+            Incomplete Application
+          </button>
+        </div>
 </div>
 </div>
 </div>
