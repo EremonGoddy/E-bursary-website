@@ -267,6 +267,19 @@ const result = await pool.query(
   }
 });
 
+app.get('/api/get-messages/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const result = await pool.query('SELECT * FROM user_messages WHERE user_id = $1 ORDER BY created_at DESC', [user_id]);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 app.post("/api/approve-student", async (req, res) => {
   try {
