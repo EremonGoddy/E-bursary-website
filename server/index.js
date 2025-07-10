@@ -282,13 +282,11 @@ app.post("/api/approve-student", async (req, res) => {
 
 app.get('/api/status-message/user/:userId', async (req, res) => {
   const userId = req.params.userId;
-
   const sql = `
     SELECT status_message 
     FROM personal_details 
     WHERE user_id = $1
   `;
-
   try {
     const result = await pool.query(sql, [userId]);
 
