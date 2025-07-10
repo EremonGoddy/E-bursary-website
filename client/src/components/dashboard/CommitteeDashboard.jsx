@@ -377,22 +377,21 @@ ${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
       <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.admission}</td>
       <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.subcounty}</td>
       <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 text-center">
+  {(item.approved_by_committee && item.approved_by_committee !== userName) ? (
+    <span className="text-gray-500 text-[0.85rem] italic">
+      Approved by {item.approved_by_committee}
+    </span>
+  ) : (
+    <Link
+      to={`/PersonalInformation/${item.user_id}`}
+      onClick={() => handleApproveStudent(item.user_id)}
+      className="text-blue-500 no-underline hover:text-blue-700 text-[0.95rem] font-bold"
+    >
+      User Details
+    </Link>
+  )}
+</td>
 
-        {item.approved_by_committee ? (
-          <span className="text-gray-500 text-[0.85rem] italic">
-            Approved by {item.approved_by_committee}
-          </span>
-        ) : (
-          <Link
-            to={`/PersonalInformation/${item.user_id}`}
-            onClick={() => handleApproveStudent(item.user_id)}
-            className="text-blue-500 no-underline hover:text-blue-700 text-[0.95rem] font-bold"
-          >
-            User Details
-          </Link>
-        )}
-        
-      </td>
     </tr>
   ))}
 </tbody>
