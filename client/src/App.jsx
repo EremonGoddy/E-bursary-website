@@ -30,6 +30,7 @@ import BursaryAllocation from './components/committeeview/BursaryAllocation';
 import ProgressStepper from './components/applicationform/ProgressStepper';
 import ForgotPassword from './components/authentication/ForgotPassword';
 import PasswordReset from './components/authentication/ResetPassword';
+import MessagePage from './components/applicationform/MessagesPage';
 
 
 function App() {
@@ -72,6 +73,7 @@ return (
 <Route path="/progress" element={<ProgressStepper/>}/>
 <Route path="/forgotpassword" element={<ForgotPassword/>}/>
 <Route path="/resetpassword" element={<PasswordReset/>}/>
+<Route path="/messages" element={<MessagePage/>}/>
 </Routes>
 </div>
 </Router>
