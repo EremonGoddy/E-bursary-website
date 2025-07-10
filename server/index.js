@@ -250,37 +250,6 @@ app.post("/api/signin", async (req, res) => {
   }
 });
 
-
-app.post('/api/send-message', async (req, res) => {
-const { user_id, sender_role, message_content } = req.body;
-
-try {
-const result = await pool.query(
-      'INSERT INTO user_messages (user_id, sender_role, message_content) VALUES ($1, $2, $3) RETURNING *',
-      [user_id, sender_role, message_content]
-    );
-
-    res.status(201).json({ message: 'Message sent', data: result.rows[0] });
-  } catch (error) {
-    console.error('Error sending message:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-app.get('/api/get-messages/:user_id', async (req, res) => {
-  const { user_id } = req.params;
-
-  try {
-    const result = await pool.query('SELECT * FROM user_messages WHERE user_id = $1 ORDER BY created_at DESC', [user_id]);
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error('Error fetching messages:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
-
 app.post("/api/approve-student", async (req, res) => {
   try {
     const { studentUserId, committeeName } = req.body;
@@ -309,6 +278,31 @@ app.post("/api/approve-student", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+
+
+app.get('/api/status-message/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  const sql = `
+    SELECT status_message 
+    FROM personal_details 
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await pool.query(sql, [userId]);
+
+    if (result.rows.length > 0) {
+      res.json({ status_message: result.rows[0].status_message });
+    } else {
+      res.status(404).json({ message: 'Not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching status message:', error);
+    res.status(500).send('Server error');
+  }
+});
+
 
 
 // ✅ Register a new user (PostgreSQL, checks for duplicate email and name)
@@ -1060,21 +1054,23 @@ app.get("/api/get-document/:id", (req, res) => {
 
 app.put('/api/update-status/:id', (req, res) => {
   const userId = req.params.id;
-  const { status } = req.body;
+  const { status, status_message } = req.body;  // 🆕 Added status_message
 
   const query = `
     UPDATE personal_details 
-    SET status = $1 
-    WHERE user_id = $2
+    SET status = $1, status_message = $2  -- 🆕 Update both columns
+    WHERE user_id = $3
   `;
 
-  pool.query(query, [status, userId], (error, result) => {
+  pool.query(query, [status, status_message, userId], (error, result) => {
     if (error) {
-      return res.status(500).json({ error: 'Error updating status' });
+      console.error('Error updating status and message:', error);  // Optional: log the actual error
+      return res.status(500).json({ error: 'Error updating status and message' });
     }
-    res.json({ message: `Status updated to ${status}` });
+    res.json({ message: `Status updated to ${status}`, status_message: status_message });
   });
 });
+
 
 app.get("/api/get-bursary/:id", (req, res) => {
   const userId = req.params.id;

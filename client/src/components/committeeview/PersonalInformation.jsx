@@ -82,24 +82,28 @@ loadDisclosureData();
 loadDocumentData();
 }, [loadPersonalData, loadAmountData, loadFamilyData, loadDisclosureData, loadDocumentData]);
 
-// Approval/Rejection
+// Approval/Rejection with status message
 const updateStatus = async (userId, status) => {
   try {
-    // 1️⃣ Update the status in the personal_details table
-    await axios.put(`https://e-bursary-backend.onrender.com/api/update-status/${userId}`, { status });
+    let statusMessage = '';
 
-    // 2️⃣ Send status message to the user_messages table
-    const senderRole = 'Committee';  // Or whatever you want to identify as
-    const messageContent = `Your bursary application has been ${status}.`;
+    // Set a meaningful status message for each case
+    if (status === 'Approved') {
+      statusMessage = 'Your bursary application has been approved.';
+    } else if (status === 'Rejected') {
+      statusMessage = 'Your bursary application has been rejected.';
+    } else if (status === 'Incomplete') {
+      statusMessage = 'Your bursary application is incomplete. Please update your information.';
+    }
 
-    await axios.post('https://e-bursary-backend.onrender.com/api/send-message', {
-      user_id: userId,
-      sender_role: senderRole,
-      message_content: messageContent
+    // Send both status and status_message to the backend
+    await axios.put(`https://e-bursary-backend.onrender.com/api/update-status/${userId}`, {
+      status: status,
+      status_message: statusMessage
     });
 
     alert(`Application ${status}`);
-    
+
     if (status === 'Approved') {
       navigate(`/bursaryallocation/${userId}`);
     } else {
@@ -109,11 +113,13 @@ const updateStatus = async (userId, status) => {
       loadDisclosureData();
       loadDocumentData();
     }
+
   } catch (error) {
-    console.error('Error updating status or sending message:', error);
-    alert('Failed to update status or send message.');
+    console.error('Error updating status:', error);
+    alert('Failed to update status.');
   }
 };
+
 
 // Fetch profile data when component loads
 useEffect(() => {
