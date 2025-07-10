@@ -250,6 +250,35 @@ app.post("/api/signin", async (req, res) => {
   }
 });
 
+app.post("/api/approve-student", async (req, res) => {
+  try {
+    const { studentUserId, committeeName } = req.body;
+
+    if (!studentUserId || !committeeName) {
+      return res.status(400).json({ message: "Student ID and Committee Name are required" });
+    }
+
+    const updateQuery = `
+      UPDATE personal_details
+      SET approved_by_committee = $1
+      WHERE user_id = $2
+      RETURNING *;
+    `;
+
+    const result = await pool.query(updateQuery, [committeeName, studentUserId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    return res.status(200).json({ message: "Student approved successfully", student: result.rows[0] });
+
+  } catch (error) {
+    console.error("Error in /api/approve-student:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 // ✅ Register a new user (PostgreSQL, checks for duplicate email and name)
 app.post("/api/post", async (req, res) => {

@@ -96,6 +96,21 @@ console.error('Error fetching profile data:', error);
 }
 }, [navigate]);
 
+const handleApproveStudent = async (studentUserId) => {
+    try {
+      const committeeName = sessionStorage.getItem('userName');
+      if (!committeeName) return;
+      await axios.post('https://e-bursary-backend.onrender.com/api/approve-student', {
+        studentUserId,
+        committeeName,
+      });
+    } catch (error) {
+      console.error('Error approving student:', error);
+    }
+  };
+
+
+
 return (
 <div className="w-full min-h-screen relative">
 {/* Top Bar */}
@@ -289,7 +304,6 @@ Logout
 </ul>
 </div>
 
-
 {/* Main Content */}
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
 ${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
@@ -365,6 +379,7 @@ ${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
             <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 text-center">
               <Link
                 to={`/PersonalInformation/${item.user_id}`}
+                onClick={() => handleApproveStudent(item.user_id)}
                 className="text-blue-500 no-underline hover:text-blue-700 text-[0.95rem] font-bold"
               >
                 User Details
@@ -383,3 +398,4 @@ ${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 };
 
 export default CommitteeDashboard;
+
