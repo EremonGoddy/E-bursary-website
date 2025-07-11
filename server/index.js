@@ -896,10 +896,10 @@ app.get('/api/committee-count', async (req, res) => {
 // Quick Statistics Route
 app.get('/api/quick-statistics', async (req, res) => {
   const queryTotal = 'SELECT COUNT(*) AS total FROM personal_details';
-  const queryApproved = "SELECT COUNT(*) AS approved FROM personal_details WHERE status = 'approved'";
+  const queryApproved = "SELECT COUNT(*) AS approved FROM personal_details WHERE status = 'Approved'";
   const queryRejected = "SELECT COUNT(*) AS rejected FROM personal_details WHERE status = 'rejected'";
   const queryPending = "SELECT COUNT(*) AS pending FROM personal_details WHERE status = 'pending'";
-  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM personal_details WHERE status = 'incomplete'";
+  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM personal_details WHERE status = 'Incomplete'";
 
   try {
     const totalResult = await pool.query(queryTotal);
