@@ -23,13 +23,17 @@ const BursaryAllocation = () => {
   const navigate = useNavigate();
   const [sidebarActive, setSidebarActive] = useState(false);
 
+   const [bursaryAmount, setBursaryAmount] = useState(0);
+  const [allocatedAmount, setAllocatedAmount] = useState(0);
+  const [remainingAmount, setRemainingAmount] = useState(0);
+
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
 
   const loadData = useCallback(async () => {
     try {
-      const url = id 
+      const url = id
         ? `https://e-bursary-backend.onrender.com/api/get-bursary/${id}`
         : `https://e-bursary-backend.onrender.com/api/get-bursary`;
       const response = await axios.get(url);
@@ -39,55 +43,74 @@ const BursaryAllocation = () => {
     }
   }, [id]);
 
+  const loadBursaryFund = async () => {
+    try {
+      const response = await axios.get('https://e-bursary-backend.onrender.com/api/committee-count');
+      setBursaryAmount(response.data.amount);
+      setAllocatedAmount(response.data.allocated);
+      setRemainingAmount(response.data.amount - response.data.allocated);
+    } catch (error) {
+      console.error('Error fetching bursary data:', error);
+    }
+  };
+
   useEffect(() => {
     loadData();
+    loadBursaryFund();
   }, [loadData]);
 
-  // Track submitted status per user to disable button after submit
   const [submitted, setSubmitted] = useState({});
 
-  // Function to handle allocation when "Allocate" button is clicked
- const handleAllocate = async (userId) => {
-  const amount = selectedAmount[userId];
-  if (!amount) {
-    alert("Please select an amount before allocating.");
-    return;
-  }
-  setLoading(true);
-  try {
-    await axios.put(`https://e-bursary-backend.onrender.com/api/update-bursary/${userId}`, { bursary: amount });
-    alert(`Allocated Ksh ${amount} to the application and updated allocation date.`);
-    setSubmitted((prev) => ({ ...prev, [userId]: true }));
-    loadData(); // Refresh data after allocation
-  } catch (error) {
-    console.error('Error updating bursary:', error);
-    // Show the error to the user
-    if (error.response && error.response.data && error.response.data.error) {
-      alert(`Error: ${error.response.data.error}`);
-    } else {
+  const handleAllocate = async (userId) => {
+    const amount = selectedAmount[userId];
+
+    if (!amount) {
+      alert("Please select an amount before allocating.");
+      return;
+    }
+
+    if (remainingAmount <= 0) {
+      alert("No funds available for allocation.");
+      return;
+    }
+
+    if (amount > remainingAmount) {
+      alert(`Insufficient funds. You can only allocate up to Ksh ${remainingAmount}.`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.put(`https://e-bursary-backend.onrender.com/api/update-bursary/${userId}`, { bursary: amount });
+      alert(`Allocated Ksh ${amount} to the application and updated allocation date.`);
+      setSubmitted((prev) => ({ ...prev, [userId]: true }));
+      loadData();
+      loadBursaryFund();
+    } catch (error) {
+      console.error('Error updating bursary:', error);
       alert('Failed to update bursary. Please try again later.');
     }
-  }
-  setLoading(false);
-};
-  // Fetch profile data when component loads
+    setLoading(false);
+  };
+
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
       navigate('/signin');
     } else {
       axios
-      .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setCommitteeDetails(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching profile data:', error);
-      });
+        .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          setCommitteeDetails(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching profile data:', error);
+        });
     }
   }, [navigate]);
+
 
   return (
     <div className="w-full min-h-screen relative bg-white-100">
@@ -284,58 +307,79 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
         </div>
 
         {/* Main Content */}
-    <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 
-          ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
-        `}>
-    <div className="max-w-2xl mx-auto shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] bg-white rounded-lg p-6">
-  <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Bursary Allocation</h1>
-  {data.map((item) => (
-    <div key={item.user_id} className="mb-3">
-      <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
-        <span className="text-gray-500">Full Name:</span> {item.fullname}
-      </p>
-      <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
-        <span className="text-gray-500">Admission Number:</span> {item.admission}
-      </p>
-      <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem] mb-8">
-        <span className="text-gray-500">Institution:</span> {item.institution}
-      </p>
-      <div className="flex flex-wrap gap-4 mt-2 mb-2">
-        {[10000, 20000, 30000, 40000, 50000].map((amount) => (
-          <label key={amount} className="flex items-center gap-2 cursor-pointer text-[1.6rem]">
-            <input
-              type="radio"
-              name={`amount-${item.user_id}`}
-              value={amount}
-              checked={selectedAmount[item.user_id] === amount}
-              onChange={() => setSelectedAmount((prev) => ({ ...prev, [item.user_id]: amount }))}
-              className="accent-blue-600 scale-125"
-            />
-            <span className="text-[1.1rem]">{amount.toLocaleString()} Ksh</span>
-          </label>
-        ))}
-      </div>
-      <div className='flex justify-center '>
-      <button
-        onClick={() => {
-          if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
-        }}
-        className={`mt-4 w-full px-4 py-2 rounded font-bold text-white transition-colors duration-200
-          ${submitted[item.user_id]
-            ? 'bg-green-600 hover:bg-green-700 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}
-        `}
-        aria-disabled={submitted[item.user_id] || loading}
-      >
-        {submitted[item.user_id] ? 'Allocated' : 'Allocate'}
-      </button>
-      </div>
-    </div>
-  ))}
-</div>
+ 
+              <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}`}>
+
+          <div className="max-w-4xl mx-auto shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] bg-white rounded-lg p-6">
+            <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
+            <div className="flex justify-around mb-6">
+              <div className="text-center text-[0.8rem] md:text-[1rem] font-semibold">
+                <p>Total Funds Available:</p>
+                <strong>{bursaryAmount.toLocaleString()} Ksh</strong>
+              </div>
+              <div className="text-center text-[0.8rem] md:text-[1rem] font-semibold">
+                <p>Amount Allocated to Students:</p>
+                <strong>{allocatedAmount.toLocaleString()} Ksh</strong>
+              </div>
+              <div className="text-center text-[0.8rem] md:text-[1rem] font-semibold">
+                <p>Remaining Funds:</p>
+                <strong>{remainingAmount.toLocaleString()} Ksh</strong>
+              </div>
+            </div>
+
+            <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Bursary Allocation</h1>
+            {data.map((item) => (
+              <div key={item.user_id} className="mb-3">
+                <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
+                  <span className="text-gray-500">Full Name:</span> {item.fullname}
+                </p>
+                <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
+                  <span className="text-gray-500">Admission Number:</span> {item.admission}
+                </p>
+                <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem] mb-8">
+                  <span className="text-gray-500">Institution:</span> {item.institution}
+                </p>
+                <div className="flex flex-wrap gap-4 mt-2 mb-2">
+                  {[10000, 20000, 30000, 40000, 50000].map((amount) => (
+                    <label key={amount} className="flex items-center gap-2 cursor-pointer text-[1.6rem]">
+                      <input
+                        type="radio"
+                        name={`amount-${item.user_id}`}
+                        value={amount}
+                        checked={selectedAmount[item.user_id] === amount}
+                        onChange={() => setSelectedAmount((prev) => ({ ...prev, [item.user_id]: amount }))}
+                        className="accent-blue-600 scale-125"
+                      />
+                      <span className="text-[1.1rem]">{amount.toLocaleString()} Ksh</span>
+                    </label>
+                  ))}
+                </div>
+                <div className='flex justify-center'>
+                  <button
+                    onClick={() => {
+                      if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
+                    }}
+                    className={`mt-4 w-full px-4 py-2 rounded font-bold text-white transition-colors duration-200
+                      ${(submitted[item.user_id] || remainingAmount <= 0)
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}
+                    `}
+                    disabled={submitted[item.user_id] || remainingAmount <= 0}
+                  >
+                    {remainingAmount <= 0 ? 'No Funds' : submitted[item.user_id] ? 'Allocated' : 'Allocate'}
+                  </button>
+                </div>
+              </div>
+            ))}
+
+          </div>
+
         </div>
+
       </div>
+
     </div>
+
   );
 };
 
