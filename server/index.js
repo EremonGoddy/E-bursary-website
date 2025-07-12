@@ -1229,28 +1229,42 @@ app.put('/api/update-bursary/:id', async (req, res) => {
     return res.status(400).json({ error: 'Invalid bursary value.' });
   }
 
-  const query = `
+  const updateQuery = `
     UPDATE personal_details 
     SET bursary = $1, allocation_date = CURRENT_TIMESTAMP 
     WHERE user_id = $2
   `;
 
   try {
-    await pool.query(query, [bursary, userId]);
+    // Step 1: Get student's name
+    const nameResult = await pool.query(
+      'SELECT fullname FROM personal_details WHERE user_id = $1',
+      [userId]
+    );
 
-    // ✅ Insert into activity_log
-    const logMessage = `Allocated Ksh ${bursary} to student with user ID ${userId}`;
+    if (nameResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    const studentName = nameResult.rows[0].name;
+
+    // Step 2: Update bursary and date
+    await pool.query(updateQuery, [bursary, userId]);
+
+    // Step 3: Log activity using name
+    const logMessage = `Allocated Ksh ${bursary} to ${studentName} (user ID: ${userId})`;
     await pool.query(
       'INSERT INTO activity_log (log_message) VALUES ($1)',
       [logMessage]
     );
 
-    res.json({ message: `Allocated Ksh ${bursary} on ${new Date().toISOString()}` });
+    res.json({ message: `Allocated Ksh ${bursary} to ${studentName} on ${new Date().toISOString()}` });
   } catch (error) {
     console.error('Error updating bursary or logging activity:', error);
     res.status(500).json({ error: 'Error updating bursary and date' });
   }
 });
+
 
 app.get('/api/users', (req, res) => {
   const query = 'SELECT * FROM users';
