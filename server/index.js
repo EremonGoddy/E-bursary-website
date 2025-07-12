@@ -257,8 +257,9 @@ app.post("/api/signin", async (req, res) => {
 app.post('/api/logout', authenticateToken, async (req, res) => {
   const { userId } = req.user;
 
+  console.log("Decoded user on logout:", req.user); // ✅ Add this
+
   try {
-    // Get user's name for logging
     const result = await pool.query("SELECT name FROM users WHERE id = $1", [userId]);
 
     if (result.rows.length > 0) {
@@ -274,6 +275,7 @@ app.post('/api/logout', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 
 app.post("/api/approve-student", async (req, res) => {
