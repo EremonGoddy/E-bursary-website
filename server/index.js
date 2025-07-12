@@ -299,7 +299,17 @@ app.post("/api/approve-student", async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    return res.status(200).json({ message: "Student approved successfully", student: result.rows[0] });
+    // ✅ Log activity
+    const logMessage = `Committee member ${committeeName} approved student with user ID ${studentUserId}`;
+    await pool.query(
+      'INSERT INTO activity_log (log_message) VALUES ($1)',
+      [logMessage]
+    );
+
+    return res.status(200).json({
+      message: "Student approved successfully",
+      student: result.rows[0]
+    });
 
   } catch (error) {
     console.error("Error in /api/approve-student:", error);
@@ -400,6 +410,10 @@ app.post('/api/reset-password', async (req, res) => {
 
     // Update password
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+
+    // Log activity
+    const logMessage = `User ${userName} (${contactValue}) reset their password.`;
+    await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
 
     res.status(200).json({ message: 'Password reset successfully' });
   } catch (error) {
@@ -683,25 +697,37 @@ app.get('/api/upload/status/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const result = await pool.query('SELECT * FROM uploaded_document WHERE user_id = $1', [userId]);
+    const result = await pool.query(
+      'SELECT * FROM uploaded_document WHERE user_id = $1',
+      [userId]
+    );
 
     console.log('Checking document for userId:', userId);
     console.log('Query result:', result.rows);
 
-    if (result.rows.length > 0 && result.rows[0].file_path && result.rows[0].file_path.trim() !== '') {
-      res.json({ uploaded: true });
-    } else {
-      res.json({ uploaded: false });
+    let uploaded = false;
+
+    if (
+      result.rows.length > 0 &&
+      result.rows[0].file_path &&
+      result.rows[0].file_path.trim() !== ''
+    ) {
+      uploaded = true;
     }
+
+    // ✅ Log the check
+    const logMessage = `Checked document upload status for user ID ${userId}: ${uploaded ? 'Uploaded' : 'Not Uploaded'}`;
+    await pool.query(
+      'INSERT INTO activity_log (log_message) VALUES ($1)',
+      [logMessage]
+    );
+
+    res.json({ uploaded });
   } catch (error) {
     console.error('Error checking upload status:', error);
     res.status(500).json({ uploaded: false });
   }
 });
-
-
-
-
 
 // Use /tmp/uploads for cloud environments like Render
 const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');
@@ -801,6 +827,10 @@ app.post('/api/forgot-password', async (req, res) => {
     console.log(`Reset code sent to ${identifier}: ${resetCode}`);
 
     // TODO: Save resetCode in DB with expiry timestamp for verification later
+
+     // ✅ Log the activity
+    const logMessage = `Password reset code sent to ${identifier}`;
+    await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
 
     res.status(200).json({ message: 'Reset code sent successfully.' });
   } catch (error) {
@@ -1188,14 +1218,14 @@ app.get("/api/get-bursary", (req, res) => {
   });
 });
 
-app.put('/api/update-bursary/:id', (req, res) => {
+app.put('/api/update-bursary/:id', async (req, res) => {
   const userId = req.params.id;
   const { bursary } = req.body;
 
   console.log('REQ BODY:', req.body);
   console.log('REQ PARAMS:', req.params);
 
-    if (!bursary || isNaN(Number(bursary))) {
+  if (!bursary || isNaN(Number(bursary))) {
     return res.status(400).json({ error: 'Invalid bursary value.' });
   }
 
@@ -1205,12 +1235,21 @@ app.put('/api/update-bursary/:id', (req, res) => {
     WHERE user_id = $2
   `;
 
-  pool.query(query, [bursary, userId], (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: 'Error updating bursary and date' });
-    }
+  try {
+    await pool.query(query, [bursary, userId]);
+
+    // ✅ Insert into activity_log
+    const logMessage = `Allocated Ksh ${bursary} to student with user ID ${userId}`;
+    await pool.query(
+      'INSERT INTO activity_log (log_message) VALUES ($1)',
+      [logMessage]
+    );
+
     res.json({ message: `Allocated Ksh ${bursary} on ${new Date().toISOString()}` });
-  });
+  } catch (error) {
+    console.error('Error updating bursary or logging activity:', error);
+    res.status(500).json({ error: 'Error updating bursary and date' });
+  }
 });
 
 app.get('/api/users', (req, res) => {
@@ -1298,11 +1337,22 @@ app.put('/api/adjust-funds', (req, res) => {
   const id = 1;
 
   const updateQuery = 'UPDATE bursary_funds SET amount = $1 WHERE id = $2';
-  pool.query(updateQuery, [amount, id], (err) => {
+
+  pool.query(updateQuery, [amount, id], async (err) => {
     if (err) return res.status(500).send(err);
-    res.status(200).json({ message: 'Fund allocation adjusted successfully!' });
+
+    try {
+      const logMessage = `Bursary fund adjusted to ${amount} shillings.`;
+      await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
+
+      res.status(200).json({ message: 'Fund allocation adjusted successfully!' });
+    } catch (logErr) {
+      console.error('Error logging activity:', logErr);
+      res.status(500).json({ message: 'Fund updated, but failed to log activity.' });
+    }
   });
 });
+
 
 // API to fetch user report by ID
 app.get('/api/user-report/:id', (req, res) => {
