@@ -255,7 +255,7 @@ app.post("/api/signin", async (req, res) => {
 });
 
 app.post('/api/logout', authenticateToken, async (req, res) => {
-  const { userId } = req.user;
+  const userId = req.user.userId || req.user.id; // fallback
 
   console.log("Decoded user on logout:", req.user); // ✅ Add this
 

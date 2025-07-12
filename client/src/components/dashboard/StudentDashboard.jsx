@@ -342,7 +342,7 @@ const StudentDashboard = () => {
       if (token) {
         await axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
           headers: {
-            Authorization: token
+           Authorization: `Bearer ${token}`
           }
         });
       }
