@@ -336,11 +336,17 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 <td className="px-3 py-2 text-center">{item.status}</td>
 <td className="px-3 py-2 text-center">{item.bursary}</td>
 <td className="px-3 py-2 text-center">
-<Link to={`/PersonalInformation/${item.user_id}`}>
-<button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded font-semibold">
-User Details
-</button>
-</Link>
+  {item.approved_by_committee ? (
+    <span className="text-gray-500 text-sm italic">
+      Approved by {item.approved_by_committee}
+    </span>
+  ) : (
+    <Link to={`/PersonalInformation/${item.user_id}`}>
+      <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded font-semibold">
+        User Details
+      </button>
+    </Link>
+  )}
 </td>
 </tr>
 ))}

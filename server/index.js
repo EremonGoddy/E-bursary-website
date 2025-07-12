@@ -242,6 +242,10 @@ app.post("/api/signin", async (req, res) => {
       };
     }
 
+    // Insert into activity log
+    const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
+    await pool.query(logQuery, [`User ${user.name} (${user.role}) signed in.`]);
+
     return res.status(200).json(response);
 
   } catch (error) {
@@ -249,6 +253,28 @@ app.post("/api/signin", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+
+app.post('/api/logout', authenticateToken, async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    // Get user's name for logging
+    const result = await pool.query("SELECT name FROM users WHERE id = $1", [userId]);
+
+    if (result.rows.length > 0) {
+      const userName = result.rows[0].name;
+      const logMessage = `User ${userName} logged out.`;
+
+      await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
+    }
+
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (err) {
+    console.error('Error logging logout:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 app.post("/api/approve-student", async (req, res) => {
   try {
@@ -335,6 +361,10 @@ app.post("/api/post", async (req, res) => {
       [name, email, hashedPassword, role, phoneNumber]
     );
 
+     // Log the activity
+    const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
+    await pool.query(logQuery, [`New user registered: ${name} (${role})`]);
+
     // Respond with the created user data
     res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
   } catch (error) {
@@ -399,6 +429,10 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
 
+    // Insert into activity log
+    const logMessage = `User ${name} changed their password successfully.`;
+    await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
+
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("Error updating password:", error);
@@ -447,6 +481,35 @@ app.get('/api/application-progress/:userId', async (req, res) => {
         currentStep = i + 1;
       } else break;
     }
+
+  // If all steps are completed
+    if (completedSteps.length === 5) {
+      // Fetch user's full name from personal_details
+      const nameResult = await pool.query(
+        'SELECT fullname FROM personal_details WHERE user_id = $1',
+        [userId]
+      );
+
+      if (nameResult.rows.length > 0) {
+        const fullname = nameResult.rows[0].fullname;
+        const logMessage = `Student ${fullname} submitted bursary application successfully.`;
+
+        // Avoid duplicate log entry
+        const existingLog = await pool.query(
+          'SELECT 1 FROM activity_log WHERE log_message = $1',
+          [logMessage]
+        );
+
+        if (existingLog.rows.length === 0) {
+          await pool.query(
+            'INSERT INTO activity_log (log_message) VALUES ($1)',
+            [logMessage]
+          );
+        }
+      }
+    }
+
+
     res.json({ currentStep, completedSteps });
   } catch (err) {
     console.error(err);
@@ -856,6 +919,11 @@ app.put('/api/student/update', (req, res) => {
         admission,
         decoded.email
       ]);
+
+      // Insert activity log
+      const logMessage = `Student profile updated: ${fullname} (${email})`;
+      const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
+      await pool.query(logQuery, [logMessage]);
 
       res.send({ message: 'Profile updated successfully', data: req.body });
     } catch (err) {

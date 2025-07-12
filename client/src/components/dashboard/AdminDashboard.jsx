@@ -29,6 +29,8 @@ const [remainingAmount, setRemainingAmount] = useState(0);
 const [totalApplications, setTotalApplications] = useState(0);
 const [approvedApplications, setApprovedApplications] = useState(0);
 const [rejectedApplications, setRejectedApplications] = useState(0);
+const [pendingApplications, setPendingApplications] = useState(0);
+const [incompleteApplications, setIncompleteApplications] = useState(0);
 const [users, setUsers] = useState([]);
 const [activityLogs, setActivityLogs] = useState([]);
 
@@ -59,10 +61,12 @@ email: response.data.email,
 axios
 .get('https://e-bursary-backend.onrender.com/api/quick-statistics')
 .then((response) => {
-const { total, approved, rejected } = response.data;
+const { total, approved, rejected, pending, incomplete } = response.data;
 setTotalApplications(total);
 setApprovedApplications(approved);
 setRejectedApplications(rejected);
+setPendingApplications(pending || 0);
+setIncompleteApplications(incomplete || 0);
 })
 .catch((error) => {
 console.error('Error fetching application statistics:', error);
@@ -95,14 +99,16 @@ setActivityLogs(logsResponse.data);
 
 const approvedPercentage = totalApplications > 0 ? (approvedApplications / totalApplications) * 100 : 0;
 const rejectedPercentage = totalApplications > 0 ? (rejectedApplications / totalApplications) * 100 : 0;
+const pendingPercentage = totalApplications > 0 ? (pendingApplications / totalApplications) * 100 : 0;
+const incompletePercentage = totalApplications > 0 ? (incompleteApplications / totalApplications) * 100 : 0;
 
 const chartData = {
-labels: ['Approved', 'Rejected'],
+labels: ['Approved', 'Rejected', 'Pending', 'Incomplete'],
 datasets: [
 {
-data: [approvedPercentage, rejectedPercentage],
-backgroundColor: ['#4CAF50', '#FF5252'],
-hoverBackgroundColor: ['#388E3C', '#D32F2F'],
+data: [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage],
+backgroundColor: ['#4CAF50', '#FF5252', '#FFC107', '#2196F3'],
+hoverBackgroundColor: ['#388E3C', '#D32F2F', '#FFA000', '#1976D2'],
 },
 ],
 };
@@ -389,6 +395,14 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.13)] rounded flex flex-col items-center">
 <h2 className="text-xl font-bold text-center">Quick Statistics</h2>
 <div className="flex flex-col md:flex-row justify-between items-center mt-4 w-full gap-4">
+<div className="text-center bg-blue-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
+<p>Pending Application</p>
+<strong>{pendingApplications}</strong>
+</div>
+<div className="text-center bg-yellow-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
+<p>Incomplete Application</p>
+<strong>{incompleteApplications}</strong>
+</div>
 <div className="text-center bg-green-500 text-white p-3 rounded shadow w-full">
 <p>Total Applications:</p>
 <strong className="text-lg">{totalApplications}</strong>

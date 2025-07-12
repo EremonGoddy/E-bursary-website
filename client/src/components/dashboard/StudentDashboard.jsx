@@ -333,14 +333,37 @@ const StudentDashboard = () => {
             {/* Logout */}
             <li className="relative group">
               <div className="flex items-center">
-                <Link to="/" onClick={() => {sessionStorage.clear(); setDocumentUploaded(false);navigate('/');}}  className={`
-                  flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
-                </Link>
+               <Link
+  to="#"
+  onClick={async (e) => {
+    e.preventDefault();
+    const token = sessionStorage.getItem('authToken');
+    try {
+      if (token) {
+        await axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+          headers: {
+            Authorization: token
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Logout logging failed:", err);
+      // Proceed to logout anyway
+    } finally {
+      sessionStorage.clear();
+      setDocumentUploaded(false);
+      navigate('/');
+    }
+  }}
+  className={`
+    flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
+    transition-all duration-200
+    ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
+  `}
+>
+  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
+  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
+</Link>
                 <span className={`
                   absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
                   rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
