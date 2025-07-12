@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faArrowRight, faBookOpen, faCalendarDays, faBullhorn } from "@fortawesome/free-solid-svg-icons";
 import "./HomePage.css";
 
 const HomePage = () => {
@@ -31,22 +31,34 @@ Ebursary
 </Link>
 <div className="space-x-4 hidden md:flex">
 <Link
-className=" text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+className="relative text-[1.35rem] px-3 py-2 transition duration-300 hover:text-[#FFD700] 
+before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
+before:bg-[#FFD700] before:transition-all before:duration-300 
+hover:before:w-[80%]"
 to="/">
 Home
 </Link>
 <Link
-className=" text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+className="relative text-[1.35rem] px-3 py-2 transition duration-300 hover:text-[#FFD700] 
+before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
+before:bg-[#FFD700] before:transition-all before:duration-300 
+hover:before:w-[80%]"
 to="/about">
 About
 </Link>
 <Link
-className=" text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+className="relative text-[1.35rem] px-3 py-2 transition duration-300 hover:text-[#FFD700] 
+before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
+before:bg-[#FFD700] before:transition-all before:duration-300 
+hover:before:w-[80%]"
 to="/services">
 Services
 </Link>
 <Link
-className="  text-[1.35rem]  transition duration-300 px-3 py-2 rounded hover:text-[#FFD700]"
+className="relative text-[1.35rem] px-3 py-2 transition duration-300 hover:text-[#FFD700] 
+before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
+before:bg-[#FFD700] before:transition-all before:duration-300 
+hover:before:w-[80%]"
 to="/contact">
 Contact
 </Link>
@@ -115,9 +127,11 @@ Empowering Education in Turkana Through Bursaries: Your Path to Success
 {/* Centered Button */}
 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 <Link
-className="getting-started text-white text-lg sm:text-xl md:text-1xl lg:text-2xl no-underline px-5 py-2 rounded-[5px] "
-to="/login">
-Get Started
+  to="/login"
+  className=" getting-started flex items-center gap-2  text-white text-lg sm:text-xl px-6 py-2 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
+>
+  Get Started
+  <FontAwesomeIcon icon={faArrowRight} className="text-white text-base sm:text-xl" />
 </Link>
 </div>
 </div>
@@ -130,7 +144,10 @@ Get Started
 <div className="grid md:grid-cols-3 gap-1 md:gap-8">
 {/* Program Overview */}
 <div className=" mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
-<h2 className="text-[1.3rem] md:text-[1.35rem] font-semibold text-gray-800 text-center">
+<div className="flex justify-center mb-2">
+  <FontAwesomeIcon icon={faBookOpen} className="text-[#1F2937] text-[1.3rem] md:text-[2rem]" />
+</div>
+<h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#374151]  text-center">
 Overview of the Bursary Program
 </h2>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">
@@ -140,7 +157,10 @@ The Turkana County Bursary Program is designed to support deserving students fro
 
 {/* Key Dates */}
 <div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
-<h2 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800 text-center">Key Dates</h2>
+    <div className="flex justify-center mb-2">
+  <FontAwesomeIcon icon={faCalendarDays} className="text-[#1F2937] text-[1.3rem] md:text-[2rem]" />
+</div>
+<h2 className="text-[1.3rem] md:text-[1.35rem]  font-bold text-[#374151] text-center">Key Dates</h2>
 <ul className=" pl-5 mt-4 text-[1rem] md:text-[1.1rem] ">
 <li className="text-gray-600 px-3 py-2">📅 Application Open: <strong>12/3/2024</strong></li>
 <li className="text-gray-600 px-3 py-2">📅 Deadline: <strong>25/3/2024</strong></li>
@@ -151,7 +171,10 @@ The Turkana County Bursary Program is designed to support deserving students fro
 
 {/* Important Announcement */}
 <div className=" mb-3 p-4 bg-white rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
-<h2 className="text-[1.3rem] md:text-[1.35rem]  font-semibold text-gray-800 text-center ">
+ <div className="flex justify-center mb-2">
+  <FontAwesomeIcon icon={faBullhorn}  className="text-[#1F2937] text-[1.3rem] md:text-[2rem]" />
+</div>
+<h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#374151]  text-center ">
 Important Announcement
 </h2>
 <p className="text-gray-600 mt-4 text-[1rem] md:text-[1.1rem]">

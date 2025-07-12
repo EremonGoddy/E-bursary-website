@@ -6,17 +6,17 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const navigate = useNavigate();
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const [errors, setErrors] = useState({});
+const [showPassword, setShowPassword] = useState(false);
+const [rememberMe, setRememberMe] = useState(false);
+const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    if (!email) newErrors.email = '*Please provide an email';
+const handleSubmit = (e) => {
+e.preventDefault();
+const newErrors = {};
+if (!email) newErrors.email = '*Please provide an email';
     if (!password) newErrors.password = '*Please provide a password';
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
