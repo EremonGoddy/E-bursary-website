@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
 const LoginPage = () => {
@@ -69,52 +69,57 @@ if (!email) newErrors.email = '*Please provide an email';
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="bg-white rounded-lg p-8 w-11/12 max-w-md shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Sign in</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-            />
-            {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
-          </div>
+  <div className="flex items-center justify-center -mt-5 md:-mt-20 min-h-screen">
+  <div className="bg-white rounded-lg p-8 w-11/12 max-w-md shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+  <h2 className=" text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-1">Welcome back</h2>
 
-          <div className="mb-4 relative">
-            <label htmlFor="password" className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">
-              Password
-            </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-            />
-            <span
-              className="text-[1.4rem] md:text-[1.6rem] mt-7 absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
-              onClick={togglePasswordVisibility}
-              style={{
-                display: 'inline-flex',
-                width: 'auto',
-                padding: '0.5rem',
-              }}
-            >
-              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-            </span>
-            {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
-          </div>
+        <h2 className="text-2xl md:text-[1.8rem] text-[#14213d] font-bold text-center mb-6">Sign in</h2>
+        <form onSubmit={handleSubmit}>
+      <div className="mb-4">
+  <label htmlFor="email" className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">
+    Email
+  </label>
+  <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+    <FontAwesomeIcon icon={faEnvelope} className="text-[#14213d] text-[1.3rem] mr-2" />
+    <input
+      type="email"
+      id="email"
+      name="email"
+      className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      placeholder="Enter your email"
+    />
+  </div>
+  {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
+</div>
+
+
+<div className="mb-4 relative">
+  <label htmlFor="password" className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">
+    Password
+  </label>
+  <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+    <FontAwesomeIcon icon={faLock} className="text-[#14213d] text-[1.3rem]  mr-2" />
+    <input
+      type={showPassword ? 'text' : 'password'}
+      id="password"
+      name="password"
+      className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      placeholder="Enter your password"
+    />
+    <span
+      className="text-[1.2rem] md:text-[1.3rem] inline-flex items-center cursor-pointer text-[#14213d] ml-2"
+      onClick={togglePasswordVisibility}
+    >
+      <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+    </span>
+  </div>
+  {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
+</div>
+
 
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center">
@@ -126,7 +131,7 @@ if (!email) newErrors.email = '*Please provide an email';
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              <label htmlFor="rememberMe" className="ml-2 text-[1rem] md:text-[1.1rem] text-gray-700">
+              <label htmlFor="rememberMe" className="ml-2 text-[1rem] md:text-[1.1rem] text-[#14213d]">
                 Remember me
               </label>
             </div>
@@ -137,13 +142,13 @@ if (!email) newErrors.email = '*Please provide an email';
 
           <button
             type="submit"
-            className="text-[1rem] md:text-[1.1rem] w-full text-white focus:ring-2 focus:ring-blue-600 py-2 rounded-lg bg-gray-900 hover:bg-gray-700 cursor-pointer transition"
+            className="text-[1rem] md:text-[1.1rem] w-full text-white focus:ring-2 focus:ring-[#fca311] py-2 rounded-lg bg-[#14213d] hover:bg-gray-700 cursor-pointer transition"
           >
             Sign in
           </button>
 
           <div className="text-center mt-4">
-            <span className="text-[1rem] md:text-[1.1rem] text-gray-600">Don't have an account? </span>
+            <span className="text-[1rem] md:text-[1.1rem] text-[#14213d]">Don't have an account? </span>
             <Link to="/register" className="text-[1rem] md:text-[1.1rem] text-blue-600 hover:text-blue-800">
               Create an Account
             </Link>
