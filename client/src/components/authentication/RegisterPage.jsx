@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faEnvelope,
+  faPhone,
+  faLock,
+  faEye,
+  faEyeSlash,
+} from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
 const RegisterPage = () => {
@@ -24,7 +31,7 @@ const RegisterPage = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = '*Please provide your full name';
     if (!formData.email) newErrors.email = '*Please provide an email';
-    if (!formData.phoneNumber) newErrors.phoneNumber = '*Please provide an phone number';
+    if (!formData.phoneNumber) newErrors.phoneNumber = '*Please provide a phone number';
     if (!formData.password) newErrors.password = '*Please provide a password';
     if (!formData.confirmPassword) newErrors.confirmPassword = '*Please confirm your password';
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = '*Passwords do not match';
@@ -44,7 +51,6 @@ const RegisterPage = () => {
       .catch((err) => {
         let errorMsg = '';
         if (err.response && err.response.data) {
-          // If backend sends { message: "..." }
           if (typeof err.response.data === 'object' && err.response.data.message) {
             errorMsg = err.response.data.message.toLowerCase();
           } else if (typeof err.response.data === 'object' && err.response.data.error) {
@@ -74,95 +80,117 @@ const RegisterPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="bg-white rounded-lg p-8 w-11/12 max-w-md shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Sign Up</h2>
+        <h2 className="text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-6">Create Account</h2>
         <form onSubmit={handleSubmit}>
+          {/* Full Name */}
           <div className="mb-4">
-            <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Full Name</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Enter your full name"
-            />
+            <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Full Name</label>
+            <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+              <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-[1.3rem] mr-2" />
+              <input
+                type="text"
+                className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter your full name"
+              />
+            </div>
             {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name}</div>}
           </div>
 
+          {/* Email */}
           <div className="mb-4">
-            <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Email</label>
-            <input
-              type="email"
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="Enter your email"
-            />
+            <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Email</label>
+            <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+              <FontAwesomeIcon icon={faEnvelope} className="text-[#14213d] text-[1.3rem] mr-2" />
+              <input
+                type="email"
+                className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Enter your email"
+              />
+            </div>
             {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
           </div>
 
-           <div className="mb-4">
-            <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Phone Number</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-              placeholder="Enter your Phone Number"
-            />
+          {/* Phone Number */}
+          <div className="mb-4">
+            <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Phone Number</label>
+            <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+              <FontAwesomeIcon icon={faPhone} className="text-[#14213d] text-[1.3rem] mr-2" />
+              <input
+                type="text"
+                className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                placeholder="Enter your phone number"
+              />
+            </div>
             {errors.phoneNumber && <div className="text-red-500 text-sm mt-1">{errors.phoneNumber}</div>}
           </div>
 
+          {/* Password */}
           <div className="mb-4 relative">
-            <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Password</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Enter your password"
-            />
+            <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Password</label>
+            <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+              <FontAwesomeIcon icon={faLock} className="text-[#14213d] text-[1.3rem] mr-2" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter your password"
+              />
+            </div>
             {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
           </div>
 
+          {/* Confirm Password */}
           <div className="mb-4 relative">
-            <label className="block text-gray-700 text-[1rem] md:text-[1.1rem] font-semibold mb-1">Confirm Password</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              placeholder="Confirm your password"
-            />
-            <span
-              className="text-[1.4rem] md:text-[1.6rem] mt-7 md:mt-7 absolute inset-y-0 right-3 inline-flex items-center cursor-pointer text-gray-500"
-              onClick={togglePasswordVisibility}>
-              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-            </span>
+            <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Confirm Password</label>
+            <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#14213d] px-3">
+              <FontAwesomeIcon icon={faLock} className="text-[#14213d] text-[1.3rem] mr-2" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="w-full py-2 text-[1rem] md:text-[1.1rem] focus:outline-none"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                placeholder="Confirm your password"
+              />
+              <span
+                className="text-[1.2rem] md:text-[1.3rem] ml-2 inline-flex items-center cursor-pointer text-[#14213d]"
+                onClick={togglePasswordVisibility}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+              </span>
+            </div>
             {errors.confirmPassword && <div className="text-red-500 text-sm mt-1">{errors.confirmPassword}</div>}
           </div>
 
+          {/* Terms and Conditions */}
           <div className="mb-4 flex items-center justify-center">
             <input
               type="checkbox"
               id="terms"
-              className="h-4 w-4 md:h-4.5 md:w-4.5 text-gray-600 border-gray-300 rounded "
+              className="h-4 w-4 text-gray-600 border-gray-300 rounded"
               checked={isTermsAccepted}
               onChange={(e) => setIsTermsAccepted(e.target.checked)}
             />
-            <label htmlFor="terms" className="ml-2 text-[1rem] md:text-[1.1rem] text-gray-700">
+            <label htmlFor="terms" className="ml-2 text-[1rem] md:text-[1.1rem] text-[#14213d]">
               I agree with terms and conditions
             </label>
           </div>
 
           <button
             type="submit"
-            className="text-[1rem] md:text-[1.1rem] w-full text-white py-2 rounded-lg bg-gray-900 hover:bg-gray-700 cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="text-[1rem] md:text-[1.1rem] w-full text-white py-2 rounded-lg bg-[#14213d] hover:bg-gray-700 cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-[#fca311]"
           >
             Register
           </button>
 
           <div className="text-center mt-4">
-            <span className="text-[1rem] md:text-[1.1rem] text-gray-600">Already have an account? </span>
+            <span className="text-[1rem] md:text-[1.1rem] text-[#14213d]">Already have an account? </span>
             <Link to="/login" className="text-[1rem] md:text-[1.1rem] text-blue-600 hover:text-blue-800">
               Sign in
             </Link>
