@@ -108,10 +108,10 @@ className="w-full object-cover h-[40vh] md:h-[60vh]"
 </div>
 
 {/* About Section */}
-<div className="py-8 px-4 sm:px-8 mt-[2px]  sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
+<div className="py-8 px-4 sm:px-8 mt-[2px]  sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
 {/* Student Registration */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
   <div className="flex justify-center mb-2">
 <FontAwesomeIcon icon={faBalanceScale} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
   </div>
@@ -123,7 +123,7 @@ Every student deserves a fair and equal opportunity to pursue their education, r
 </div>
 
 {/* Application Tracking */}
-<div className=" mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className=" mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
  <div className="flex justify-center mb-2">
 <FontAwesomeIcon icon={faEye} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
   </div>
@@ -135,7 +135,7 @@ From application to allocation, our platform keeps both students and guardians i
 </div>
 
 {/* Document Upload */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl  transition-all duration-300 transform hover:scale-[1.01]">
  <div className="flex justify-center mb-2">
 <FontAwesomeIcon icon={faMobileScreenButton} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
   </div>
@@ -147,7 +147,7 @@ From application to allocation, our platform keeps both students and guardians i
 </div>
 
 {/* Allocation Notifications */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl  transition-all duration-300 transform hover:scale-[1.01]">
 <div className="flex justify-center mb-2">
 <FontAwesomeIcon icon={faPeopleGroup} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
   </div>

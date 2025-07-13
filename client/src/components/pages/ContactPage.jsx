@@ -113,10 +113,10 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 </div>
 
 {/* Services Section */}
-<div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px]">
+<div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6 mb-3 md:mb-8">
 {/* Location */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
 <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]">Location</h4>
@@ -127,7 +127,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Phone */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
 <FontAwesomeIcon icon={faPhoneAlt} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]">Phone</h4>
@@ -137,7 +137,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 
 {/* Email */}
-<div className="mb-3 p-4 bg-white  rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
 <FontAwesomeIcon icon={faEnvelope} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
 <div>
 <h4 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]">Email</h4>
@@ -158,7 +158,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
   </div>
 
   {/* Message Form */}
-  <div className="mb-3 p-4 bg-white rounded-lg shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] ml-auto w-full max-w-lg">
+  <div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01 ml-auto w-full max-w-lg">
     <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Send us a Message</h2>
     <form className="p-4 space-y-4">
       <div>

@@ -78,8 +78,8 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="bg-white rounded-lg p-8 w-11/12 max-w-md -mt-2 md:mt-0 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+      <div className=" p-8 w-11/12 max-w-md -mt-2 md:mt-0 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
         <h2 className="text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-6">Create Account</h2>
         <form onSubmit={handleSubmit}>
           {/* Full Name */}
