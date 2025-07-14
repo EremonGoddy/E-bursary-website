@@ -84,9 +84,9 @@ icon: <FontAwesomeIcon icon={faTriangleExclamation} style={{ color: '#fca311' }}
   <div className=" p-6 md:p-8 w-12/12 md:w-11/12 max-w-md backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
   <h2 className=" text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-1">Welcome back</h2>
 
-        <h2 className="text-2xl md:text-[1.8rem] text-[#14213d] font-bold text-center mb-6">Sign in</h2>
-        <form onSubmit={handleSubmit}>
-      <div className="mb-4">
+<h2 className="text-2xl md:text-[1.8rem] text-[#14213d] font-bold text-center mb-6">Sign in</h2>
+<form onSubmit={handleSubmit}>
+<div className="mb-4">
   <label htmlFor="email" className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">
     Email
   </label>

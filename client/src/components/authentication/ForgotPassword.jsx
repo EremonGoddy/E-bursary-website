@@ -25,7 +25,7 @@ const ForgotPassword = () => {
         setTimer(prev => prev - 1);
       }, 1000);
     } else if (timer === 0 && otpSent) {
-  toast.warning("Role not recognized", {
+  toast.warning("OTP has expired resend it again", {
   icon: <FontAwesomeIcon icon={faTriangleExclamation} style={{ color: '#fca311' }} />,
   });
   setOtpSent(false);  // OTP expired, allow resending
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
     const response = await axios.post('https://e-bursary-backend.onrender.com/api/send-otp', { email: contactValue });
 
     if (response.status === 200) {
-        toast.success("Login successful", {
+        toast.success("OTP sent successful", {
         icon: <FontAwesomeIcon icon={faCircleCheck} style={{ color: '#00ff88' }} />,
       });
       setOtpSent(true);
@@ -87,15 +87,20 @@ const ForgotPassword = () => {
       const response = await axios.post('https://e-bursary-backend.onrender.com/api/verify-otp', payload);
 
       if (response.status === 200) {
-        alert('OTP verified successfully.');
+       toast.success("OTP sent successful", {
+        icon: <FontAwesomeIcon icon={faCircleCheck} style={{ color: '#00ff88' }} />,
+      });
         navigate('/resetpassword', { state: { contactValue } });
       }
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Invalid OTP or expired.');
-    } finally {
-      setVerifying(false);
-    }
+  console.error(err);
+  const message = err.response?.data?.message || 'Invalid OTP or expired.';
+  setError(message);
+
+  toast.error(message, {
+    icon: <FontAwesomeIcon icon={faCircleExclamation} style={{ color: '#ffffff' }} />,
+  });
+}
   };
 
   return (
