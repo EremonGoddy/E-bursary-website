@@ -4,7 +4,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope,faCircleCheck, faCircleExclamation, faTriangleExclamation} from '@fortawesome/free-solid-svg-icons';
 import './toastifyCustom.css';
 
 const ForgotPassword = () => {
@@ -61,11 +61,15 @@ const ForgotPassword = () => {
       setTimer(120); // 2-minute countdown
     }
   } catch (err) {
-    console.error(err);
-    setError(err.response?.data?.message || 'Failed to send OTP.');
-  } finally {
-    setLoading(false);
-  }
+  console.error(err);
+  const message = err.response?.data?.message || 'Failed to send OTP.';
+  setError(message);
+
+  toast.error(message, {
+    icon: <FontAwesomeIcon icon={faCircleExclamation} style={{ color: '#ffffff' }} />,
+  });
+}
+
 };
 
 
