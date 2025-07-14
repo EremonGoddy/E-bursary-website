@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import './toastifyCustom.css';
 
 const ForgotPassword = () => {
   const [contactValue, setContactValue] = useState('');
@@ -21,9 +24,12 @@ const ForgotPassword = () => {
       countdown = setInterval(() => {
         setTimer(prev => prev - 1);
       }, 1000);
-    } else if (timer === 0) {
-      setOtpSent(false);  // OTP expired, allow sending again
-    }
+    } else if (timer === 0 && otpSent) {
+  toast.warning("Role not recognized", {
+  icon: <FontAwesomeIcon icon={faTriangleExclamation} style={{ color: '#fca311' }} />,
+  });
+  setOtpSent(false);  // OTP expired, allow resending
+}
 
     return () => clearInterval(countdown);
   }, [otpSent, timer]);
@@ -48,7 +54,9 @@ const ForgotPassword = () => {
     const response = await axios.post('https://e-bursary-backend.onrender.com/api/send-otp', { email: contactValue });
 
     if (response.status === 200) {
-      alert('OTP has been sent.');
+        toast.success("Login successful", {
+        icon: <FontAwesomeIcon icon={faCircleCheck} style={{ color: '#00ff88' }} />,
+      });
       setOtpSent(true);
       setTimer(120); // 2-minute countdown
     }
@@ -114,7 +122,14 @@ const ForgotPassword = () => {
           disabled={loading || (!contactValue || otpSent)}
           className={`w-full py-2 rounded-lg text-white font-semibold ${loading || otpSent ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
-          {loading ? 'Sending OTP...' : otpSent ? 'OTP Sent' : 'Send OTP'}
+{loading
+  ? 'Sending OTP...'
+  : otpSent
+  ? 'OTP Sent'
+  : timer === 0 && contactValue
+  ? 'Resend OTP'
+  : 'Send OTP'}
+
         </button>
 
         {otpSent && (
@@ -143,6 +158,7 @@ const ForgotPassword = () => {
 
         {error && <div className="mt-4 text-red-600 text-sm text-center">{error}</div>}
       </div>
+        <ToastContainer position="top-right"/>
     </div>
   );
 };
