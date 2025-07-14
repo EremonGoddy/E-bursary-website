@@ -1,0 +1,23 @@
+/* toastifyCustom.css */
+.Toastify__toast {
+  font-size: 1.2rem;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  border-radius: 10px;
+}
+
+.Toastify__toast--success {
+  background: #14213d;
+}
+
+.Toastify__toast--error {
+  background: #e63946;
+}
+
+.Toastify__toast--warning {
+  background: #fca311;
+}
+
+.Toastify__toast--info {
+  background: #0077b6;
+}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope} from '@fortawesome/free-solid-svg-icons';
 
 const ForgotPassword = () => {
   const [contactValue, setContactValue] = useState('');
@@ -10,6 +12,7 @@ const ForgotPassword = () => {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(0);
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,31 +34,32 @@ const ForgotPassword = () => {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  const handleSendOTP = async () => {
-    if (!contactValue) {
-      alert('Please enter your email or phone number.');
-      return;
+ const handleSendOTP = async () => {
+  if (!contactValue || !contactValue.includes('@')) {
+    setEmailError('Please enter a valid email address.');
+    return;
+  }
+
+  setEmailError('');
+  setLoading(true);
+  setError('');
+
+  try {
+    const response = await axios.post('https://e-bursary-backend.onrender.com/api/send-otp', { email: contactValue });
+
+    if (response.status === 200) {
+      alert('OTP has been sent.');
+      setOtpSent(true);
+      setTimer(120); // 2-minute countdown
     }
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || 'Failed to send OTP.');
+  } finally {
+    setLoading(false);
+  }
+};
 
-    setLoading(true);
-    setError('');
-
-    try {
-      const payload = contactValue.includes('@') ? { email: contactValue } : { phoneNumber: contactValue };
-      const response = await axios.post('https://e-bursary-backend.onrender.com/api/send-otp', payload);
-
-      if (response.status === 200) {
-        alert('OTP has been sent.');
-        setOtpSent(true);
-        setTimer(120); // 2-minute countdown
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Failed to send OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleVerifyOTP = async () => {
     if (!otp) {
@@ -85,22 +89,30 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <div className="w-full max-w-md p-6 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Forgot Password</h2>
+        <h2 className="text-2xl font-bold mb-6 text-[#14213d] text-center">Forgot Password</h2>
 
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Enter email or phone number"
-            value={contactValue}
-            onChange={(e) => setContactValue(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+     <div className="mb-2">
+  <div className="flex items-center border border-gray-300 rounded focus-within:ring-2 focus-within:ring-blue-500 px-3">
+    <FontAwesomeIcon icon={faEnvelope} className="text-gray-600 mr-2" />
+    <input
+      type="email"
+      placeholder="Enter your email"
+      value={contactValue}
+      onChange={(e) => {
+        setContactValue(e.target.value);
+        setEmailError('');
+      }}
+      className="w-full py-2 focus:outline-none"
+    />
+  </div>
+  {emailError && <div className="text-red-600 text-sm mt-1">{emailError}</div>}
+</div>
+
 
         <button
           onClick={handleSendOTP}
           disabled={loading || (!contactValue || otpSent)}
-          className={`w-full py-3 rounded-lg text-white font-semibold ${loading || otpSent ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`w-full py-2 rounded-lg text-white font-semibold ${loading || otpSent ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
           {loading ? 'Sending OTP...' : otpSent ? 'OTP Sent' : 'Send OTP'}
         </button>
@@ -111,20 +123,20 @@ const ForgotPassword = () => {
           </div>
         )}
 
-        <div className="mt-6 mb-4">
+        <div className="mt-6 mb-2">
           <input
             type="text"
             placeholder="Enter OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
 
         <button
           onClick={handleVerifyOTP}
           disabled={verifying || !otp}
-          className={`w-full py-3 rounded-lg text-white font-semibold ${verifying ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+          className={`w-full py-2 rounded-lg text-white font-semibold ${verifying ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
         >
           {verifying ? 'Verifying...' : 'Verify & Next'}
         </button>

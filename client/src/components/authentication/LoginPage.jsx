@@ -4,8 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faEnvelope, faLock, faCircleCheck, faCircleExclamation, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import './toastifyCustom.css';
 
 const LoginPage = () => {
 const [email, setEmail] = useState('');
@@ -36,6 +37,11 @@ if (!email) newErrors.email = '*Please provide an email';
         storage.setItem('userName', name);
         storage.setItem('userId', student?.user_id || '');
 
+        // ✅ Show success toast right after login success
+    toast.success("Login successful", {
+  icon: <FontAwesomeIcon icon={faCircleCheck} style={{ color: '#00ff88' }} />,
+});
+
         if (role === 'Student') {
           axios
             .get(`https://e-bursary-backend.onrender.com/api/upload/status/${student?.user_id}`, {
@@ -56,13 +62,16 @@ if (!email) newErrors.email = '*Please provide an email';
         } else if (role === 'Committee') {
           navigate('/committeedashboard');
         } else {
-         toast.warning('Role not recognized');
+        toast.warning("Role not recognized", {
+icon: <FontAwesomeIcon icon={faTriangleExclamation} style={{ color: '#fca311' }} />,
+});
         }
       })
       .catch((err) => {
         console.error('Login error:', err);
-        const message = err?.response?.data?.message || 'Login failed. Please try again.';
-        toast.error(message); // Replaces alert
+        toast.error("Invalid password", {
+  icon: <FontAwesomeIcon icon={faCircleExclamation} style={{ color: '#ffffff' }} />,
+});
       });
   };
 
@@ -156,7 +165,7 @@ if (!email) newErrors.email = '*Please provide an email';
             </Link>
           </div>
         </form>
-        <ToastContainer position="top-right" autoClose={4000} />
+        <ToastContainer position="top-right"/>
       </div>
     </div>
   );
