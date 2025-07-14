@@ -158,7 +158,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
   </div>
 
   {/* Message Form */}
-  <div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01 ml-auto w-full max-w-lg">
+  <div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] ml-auto w-full max-w-lg">
     <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Send us a Message</h2>
     <form className="p-4 space-y-4">
       <div>

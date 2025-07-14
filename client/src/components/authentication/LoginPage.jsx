@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -54,13 +56,13 @@ if (!email) newErrors.email = '*Please provide an email';
         } else if (role === 'Committee') {
           navigate('/committeedashboard');
         } else {
-          alert('Role not recognized');
+         toast.warning('Role not recognized');
         }
       })
       .catch((err) => {
         console.error('Login error:', err);
         const message = err?.response?.data?.message || 'Login failed. Please try again.';
-        alert(message);
+        toast.error(message); // Replaces alert
       });
   };
 
@@ -154,6 +156,7 @@ if (!email) newErrors.email = '*Please provide an email';
             </Link>
           </div>
         </form>
+        <ToastContainer position="top-right" autoClose={4000} />
       </div>
     </div>
   );
