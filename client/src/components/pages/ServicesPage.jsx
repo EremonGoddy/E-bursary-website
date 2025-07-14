@@ -107,7 +107,7 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
 {/* Student Registration */}
-<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
+<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
 <div className="flex justify-center mb-2">
 <FontAwesomeIcon icon={faUserPlus} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
   </div>
@@ -121,7 +121,7 @@ allowing students to focus on their education without hassle.
 </div>
 
 {/* Application Tracking */}
-<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
+<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
     <div className="flex justify-center mb-2">
     <FontAwesomeIcon icon={faListCheck} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
       </div>
@@ -134,7 +134,7 @@ updates. No need to follow up manually — our platform keeps you in the loop.
 </div>
 
 {/* Document Upload */}
-<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
+<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
     <div className="flex justify-center mb-2">
     <FontAwesomeIcon icon={faFileUpload} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
       </div>
@@ -147,7 +147,7 @@ your application digitally, reducing the need for physical paperwork.
 </div>
 
 {/* Allocation Notifications */}
-<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
+<div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
     <div className="flex justify-center mb-2">
     <FontAwesomeIcon icon={faBell} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
       </div>

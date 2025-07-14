@@ -70,7 +70,7 @@ if (!email) newErrors.email = '*Please provide an email';
 
   return (
   <div className="flex items-center justify-center -mt-5 md:-mt-20 min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-  <div className=" p-8 w-11/12 max-w-md backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01">
+  <div className=" p-6 md:p-8 w-12/12 md:w-11/12 max-w-md backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
   <h2 className=" text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-1">Welcome back</h2>
 
         <h2 className="text-2xl md:text-[1.8rem] text-[#14213d] font-bold text-center mb-6">Sign in</h2>
