@@ -21,3 +21,24 @@
 .Toastify__toast--info {
   background: #0077b6;
 }
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+  .Toastify__toast {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.8rem !important;
+    min-height: 40px !important;
+    max-width: 85% !important;
+    margin: auto !important;
+  }
+
+  .Toastify__toast-body {
+    font-size: 0.85rem !important;
+  }
+
+  .Toastify__close-button {
+    font-size: 0.8rem !important;
+    padding: 0.3rem !important;
+    color:white !important;
+  }
+}

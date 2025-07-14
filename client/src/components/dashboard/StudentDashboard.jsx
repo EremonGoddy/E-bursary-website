@@ -5,18 +5,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHouse,
   faFileAlt,
-  faPaperclip,
   faDownload,
   faComments,
   faCog,
   faSignOutAlt,
-  faCashRegister,
-  faCheckDouble,
+  faCheckCircle,
+  faHourglassHalf,
+  faTimesCircle,
+  faEye,
   faUser,
   faBars,
   faEdit,
   faBell,
   faTimes,
+  faMoneyBillWave,
 } from '@fortawesome/free-solid-svg-icons';
 import "./Dashboard.css";
 
@@ -29,6 +31,22 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const navigate = useNavigate();
+
+
+    const getStatusIcon = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return { icon: faCheckCircle, color: 'text-green-500' };
+      case 'pending':
+        return { icon: faHourglassHalf, color: 'text-yellow-500' };
+      case 'rejected':
+        return { icon: faTimesCircle, color: 'text-red-500' };
+      case 'under review':
+        return { icon: faEye, color: 'text-blue-500' };
+      default:
+        return { icon: faFileAlt, color: 'text-gray-400' };
+    }
+  }
 
   // Ensures the proper step navigation on sidebar 'Apply' click
   const handleApplyClick = async (e) => {
@@ -164,9 +182,9 @@ const StudentDashboard = () => {
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
           <div className="flex items-center space-x-6">
-            <h2 className="mr-2 md:mr-5 text-[1.1rem] md:text-[1.20rem] font-semibold">
+            <h2 className="mr-2 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
               Welcome: {userName}
             </h2>
             <div className="flex items-center space-x-2">
@@ -182,205 +200,145 @@ const StudentDashboard = () => {
       </div>
 
       <div className="flex pt-20 min-h-screen">
-        {/* Sidebar */}
-        <div
-          className={`
-            fixed top-0 left-0 z-30 bg-[#1F2937] 
-            h-screen 
-            ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
-            mt-10
-            text-white p-4 
-            flex flex-col
-            transition-all duration-300
-            min-h-screen
-            md:min-h-screen
-          `}
-        >
-          <FontAwesomeIcon
-            icon={faBars}
-            className={`
-              text-white 
-              ${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
-              text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
-            `}
-            onClick={toggleSidebar}
-          />
-          <ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
-            {/* Dashboard */}
-            <li className="list-none mt-[30px] text-center relative group">
-              <div className="flex items-center">
-                <Link to="/student" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[40px] h-[40px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Dashboard
-                </span>
-              </div>
-            </li>
-            {/* Apply */}
-            <li className="relative group">
-              <div className="flex items-center">
-<a
-  href="#"
-  onClick={documentUploaded ? undefined : handleApplyClick}   // Disable click handler safely
-  className={`flex items-center w-full ${documentUploaded ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
-  aria-disabled={documentUploaded ? "true" : "false"}
->
-  <FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>
-    Apply
-  </span>
-</a>
+  {/* Sidebar */}
+  <div
+    className={`fixed top-0 left-0 z-30 bg-[#14213d] text-white flex flex-col transition-all duration-300 mt-10
+      ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[48px]'} 
+      h-screen p-4`}
+  >
+    {/* Toggle Button */}
+    <FontAwesomeIcon
+      icon={faBars}
+      className={`cursor-pointer self-start text-white mt-4 text-[1.4rem] md:text-[1.7rem] transition-all duration-300 
+        ${sidebarActive ? 'translate-x-[130px] md:translate-x-[150px]' : '-ml-2 md:-ml-1.5'}`}
+      onClick={toggleSidebar}
+    />
 
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Apply
-                </span>
-              </div>
-            </li>
-            {/* Download Report */}
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/studentreport" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faDownload} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Report</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'hidden' : 'block'}
-                `}>
-                  Report
-                </span>
-              </div>
-            </li>
-            {/* Messages */}
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/messages" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faComments} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Messages</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Messages
-                </span>
-              </div>
-            </li>
-            {/* Settings */}
-            <li className="relative group">
-              <div className="flex items-center">
-                <Link to="/studentsetting" className={`
-                  flex items-center w-full space-x-2 text-white no-underline
-                  transition-all duration-200
-                  ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-                `}>
-                  <FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
-                  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[2px] md:ml-[10px]' : 'hidden'}`}>Settings</span>
-                </Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Settings
-                </span>
-              </div>
-            </li>
-            {/* Logout */}
-            <li className="relative group">
-              <div className="flex items-center">
-               <Link
-  to="#"
-  onClick={async (e) => {
-    e.preventDefault();
-    const token = sessionStorage.getItem('authToken');
-    try {
-      if (token) {
-        await axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-          headers: {
-           Authorization: `Bearer ${token}`
-          }
-        });
-      }
-    } catch (err) {
-      console.error("Logout logging failed:", err);
-      // Proceed to logout anyway
-    } finally {
-      sessionStorage.clear();
-      setDocumentUploaded(false);
-      navigate('/');
-    }
-  }}
-  className={`
-    flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
-    transition-all duration-200
-    ${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-  `}
->
-  <FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-  <span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
-</Link>
-                <span className={`
-                  absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
-                  rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-                  text-center shadow-lg transition-all duration-300 ease-in-out
-                  opacity-0 group-hover:opacity-100
-                  pointer-events-none group-hover:pointer-events-auto
-                  leading-[35px] h-[35px] block
-                  ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-                `}>
-                  Logout
-                </span>
-              </div>
-            </li>
-          </ul>
-        </div>
+    {/* Navigation */}
+    <ul className="flex flex-col h-full mt-6 space-y-14">
+      {/* Item Component */}
+      {[
+        {
+          icon: faHouse,
+          label: 'Dashboard',
+          to: '/student'
+        },
+        {
+          icon: faFileAlt,
+          label: 'Apply',
+          isButton: true,
+          onClick: handleApplyClick,
+          disabled: documentUploaded
+        },
+        {
+          icon: faDownload,
+          label: 'Report',
+          to: '/studentreport'
+        },
+        {
+          icon: faComments,
+          label: 'Messages',
+          to: '/messages'
+        },
+        {
+          icon: faCog,
+          label: 'Settings',
+          to: '/studentsetting'
+        },
+        {
+          icon: faSignOutAlt,
+          label: 'Logout',
+          isLogout: true
+        }
+      ].map((item, index) => (
+        <li  className={`group relative ${item.isLogout ? 'mt-50' : ''}`}
+    key={index}
+  >
+          {/* Navigation Link or Button */}
+          {item.isLogout ? (
+            <a
+              href="#"
+              onClick={async (e) => {
+                e.preventDefault();
+                const token = sessionStorage.getItem('authToken');
+                try {
+                  if (token) {
+                    await axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+                      headers: { Authorization: `Bearer ${token}` }
+                    });
+                  }
+                } catch (err) {
+                  console.error("Logout logging failed:", err);
+                } finally {
+                  sessionStorage.clear();
+                  setDocumentUploaded(false);
+                  navigate('/');
+                }
+              }}
+              className={`flex items-center space-x-2 transition-all duration-200 ${
+                sidebarActive ? 'justify-start' : 'justify-center'
+              }`}
+            >
+              <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+              <span
+                className={`${
+                  sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+                }`}
+              >
+                {item.label}
+              </span>
+            </a>
+          ) : item.isButton ? (
+            <a
+              href="#"
+              onClick={item.disabled ? undefined : item.onClick}
+              className={`flex items-center space-x-2 transition-all duration-200 ${
+                sidebarActive ? 'justify-start' : 'justify-center'
+              } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
+              aria-disabled={item.disabled ? 'true' : 'false'}
+            >
+              <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+              <span
+                className={`${
+                  sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+                }`}
+              >
+                {item.label}
+              </span>
+            </a>
+          ) : (
+            <Link
+              to={item.to}
+              className={`flex items-center space-x-2 transition-all duration-200 ${
+                sidebarActive ? 'justify-start' : 'justify-center'
+              }`}
+            >
+              <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+              <span
+                className={`${
+                  sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+                }`}
+              >
+                {item.label}
+              </span>
+            </Link>
+          )}
+
+          {/* Tooltip */}
+          {!sidebarActive && (
+      <span className="absolute left-14 top-1/2 -translate-y-1/2 bg-[#1F2937] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1rem] md:text-[1.1rem] w-[120px] h-[38px] flex items-center justify-center z-50">
+  {item.label}
+</span>
+
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
+        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 
           ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
         `}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -392,49 +350,52 @@ const StudentDashboard = () => {
               <>
                 {/* Bursary Funds & Status */}
                 <div className="flex flex-col gap-4">
-                  <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center mb-2">
-                    <h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1">Bursary funds allocated:</h2>
-                    <p className="mb-2">
+                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                    <h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1 text-[#14213d]">Bursary funds allocated:</h2>
+                    <p className="mb-2 text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold">
                       {studentDetails.bursary
-                        ? `${parseFloat(studentDetails.bursary).toFixed(2)} shillings`
-                        : "0.00 shillings"}
+                          ? `${Number(studentDetails.bursary).toLocaleString()} Ksh`
+                        : "0.00 Ksh"}
                     </p>
-                    <FontAwesomeIcon icon={faCashRegister} className="text-green-500 text-3xl" />
+                 <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-500 text-4xl" />
                   </div>
-                  <div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded flex flex-col items-center">
+                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                     <h2 className="text-[1.2rem] md:text-[1.2rem]  font-bold mb-1">Status of the application:</h2>
-                    <p className="mb-2">{studentDetails.status}</p>
-                    <FontAwesomeIcon icon={faCheckDouble} className="text-blue-500 text-3xl" />
+                    <p className="mb-2 text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold">{studentDetails.status}</p>
+                   <FontAwesomeIcon
+    icon={getStatusIcon(studentDetails.status).icon}
+    className={`${getStatusIcon(studentDetails.status).color} text-4xl`}
+  />
                   </div>
                 </div>
                 {/* User Profile */}
-                <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)]  rounded flex flex-col items-center">
-                  <h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.35rem]">User Profile</h2>
-                  <hr className="my-4 w-full" />
+                <div className=" p-6 flex flex-col items-center  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                  <h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.35rem] text-[#14213d]">User Profile</h2>
+                  <hr className="my-4 w-full " />
                   <div className="text-center leading-8">
                     <img
                       className="rounded-full w-24 h-24 mx-auto"
                       src="/images/patient.png"
                       alt="Profile"
                     />
-                    <h5 className="font-semibold mt-4 text-[1rem] md:text-[1.1rem]">
+                    <h5 className="font-bold mt-4 text-[1rem] text-[#14213d] md:text-[1.1rem]">
                       {studentDetails.fullname}
                     </h5>
-                    <p className="text-gray-500 text-[1rem] md:text-[1.1rem]">Student</p>
+                    <p className="font-semibold text-[1rem] md:text-[1.1rem] text-[#14213d]">Student</p>
                   </div>
                   <hr className="my-4 w-full " />
-                  <p className='leading-8 text-[1rem] md:text-[1.1rem]'>
+                  <p className='leading-8 text-[1rem] text-[#14213d] md:text-[1.1rem]'>
                     <strong>Student No:</strong> {studentDetails.admission}
                   </p>
-                  <p className='leading-8 text-[1rem] md:text-[1.1rem]'>
+                  <p className='leading-8 text-[1rem] md:text-[1.1rem] text-[#14213d]'>
                     <strong>School:</strong> {studentDetails.institution}
                   </p>
                 </div>
                 {/* Personal Information */}
-                <div className="bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded">
+                <div className=" p-6  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                   <div className="flex items-center mb-4">
-                    <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl md:text-2xl mr-2" />
-                    <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem]">Personal Information</h2>
+                    <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl md:text-2xl mr-2" />
+                    <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem] text-[#14213d]">Personal Information</h2>
                     <button
                       className="bg-blue-500 text-white px-3  md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
                       onClick={handleEditClick}
@@ -444,7 +405,7 @@ const StudentDashboard = () => {
                   </div>
                   <hr className="my-4" />
                   <table className="table-auto w-full text-left">
-                    <tbody className="leading-8 text-[1rem] md:text-[1.1rem]">
+                    <tbody className="leading-8 text-[1rem] md:text-[1.1rem] text-[#14213d]">
                       <tr>
                         <th className="pr-4">Full name:</th>
                         <td>{studentDetails.fullname}</td>

@@ -15,6 +15,7 @@ import {
   faCircleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import './toastifyCustom.css';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
