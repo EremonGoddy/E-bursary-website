@@ -182,6 +182,8 @@ const StudentDashboard = () => {
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
+        
+
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
           <div className="flex items-center space-x-6">
             <h2 className="mr-2 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
@@ -193,154 +195,175 @@ const StudentDashboard = () => {
                 alt="User"
                 className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
               />
-              <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
             </div>
+            {/* Sidebar toggle only visible on small screens */}
+<div className="block md:hidden">
+  {sidebarActive ? (
+    <FontAwesomeIcon
+      icon={faTimes}
+      className="text-[1.7rem] cursor-pointer text-[#14213d]"
+      onClick={toggleSidebar}
+    />
+  ) : (
+    <FontAwesomeIcon
+      icon={faBars}
+      className="text-[1.7rem] cursor-pointer text-[#14213d]"
+      onClick={toggleSidebar}
+    />
+  )}
+</div>
           </div>
         </div>
       </div>
 
       <div className="flex pt-20 min-h-screen">
   {/* Sidebar */}
-  <div
-    className={`fixed top-0 left-0 z-30 bg-[#14213d] text-white flex flex-col transition-all duration-300 mt-10
-      ${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[48px]'} 
-      h-screen p-4`}
-  >
-    {/* Toggle Button */}
-    <FontAwesomeIcon
-      icon={faBars}
-      className={`cursor-pointer self-start text-white mt-4 text-[1.4rem] md:text-[1.7rem] transition-all duration-300 
-        ${sidebarActive ? 'translate-x-[130px] md:translate-x-[150px]' : '-ml-2 md:-ml-1.5'}`}
-      onClick={toggleSidebar}
-    />
+<div
+  className={`
+    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-16
+    transition-all duration-300 ease-in-out
+    overflow-hidden
+    ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
+    ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[50px] md:p-2'}
+  `}
+>
+  
 
-    {/* Navigation */}
-    <ul className="flex flex-col h-full mt-6 space-y-14">
-      {/* Item Component */}
-      {[
-        {
-          icon: faHouse,
-          label: 'Dashboard',
-          to: '/student'
-        },
-        {
-          icon: faFileAlt,
-          label: 'Apply',
-          isButton: true,
-          onClick: handleApplyClick,
-          disabled: documentUploaded
-        },
-        {
-          icon: faDownload,
-          label: 'Report',
-          to: '/studentreport'
-        },
-        {
-          icon: faComments,
-          label: 'Messages',
-          to: '/messages'
-        },
-        {
-          icon: faCog,
-          label: 'Settings',
-          to: '/studentsetting'
-        },
-        {
-          icon: faSignOutAlt,
-          label: 'Logout',
-          isLogout: true
-        }
-      ].map((item, index) => (
-        <li  className={`group relative ${item.isLogout ? 'mt-50' : ''}`}
-    key={index}
-  >
-          {/* Navigation Link or Button */}
-          {item.isLogout ? (
-            <a
-              href="#"
-              onClick={async (e) => {
-                e.preventDefault();
-                const token = sessionStorage.getItem('authToken');
-                try {
-                  if (token) {
-                    await axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-                      headers: { Authorization: `Bearer ${token}` }
-                    });
-                  }
-                } catch (err) {
-                  console.error("Logout logging failed:", err);
-                } finally {
+  {/* Toggle Button for Desktop View */}
+<div className="hidden md:flex justify-end mb-4">
+  <FontAwesomeIcon
+    icon={sidebarActive ? faTimes : faBars}
+    className="text-white cursor-pointer text-xl"
+    onClick={toggleSidebar}
+  />
+</div>
+
+  {/* Navigation */}
+  <ul className="flex flex-col h-full mt-6 space-y-14">
+    {[
+      {
+        icon: faHouse,
+        label: 'Dashboard',
+        to: '/student'
+      },
+      {
+        icon: faFileAlt,
+        label: 'Apply',
+        isButton: true,
+        onClick: handleApplyClick,
+        disabled: documentUploaded
+      },
+      {
+        icon: faDownload,
+        label: 'Report',
+        to: '/studentreport'
+      },
+      {
+        icon: faComments,
+        label: 'Messages',
+        to: '/messages'
+      },
+      {
+        icon: faCog,
+        label: 'Settings',
+        to: '/studentsetting'
+      },
+      {
+        icon: faSignOutAlt,
+        label: 'Logout',
+        isLogout: true
+      }
+    ].map((item, index) => (
+      <li
+        className={`group relative ${item.isLogout ? 'mt-20px' : ''}`}
+        key={index}
+      >
+        {/* Render as Link, Button, or Logout Anchor */}
+        {item.isLogout ? (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              const token = sessionStorage.getItem('authToken');
+              axios
+                .post('https://e-bursary-backend.onrender.com/api/logout ', {}, {
+                  headers: { Authorization: `Bearer ${token}` }
+                })
+                .catch(() => {})
+                .finally(() => {
                   sessionStorage.clear();
                   setDocumentUploaded(false);
                   navigate('/');
-                }
-              }}
-              className={`flex items-center space-x-2 transition-all duration-200 ${
-                sidebarActive ? 'justify-start' : 'justify-center'
+                });
+            }}
+            className={`flex items-center space-x-2 transition-all duration-200 ${
+              sidebarActive ? 'justify-start' : 'justify-center'
+            }`}
+          >
+            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+            <span
+              className={`${
+                sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
               }`}
             >
-              <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-              <span
-                className={`${
-                  sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-                }`}
-              >
-                {item.label}
-              </span>
-            </a>
-          ) : item.isButton ? (
-            <a
-              href="#"
-              onClick={item.disabled ? undefined : item.onClick}
-              className={`flex items-center space-x-2 transition-all duration-200 ${
-                sidebarActive ? 'justify-start' : 'justify-center'
-              } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
-              aria-disabled={item.disabled ? 'true' : 'false'}
-            >
-              <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-              <span
-                className={`${
-                  sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-                }`}
-              >
-                {item.label}
-              </span>
-            </a>
-          ) : (
-            <Link
-              to={item.to}
-              className={`flex items-center space-x-2 transition-all duration-200 ${
-                sidebarActive ? 'justify-start' : 'justify-center'
+              {item.label}
+            </span>
+          </a>
+        ) : item.isButton ? (
+          <a
+            href="#"
+            onClick={item.disabled ? undefined : item.onClick}
+            className={`flex items-center space-x-2 transition-all duration-200 ${
+              sidebarActive ? 'justify-start' : 'justify-center'
+            } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
+            aria-disabled={item.disabled ? 'true' : 'false'}
+          >
+            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+            <span
+              className={`${
+                sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
               }`}
             >
-              <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-              <span
-                className={`${
-                  sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-                }`}
-              >
-                {item.label}
-              </span>
-            </Link>
-          )}
+              {item.label}
+            </span>
+          </a>
+        ) : (
+          <Link
+            to={item.to}
+            className={`flex items-center space-x-2 transition-all duration-200 ${
+              sidebarActive ? 'justify-start' : 'justify-center'
+            }`}
+          >
+            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+            <span
+              className={`${
+                sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+              }`}
+            >
+              {item.label}
+            </span>
+          </Link>
+        )}
 
-          {/* Tooltip */}
-          {!sidebarActive && (
-      <span className="absolute left-14 top-1/2 -translate-y-1/2 bg-[#1F2937] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1rem] md:text-[1.1rem] w-[120px] h-[38px] flex items-center justify-center z-50">
+        {/* Tooltip shown only in desktop when sidebar is inactive */}
+        {!sidebarActive && (
+     <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-[#1F2937] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[0.95rem] w-[120px] flex items-center justify-center z-50">
   {item.label}
 </span>
 
-          )}
-        </li>
-      ))}
-    </ul>
-  </div>
 
+        )}
+      </li>
+    ))}
+  </ul>
+</div>
 
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 
-          ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
-        `}>
+        <div
+  className={`flex-1 transition-all duration-300 pt-4 px-4 md:px-10
+    ${sidebarActive ? 'ml-[10px]' : 'ml-0 md:ml-[210px]'}
+  `}
+>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {loading ? (
               <div className="col-span-1 md:col-span-3 flex justify-center items-center min-h-[300px]">
