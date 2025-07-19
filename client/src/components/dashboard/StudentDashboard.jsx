@@ -181,7 +181,7 @@ const StudentDashboard = () => {
   const applicationCompleted = documentUploaded;
 
   return (
-    <div className="w-full min-h-screen relative">
+    <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
@@ -371,7 +371,7 @@ const StudentDashboard = () => {
 
         {/* Main Content */}
         <div
-  className={`flex-1 transition-all duration-300 -mt-6 md:mt-0 pt-4 px-4 md:px-10
+  className={`flex-1 transition-all duration-300 -mt-6 md:mt-0 pt-4 px-4 md:px-10 
     ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[20px]'}
   `}
 >
@@ -495,21 +495,29 @@ const StudentDashboard = () => {
             ) : (
               <div
                 className={`
-                  bg-white p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md  flex flex-col gap-4
-                  transition-all duration-300
-                  w-[280px]
+                   p-6 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]
+                  
+                  w-[330px]
                   md:w-[500px]
                   mx-auto
-                  mt-10
+                  mt-30
                   md:mt-60
                   ${sidebarActive
-                    ? '-ml-[40px] md:ml-[480px]'
-                    : 'ml-[8px] md:ml-[450px]'
+                    ? 'ml-[3px] md:ml-[480px]'
+                    : 'ml-[3px] md:ml-[600px]'
                   }
                 `}
               >
-                <h2 className="text-[1.3rem] md:text-[1.3rem] font-bold text-center">Dashboard is empty</h2>
-                <p className="block text-[1rem] md:text-[1.1rem]" >Please click on the 'Apply' icon in the sidebar to complete your information.</p>
+<div className="text-center space-y-2">
+  <h2 className="text-xl md:text-2xl font-bold text-[#14213d]">
+    {userName}, your Dashboard is currently empty
+  </h2>
+  <p className="text-base md:text-lg text-[#14213d]">
+    Please click on the <span className="font-semibold text-[#14213d]">'Apply'<FontAwesomeIcon icon={faFileAlt} className="text-[#14213d]" />
+</span> icon in the sidebar to complete your information.
+  </p>
+</div>
+
               </div>
             )}
           </div>
