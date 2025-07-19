@@ -55,7 +55,7 @@ className=" md:hidden p-2 rounded-lg focus:outline-none"
 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
 <FontAwesomeIcon
 icon={isMobileMenuOpen ? faXmark : faBars}
-className="text-[#14213d]   text-3xl focus"/>
+className="text-[#14213d] text-2xl focus"/>
 </button>
 </div>
 {/* Mobile Menu */}

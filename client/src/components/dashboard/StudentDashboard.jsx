@@ -70,10 +70,13 @@ const StudentDashboard = () => {
     }
   };
 
+  
+
   // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
+
 
   // Fetch student info and document upload status
   useEffect(() => {
@@ -185,33 +188,37 @@ const StudentDashboard = () => {
         
 
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
-          <div className="flex items-center space-x-6">
-            <h2 className="mr-2 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+          <div className="flex items-center space-x-1">
+            <h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
               Welcome: {userName}
             </h2>
             <div className="flex items-center space-x-2">
-              <img
-                src="/images/patient.png"
-                alt="User"
-                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
-              />
-            </div>
-            {/* Sidebar toggle only visible on small screens */}
+ <img
+  src={
+    studentDetails.gender === 'Female'
+      ? '/images/woman.png'
+      : studentDetails.gender === 'Male'
+      ? '/images/patient.png'
+      : '/images/user.png'
+  }
+  alt="User"
+  className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
+/>
+
+
+
+ </div>
+{/* Sidebar toggle only visible on small screens */}
+{/* Toggle Button for opening sidebar on mobile */}
 <div className="block md:hidden">
-  {sidebarActive ? (
-    <FontAwesomeIcon
-      icon={faTimes}
-      className="text-[1.7rem] cursor-pointer text-[#14213d]"
-      onClick={toggleSidebar}
-    />
-  ) : (
-    <FontAwesomeIcon
-      icon={faBars}
-      className="text-[1.7rem] cursor-pointer text-[#14213d]"
-      onClick={toggleSidebar}
-    />
-  )}
+  <FontAwesomeIcon
+    icon={faBars}
+    className="text-[1.7rem] cursor-pointer text-[#14213d]"
+    onClick={toggleSidebar}
+  />
 </div>
+
+
           </div>
         </div>
       </div>
@@ -220,9 +227,9 @@ const StudentDashboard = () => {
   {/* Sidebar */}
 <div
   className={`
-    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-16
-    transition-all duration-300 ease-in-out
-    overflow-hidden
+    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-15
+    transition-all duration-100 ease-in-out
+    overflow-visible
     ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
     ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[50px] md:p-2'}
   `}
@@ -233,10 +240,14 @@ const StudentDashboard = () => {
 <div className="hidden md:flex justify-end mb-4">
   <FontAwesomeIcon
     icon={sidebarActive ? faTimes : faBars}
-    className="text-white cursor-pointer text-xl"
+    className={`text-white cursor-pointer text-[1.5rem] ${
+      sidebarActive ? 'ml-auto' : 'mr-2'
+    }`}
     onClick={toggleSidebar}
   />
 </div>
+
+
 
   {/* Navigation */}
   <ul className="flex flex-col h-full mt-6 space-y-14">
@@ -259,8 +270,8 @@ const StudentDashboard = () => {
         to: '/studentreport'
       },
       {
-        icon: faComments,
-        label: 'Messages',
+        icon: faBell,
+        label: 'Notification',
         to: '/messages'
       },
       {
@@ -275,7 +286,7 @@ const StudentDashboard = () => {
       }
     ].map((item, index) => (
       <li
-        className={`group relative ${item.isLogout ? 'mt-20px' : ''}`}
+        className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`}
         key={index}
       >
         {/* Render as Link, Button, or Logout Anchor */}
@@ -347,7 +358,7 @@ const StudentDashboard = () => {
 
         {/* Tooltip shown only in desktop when sidebar is inactive */}
         {!sidebarActive && (
-     <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-[#1F2937] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[0.95rem] w-[120px] flex items-center justify-center z-50">
+     <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1 rem] w-[120px] flex items-center justify-center z-50">
   {item.label}
 </span>
 
@@ -360,8 +371,8 @@ const StudentDashboard = () => {
 
         {/* Main Content */}
         <div
-  className={`flex-1 transition-all duration-300 pt-4 px-4 md:px-10
-    ${sidebarActive ? 'ml-[10px]' : 'ml-0 md:ml-[210px]'}
+  className={`flex-1 transition-all duration-300 -mt-6 md:mt-0 pt-4 px-4 md:px-10
+    ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[20px]'}
   `}
 >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -372,8 +383,8 @@ const StudentDashboard = () => {
             ) : Object.keys(studentDetails).length > 0 ? (
               <>
                 {/* Bursary Funds & Status */}
-                <div className="flex flex-col gap-4">
-                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                <div className="flex flex-col gap-1 md:gap-4">
+                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                     <h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1 text-[#14213d]">Bursary funds allocated:</h2>
                     <p className="mb-2 text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold">
                       {studentDetails.bursary
@@ -382,7 +393,7 @@ const StudentDashboard = () => {
                     </p>
                  <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-500 text-4xl" />
                   </div>
-                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                     <h2 className="text-[1.2rem] md:text-[1.2rem]  font-bold mb-1">Status of the application:</h2>
                     <p className="mb-2 text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold">{studentDetails.status}</p>
                    <FontAwesomeIcon
@@ -392,15 +403,23 @@ const StudentDashboard = () => {
                   </div>
                 </div>
                 {/* User Profile */}
-                <div className=" p-6 flex flex-col items-center  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                <div className=" p-6 flex -mt-2 md:mt-0 flex-col items-center  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                   <h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.35rem] text-[#14213d]">User Profile</h2>
                   <hr className="my-4 w-full " />
                   <div className="text-center leading-8">
-                    <img
-                      className="rounded-full w-24 h-24 mx-auto"
-                      src="/images/patient.png"
-                      alt="Profile"
-                    />
+
+                     <img
+  src={
+    studentDetails.gender === 'Female'
+      ? '/images/woman.png'
+      : studentDetails.gender === 'Male'
+      ? '/images/patient.png'
+      : '/images/user.png'
+  }
+  alt="Profile"
+  className="rounded-full w-24 h-24 mx-auto"
+/>
+                    
                     <h5 className="font-bold mt-4 text-[1rem] text-[#14213d] md:text-[1.1rem]">
                       {studentDetails.fullname}
                     </h5>
@@ -415,7 +434,7 @@ const StudentDashboard = () => {
                   </p>
                 </div>
                 {/* Personal Information */}
-                <div className=" p-6  backdrop-blur-xl bg-white/80 border border-gray-200 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                <div className=" p-6  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                   <div className="flex items-center mb-4">
                     <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl md:text-2xl mr-2" />
                     <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem] text-[#14213d]">Personal Information</h2>
@@ -504,154 +523,59 @@ const StudentDashboard = () => {
           <div className="shadow-overlay fixed inset-0 bg-black bg-opacity-40 z-40" onClick={handleCloseForm}></div>
           {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center mt-10 z-50">
-            <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[310px] md:max-w-[500px] relative  pl-3 pr-3 md:pr-6 md:pl-6">
-              {/* Cancel (close) icon in top right */}
-              <FontAwesomeIcon
-                icon={faTimes}
-                className='absolute top-1 right-2 text-[#1F2937]  hover:text-gray-600 text-lg text-[1.7rem] md:text-[2.4rem] cursor-pointer'
-                onClick={handleCloseForm}
-              />
-              <form onSubmit={handleFormSubmit}>
-                <div className="mb-2 md:mb-4 mt-8 md:mt-12  flex items-center gap-2">
-                  <label htmlFor="fullname" className="block font-medium text-[1.1rem] min-w-[70px] md:min-w-[90px]">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="fullname"
-                    name="fullname"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.fullname || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="email" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.email || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="subcounty" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
-                    Sub County
-                  </label>
-                  <input
-                    type="text"
-                    id="subcounty"
-                    name="subcounty"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.subcounty || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="ward" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
-                    Ward
-                  </label>
-                  <input
-                    type="text"
-                    id="ward"
-                    name="ward"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.ward || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="village" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
-                    Village Unit
-                  </label>
-                  <input
-                    type="text"
-                    id="village"
-                    name="village"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.village || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="birth" className="block font-medium text-[1.1rem] min-w-[70px] md:min-w-[90px]">
-                    Date of Birth
-                  </label>
-                  <input
-                    type="date"
-                    id="birth"
-                    name="birth"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.birth || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="gender" className="block font-medium text-[1.1rem] min-w-[40px] md:min-w-[90px]">
-                    Sex
-                  </label>
-                  <input
-                    type="text"
-                    id="gender"
-                    name="gender"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.gender || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="institution" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
-                    Name of Institution
-                  </label>
-                  <input
-                    type="text"
-                    id="institution"
-                    name="institution"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.institution || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="year" className="block font-medium text-[1.1rem] min-w-[50px] md:min-w-[90px]">
-                    Year
-                  </label>
-                  <input
-                    type="text"
-                    id="year"
-                    name="year"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.year || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-2 md:mb-4 flex items-center gap-2">
-                  <label htmlFor="admission" className="block font-medium text-[1.1rem] min-w-[70px] md:min-w-[90px]">
-                    Admission
-                  </label>
-                  <input
-                    type="text"
-                    id="admission"
-                    name="admission"
-                    className="form-input flex-1 border rounded px-2 py-1 text-[1.1rem]"
-                    value={formData.admission || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="flex justify-end items-center mt-4">
-                  <button
-                    type="submit"
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-[1rem]"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </div>
+    <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[350px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
+  {/* Cancel (close) icon in top right */}
+  <div className="mb-7 md:mt-6 ">
+  <FontAwesomeIcon
+    icon={faTimes}
+    className="absolute w-8 h-8 top-1  -right-1 md:right-2 text-[#14213d] hover:text-[#14213d] hover:bg-gray-200 p-1 rounded-full text-[1.6rem] md:text-[2rem] cursor-pointer transition duration-200 ease-in-out active:scale-90"
+    onClick={handleCloseForm}
+  />
+</div>
+
+  <form onSubmit={handleFormSubmit}>
+    {[
+      { id: 'fullname', label: 'Full Name', type: 'text' },
+      { id: 'email', label: 'Email', type: 'email' },
+      { id: 'subcounty', label: 'Sub County', type: 'text' },
+      { id: 'ward', label: 'Ward', type: 'text' },
+      { id: 'village', label: 'Village Unit', type: 'text' },
+      { id: 'birth', label: 'Date of Birth', type: 'date' },
+      { id: 'gender', label: 'Sex', type: 'text' },
+      { id: 'institution', label: 'Name of Institution', type: 'text' },
+      { id: 'year', label: 'Year', type: 'text' },
+      { id: 'admission', label: 'Admission', type: 'text' },
+    ].map(({ id, label, type }) => (
+      <div key={id} className="mb-3 flex items-center gap-3 text-[#14213d]">
+  <label
+    htmlFor={id}
+    className="block font-medium text-[1rem] md:text-[1.05rem] w-[110px]" // Fixed width
+  >
+    {label}:
+  </label>
+  <input
+    type={type}
+    id={id}
+    name={id}
+    value={formData[id] || ''}
+    onChange={handleInputChange}
+    className="flex-1 max-w-[300px] text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+  />
+</div>
+
+    ))}
+
+    <div className="flex justify-end items-center mt-6">
+      <button
+        type="submit"
+        className="px-3 py-1 md:px-4 md:py-2 bg-[#14213d] text-white font-medium rounded-md hover:bg-gray-800 transition"
+      >
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+
           </div>
         </>
       )}

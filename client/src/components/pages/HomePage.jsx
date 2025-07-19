@@ -70,7 +70,7 @@ onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
 >
 <FontAwesomeIcon
 icon={isMobileMenuOpen ? faXmark : faBars}
-className="text-[#14213d] text-3xl focus"/>
+className="text-[#14213d] text-2xl focus"/>
 </Link>
 </div>
 {/* Mobile Menu */}
