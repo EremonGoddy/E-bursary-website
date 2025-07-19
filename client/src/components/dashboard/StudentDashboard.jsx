@@ -523,7 +523,7 @@ const StudentDashboard = () => {
           <div className="shadow-overlay fixed inset-0 bg-black bg-opacity-40 z-40" onClick={handleCloseForm}></div>
           {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center mt-10 z-50">
-    <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[350px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
+    <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[330px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
   {/* Cancel (close) icon in top right */}
   <div className="mb-7 md:mt-6 ">
   <FontAwesomeIcon
@@ -546,7 +546,7 @@ const StudentDashboard = () => {
       { id: 'year', label: 'Year', type: 'text' },
       { id: 'admission', label: 'Admission', type: 'text' },
     ].map(({ id, label, type }) => (
-      <div key={id} className="mb-3 flex items-center gap-3 text-[#14213d]">
+      <div key={id} className="mb-3 flex items-center  text-[#14213d]">
   <label
     htmlFor={id}
     className="block font-medium text-[1rem] md:text-[1.05rem] w-[110px]" // Fixed width
@@ -559,7 +559,7 @@ const StudentDashboard = () => {
     name={id}
     value={formData[id] || ''}
     onChange={handleInputChange}
-    className="flex-1 max-w-[300px] text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+    className="flex-1 max-w-[320px] text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
   />
 </div>
 
