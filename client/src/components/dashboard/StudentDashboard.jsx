@@ -28,6 +28,7 @@ const StudentDashboard = () => {
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
+  const [hasNewMessage, setHasNewMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const navigate = useNavigate();
@@ -70,7 +71,33 @@ const StudentDashboard = () => {
     }
   };
 
-  
+
+  useEffect(() => {
+  const token = sessionStorage.getItem('authToken');
+  const userId = sessionStorage.getItem('userId');
+
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
+
+  if (userId) {
+    axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
+      headers: { Authorization: token }
+    })
+    .then(response => {
+      const message = response.data.status_message;
+      if (message && message.toLowerCase().includes("new")) {
+        setHasNewMessage(true);
+      } else {
+        setHasNewMessage(false);
+      }
+    })
+    .catch(err => {
+      console.error('Error checking status message:', err);
+    });
+  }
+}, []);
 
   // Toggle sidebar
   const toggleSidebar = () => {
@@ -218,13 +245,12 @@ const StudentDashboard = () => {
   />
 </div>
 
-
           </div>
         </div>
       </div>
 
       <div className="flex pt-20 min-h-screen">
-  {/* Sidebar */}
+{/* Sidebar */}
 <div
   className={`
     fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-15
@@ -250,123 +276,122 @@ const StudentDashboard = () => {
 
 
   {/* Navigation */}
-  <ul className="flex flex-col h-full mt-6 space-y-14">
-    {[
-      {
-        icon: faHouse,
-        label: 'Dashboard',
-        to: '/student'
-      },
-      {
-        icon: faFileAlt,
-        label: 'Apply',
-        isButton: true,
-        onClick: handleApplyClick,
-        disabled: documentUploaded
-      },
-      {
-        icon: faDownload,
-        label: 'Report',
-        to: '/studentreport'
-      },
-      {
-        icon: faBell,
-        label: 'Notification',
-        to: '/messages'
-      },
-      {
-        icon: faCog,
-        label: 'Settings',
-        to: '/studentsetting'
-      },
-      {
-        icon: faSignOutAlt,
-        label: 'Logout',
-        isLogout: true
-      }
-    ].map((item, index) => (
-      <li
-        className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`}
-        key={index}
-      >
-        {/* Render as Link, Button, or Logout Anchor */}
-        {item.isLogout ? (
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              const token = sessionStorage.getItem('authToken');
-              axios
-                .post('https://e-bursary-backend.onrender.com/api/logout ', {}, {
-                  headers: { Authorization: `Bearer ${token}` }
-                })
-                .catch(() => {})
-                .finally(() => {
-                  sessionStorage.clear();
-                  setDocumentUploaded(false);
-                  navigate('/');
-                });
-            }}
-            className={`flex items-center space-x-2 transition-all duration-200 ${
-              sidebarActive ? 'justify-start' : 'justify-center'
+<ul className="flex flex-col h-full mt-6 space-y-14">
+  {[
+    {
+      icon: faHouse,
+      label: 'Dashboard',
+      to: '/student'
+    },
+    {
+      icon: faFileAlt,
+      label: 'Apply',
+      isButton: true,
+      onClick: handleApplyClick,
+      disabled: documentUploaded
+    },
+    {
+      icon: faDownload,
+      label: 'Report',
+      to: '/studentreport'
+    },
+    {
+      icon: faBell,
+      label: 'Notification',
+      to: '/messages'
+    },
+    {
+      icon: faCog,
+      label: 'Settings',
+      to: '/studentsetting'
+    },
+    {
+      icon: faSignOutAlt,
+      label: 'Logout',
+      isLogout: true
+    }
+  ].map((item, index) => (
+    <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`} key={index}>
+      
+      {item.isLogout ? (
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            const token = sessionStorage.getItem('authToken');
+            axios
+              .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+              .catch(() => {})
+              .finally(() => {
+                sessionStorage.clear();
+                setDocumentUploaded(false);
+                navigate('/');
+              });
+          }}
+          className={`flex items-center space-x-2 transition-all duration-200 ${
+            sidebarActive ? 'justify-start' : 'justify-center'
+          }`}
+        >
+          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+          <span
+            className={`${
+              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
             }`}
           >
-            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-            <span
-              className={`${
-                sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-              }`}
-            >
-              {item.label}
-            </span>
-          </a>
-        ) : item.isButton ? (
-          <a
-            href="#"
-            onClick={item.disabled ? undefined : item.onClick}
-            className={`flex items-center space-x-2 transition-all duration-200 ${
-              sidebarActive ? 'justify-start' : 'justify-center'
-            } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
-            aria-disabled={item.disabled ? 'true' : 'false'}
-          >
-            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-            <span
-              className={`${
-                sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-              }`}
-            >
-              {item.label}
-            </span>
-          </a>
-        ) : (
-          <Link
-            to={item.to}
-            className={`flex items-center space-x-2 transition-all duration-200 ${
-              sidebarActive ? 'justify-start' : 'justify-center'
+            {item.label}
+          </span>
+        </a>
+      ) : item.isButton ? (
+        <a
+          href="#"
+          onClick={item.disabled ? undefined : item.onClick}
+          className={`flex items-center space-x-2 transition-all duration-200 ${
+            sidebarActive ? 'justify-start' : 'justify-center'
+          } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
+          aria-disabled={item.disabled ? 'true' : 'false'}
+        >
+          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+          <span
+            className={`${
+              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
             }`}
           >
+            {item.label}
+          </span>
+        </a>
+      ) : (
+        <Link
+          to={item.to}
+          className={`flex items-center space-x-2 transition-all duration-200 ${
+            sidebarActive ? 'justify-start' : 'justify-center'
+          }`}
+        >
+          <div className="relative">
             <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-            <span
-              className={`${
-                sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-              }`}
-            >
-              {item.label}
-            </span>
-          </Link>
-        )}
+            {item.label === 'Notification' && hasNewMessage && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+            )}
+          </div>
+          <span
+            className={`${
+              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+            }`}
+          >
+            {item.label}
+          </span>
+        </Link>
+      )}
 
-        {/* Tooltip shown only in desktop when sidebar is inactive */}
-        {!sidebarActive && (
-     <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1 rem] w-[120px] flex items-center justify-center z-50">
-  {item.label}
-</span>
-
-
-        )}
-      </li>
-    ))}
-  </ul>
+      {!sidebarActive && (
+        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+          {item.label}
+        </span>
+      )}
+    </li>
+  ))}
+</ul>
 </div>
 
         {/* Main Content */}

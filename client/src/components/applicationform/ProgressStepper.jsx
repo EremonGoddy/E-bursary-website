@@ -46,48 +46,46 @@ const ProgressStepper = () => {
   const { currentStep, completedSteps } = progress;
 
   return (
-    <div className="flex items-center justify-center mb-6 mt-1 w-full max-w-8xl mx-auto">
-      {steps.map((step, idx) => {
-        // Consider step completed if in completedSteps or before currentStep
-        const isCompleted = completedSteps.includes(idx) || idx < currentStep;
-        const isActive = idx === currentStep;
+    <div className="flex items-center justify-start md:justify-center -ml-2 md:ml-0 mb-6 -mt-8 md:-mt-5 md:w-full w-full mx-1 md:mx-auto">
+     {steps.map((step, idx) => {
+  const isCompleted = completedSteps.includes(idx) || idx < currentStep;
+  const isActive = idx === currentStep;
+  const iconColorClass = isCompleted || isActive ? "text-white" : step.color;
+  let bgColor = "bg-gray-200";
+  if (isCompleted) bgColor = "bg-green-500";
+  else if (isActive) bgColor = "bg-blue-600";
 
-        // Icon color: white for completed or active, else the color in the step
-        const iconColorClass = isCompleted || isActive ? "text-white" : step.color;
+  return (
+    <React.Fragment key={step.label}>
+      <div className="flex flex-col items-center">
+        <div className={`rounded-full w-8 h-8 md:w-11 md:h-11 flex items-center justify-center text-sm md:text-xl ${bgColor}`}>
+          <FontAwesomeIcon icon={step.icon} className={iconColorClass} />
+        </div>
+        <span className={`text-xs md:text-sm mt-1 text-center w-10 md:w-20 ${
+          isActive ? 'font-semibold text-blue-700'
+            : isCompleted ? 'text-green-600'
+            : 'text-gray-400'
+        }`}>
+          {step.label}
+        </span>
+      </div>
 
-        // Step circle background
-        let bgColor = "bg-gray-200";
-        if (isCompleted) bgColor = "bg-green-500";
-        else if (isActive) bgColor = "bg-blue-600";
+      {/* Add connector line between steps */}
+      {idx !== steps.length - 1 && (
+        <div className="flex-1 h-1 bg-gray-200 md:mx-2 mx-1 relative -mt-8">
+          <div className={`h-full transition-colors duration-300 ${
+            isCompleted
+              ? "bg-green-500"
+              : isActive
+              ? "bg-blue-500"
+              : "bg-gray-200"
+          }`} />
+        </div>
+      )}
+    </React.Fragment>
+  );
+})}
 
-        return (
-          <React.Fragment key={step.label}>
-            <div className="flex flex-col items-center min-w-[100px]">
-              <div className={`rounded-full w-11 h-11 flex items-center justify-center text-2xl ${bgColor} transition-colors duration-300`}>
-                <FontAwesomeIcon icon={step.icon} className={iconColorClass} />
-              </div>
-              <span className={`text-sm mt-2 text-center w-28 break-words ${
-                isActive ? 'font-semibold text-blue-700'
-                  : isCompleted ? 'text-green-600'
-                  : 'text-gray-400'
-              }`}>
-                {step.label}
-              </span>
-            </div>
-            {/* Connector line */}
-            {idx !== steps.length - 1 && (
-              <div className={
-                "flex-1 h-1.5 mx-4 rounded transition-colors duration-300 " +
-                (isCompleted
-                  ? "bg-green-500"
-                  : isActive
-                    ? "bg-blue-500"
-                    : "bg-gray-200")
-              } />
-            )}
-          </React.Fragment>
-        );
-      })}
     </div>
   );
 };
