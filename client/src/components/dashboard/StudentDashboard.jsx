@@ -396,8 +396,8 @@ const StudentDashboard = () => {
 
         {/* Main Content */}
         <div
-  className={`flex-1 transition-all duration-300 -mt-6 md:mt-0 pt-4 px-4 md:px-10 
-    ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[20px]'}
+  className={`flex-1 transition-all duration-300 -mt-6 md:mt-0 pt-4  
+    ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
   `}
 >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
