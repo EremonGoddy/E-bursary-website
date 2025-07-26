@@ -4,8 +4,8 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse, faFileAlt, faPaperclip, faDownload,faTimes, faComments, faCog,
-  faSignOutAlt, faBars, faBell,
+faHouse, faFileAlt, faPaperclip, faDownload,faTimes, faComments, faCog,
+faSignOutAlt, faBars, faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 const AmountDetails = () => {
