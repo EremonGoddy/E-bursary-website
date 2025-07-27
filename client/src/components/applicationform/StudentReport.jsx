@@ -179,9 +179,9 @@ const StudentReport = () => {
     // Declaration Table
     const declarationInfo = [
       ['Declaration', 'I hereby confirm the above details are accurate and complete.'],
-      ['Allocated Amount', studentDetails.approved_by_committee || 'N/A'],
+      ['Approved by', studentDetails.approved_by_committee || 'N/A'],
       ['Signature', '________________________'],
-       ['Application Status', studentDetails.allocation_date || 'N/A'],
+       ['Allocation date', studentDetails.allocation_date || 'N/A'],
      
     ];
 
