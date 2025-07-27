@@ -892,7 +892,7 @@ app.get('/api/reports', (req, res) => {
         status,
         bursary,
         approved_by_committee,
-        allocation_date,
+        allocation_date
       FROM personal_details 
       WHERE email = $1
     `;
