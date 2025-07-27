@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse, faFileAlt, faPaperclip, faDownload, faComments,faTimes, faCog,
+  faHouse, faFileAlt, faDownload, faTimes, faCog,
   faSignOutAlt, faBars, faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
