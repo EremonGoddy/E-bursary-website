@@ -180,7 +180,7 @@ const StudentReport = () => {
     const declarationInfo = [
       ['Declaration', 'I hereby confirm the above details are accurate and complete.'],
       ['Approved by', studentDetails.approved_by_committee || 'N/A'],
-      ['Signature', '________________________'],
+    ['Signature', studentDetails.digital_signature || '________________________'], // Updated this line
        ['Allocation date', studentDetails.allocation_date || 'N/A'],
      
     ];
@@ -464,6 +464,10 @@ const StudentReport = () => {
             </div>
             {/* End Responsive Table Wrapper */}
           </div>
+          <div className="text-center mt-4 text-[1rem] md:text-[1.2rem] text-[#14213d] font-medium">
+  Digital Signature: <span className="text-[#e63946]">{studentDetails.digital_signature || 'Pending'}</span>
+</div>
+
         </div>
       </div>
     </div>

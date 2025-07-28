@@ -899,16 +899,32 @@ app.get('/api/reports', (req, res) => {
 
     try {
       const result = await pool.query(sqlGet, [decoded.email]);
+
       if (result.rows.length === 0) {
         return res.status(404).send('Student not found');
       }
-      res.json(result.rows[0]);
+
+      const student = result.rows[0];
+
+      // Extract first letter from the committee name (approved_by_committee)
+      let digital_signature = null;
+      if (student.approved_by_committee) {
+        const firstLetter = student.approved_by_committee.trim().charAt(0).toUpperCase();
+        digital_signature = `HOLD-${firstLetter}`;  // Placeholder only
+      }
+
+      res.json({
+        ...student,
+        digital_signature, // Add placeholder signature to response
+      });
+
     } catch (err) {
       console.error('Error fetching data:', err);
       res.status(500).send('Error fetching data');
     }
   });
 });
+
 
 app.put('/api/student/update', (req, res) => {
   const token = req.headers['authorization'];
