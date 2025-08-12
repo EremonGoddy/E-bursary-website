@@ -242,10 +242,11 @@ app.post("/api/signin", async (req, res) => {
       };
     }
 
-    // Insert into activity log
+    /*Insert into activity log
     const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
     await pool.query(logQuery, [`User ${user.name} (${user.role}) signed in.`]);
-
+    
+*/
     return res.status(200).json(response);
 
   } catch (error) {
@@ -266,7 +267,7 @@ app.post('/api/logout', authenticateToken, async (req, res) => {
       const userName = result.rows[0].name;
       const logMessage = `User ${userName} logged out.`;
 
-      await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
+      //await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
     }
 
     res.status(200).json({ message: 'Logout successful' });
@@ -299,12 +300,12 @@ app.post("/api/approve-student", async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // ✅ Log activity
+    /* ✅ Log activity
     const logMessage = `Committee member ${committeeName} approved student with user ID ${studentUserId}`;
     await pool.query(
       'INSERT INTO activity_log (log_message) VALUES ($1)',
       [logMessage]
-    );
+    );*/
 
     return res.status(200).json({
       message: "Student approved successfully",
@@ -373,10 +374,10 @@ app.post("/api/post", async (req, res) => {
       [name, email, hashedPassword, role, phoneNumber]
     );
 
-     // Log the activity
+     /*Log the activity
     const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
     await pool.query(logQuery, [`New user registered: ${name} (${role})`]);
-
+*/
     // Respond with the created user data
     res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
   } catch (error) {
@@ -411,10 +412,10 @@ app.post('/api/reset-password', async (req, res) => {
     // Update password
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
 
-    // Log activity
+    /* Log activity
     const logMessage = `User ${userName} (${contactValue}) reset their password.`;
     await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
-
+*/
     res.status(200).json({ message: 'Password reset successfully' });
   } catch (error) {
     console.error('Error resetting password:', error);
@@ -445,10 +446,10 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
 
-    // Insert into activity log
+    /* Insert into activity log
     const logMessage = `User ${name} changed their password successfully.`;
     await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
-
+*/
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("Error updating password:", error);
@@ -970,11 +971,11 @@ app.put('/api/student/update', (req, res) => {
         decoded.email
       ]);
 
-      // Insert activity log
+      /* Insert activity log
       const logMessage = `Student profile updated: ${fullname} (${email})`;
       const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
       await pool.query(logQuery, [logMessage]);
-
+*/
       res.send({ message: 'Profile updated successfully', data: req.body });
     } catch (err) {
       console.error('Error updating data:', err);

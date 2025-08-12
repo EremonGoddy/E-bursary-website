@@ -4,18 +4,18 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse, faFileAlt, faPaperclip, faTimes, faDownload, faComments, faCog,
-  faSignOutAlt, faBars, faBell,
+faHouse, faFileAlt, faPaperclip, faTimes, faDownload, faComments, faCog,
+faSignOutAlt, faBars, faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 const FamilyDetails = () => {
-  const [sidebarActive, setSidebarActive] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [studentDetails, setStudentDetails] = useState({});
-  const [documentUploaded, setDocumentUploaded] = useState(false);
-  const [hasNewMessage, setHasNewMessage] = useState(false);
-  const [formData, setFormData] = useState({
-    family_status: '',
+const [sidebarActive, setSidebarActive] = useState(false);
+const [userName, setUserName] = useState('');
+const [studentDetails, setStudentDetails] = useState({});
+const [documentUploaded, setDocumentUploaded] = useState(false);
+const [hasNewMessage, setHasNewMessage] = useState(false);
+const [formData, setFormData] = useState({
+family_status: '',
     disability: '',
     parentname: '',
     relationship: '',
