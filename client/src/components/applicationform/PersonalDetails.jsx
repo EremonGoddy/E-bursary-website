@@ -26,6 +26,31 @@ const PersonalDetails = () => {
     year: '',
     admission: ''
   });
+
+   const subCounties = {
+    "Turkana Central": ["Kanamkemer", "Kerio Delta", "Kalokol", "Lodwar Township"],
+    "Turkana East": ["Lokori/Kochodin", "Katilia", "Kapedo/Napeitom"],
+    "Turkana South": ["Kaputir", "Katilu", "Lobokat", "Lokichar"],
+    "Loima": ["Lokiriama/Lorengippi", "Lomelo", "Loima", "Turkwel"],
+    "Turkana North": ["Kaeris", "Kaaleng/Kaikor", "Lapur", "Lake Zone"],
+    "Kibish": ["Kibish", "Nakalale", "Lapur"],
+    "Turkana West": ["Letea", "Kalobeyei", "Kakuma", "Lopur", "Songot"],
+  };
+
+   // Villages linked to wards
+  const villages = {
+    Kaeris: ["Kaeris Village", "Kangakipur", "Mlima-Tatu", "Kanukurudio"],
+    "Kaaleng/Kaikor": ["Kaikor", "Kaaleng", "Lokamarinyang"],
+    Lapur: ["Lowareng'ak", "Todonyang", "Nachukui"],
+    "Lake Zone": ["Namadak", "Lorengippi", "Kalokol East"],
+    // Example villages for others
+    Kanamkemer: ["Kanamkemer A", "Kanamkemer B"],
+    "Kerio Delta": ["Kerio East", "Kerio West"],
+    Kalokol: ["Kalokol North", "Kalokol South"],
+    "Lodwar Township": ["Town East", "Town West"],
+    // Add the rest as needed...
+  };
+
   const [errorMsg, setErrorMsg] = useState("");
   const [allStudents, setAllStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -169,7 +194,10 @@ const PersonalDetails = () => {
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: value,
+    ...(name=== "subcounty" ? {ward: "", village: "" } : {}),
+      ...(name === "ward" ? { village: "" } : {}),
+     });
     setErrorMsg("");
   };
 
@@ -459,44 +487,73 @@ const PersonalDetails = () => {
                   required
                 />
               </div>
+            <div>
+ {/* Sub County Dropdown */}
+      <label htmlFor="subcounty" className="block text-[#14213d] font-medium mb-1">
+        Sub County
+      </label>
+      <select
+        id="subcounty"
+        name="subcounty"
+        value={formData.subcounty}
+        onChange={handleChange}
+        className="form-select w-full border border-gray-300 text-[#14213d] rounded px-3 py-2 focus:border-blue-500"
+        required
+      >
+        <option value="">Select Sub County</option>
+        {Object.keys(subCounties).map((sub) => (
+          <option key={sub} value={sub}>
+            {sub}
+          </option>
+        ))}
+      </select>
+</div>
+
               <div>
-                <label htmlFor="subcounty" className="block text-[#14213d] font-medium mb-1">Sub County</label>
-                <input
-                  type="text"
-                  id="subcounty"
-                  name="subcounty"
-                  value={formData.subcounty}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 text-[#14213d] rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Sub County"
-                  required
-                />
+                {/* Ward Dropdown */}
+      <label htmlFor="ward" className="block text-[#14213d] font-medium mb-1">
+        Ward
+      </label>
+      <select
+        id="ward"
+        name="ward"
+        value={formData.ward}
+        onChange={handleChange}
+        className="form-select w-full border border-gray-300 text-[#14213d] rounded px-3 py-2 focus:border-blue-500"
+        required
+        disabled={!formData.subcounty} // Disable until subcounty is chosen
+      >
+        <option value="">Select Ward</option>
+        {formData.subcounty &&
+          subCounties[formData.subcounty].map((ward) => (
+            <option key={ward} value={ward}>
+              {ward}
+            </option>
+          ))}
+      </select>
               </div>
               <div>
-                <label htmlFor="ward" className="block text-[#14213d] font-medium mb-1">Ward</label>
-                <input
-                  type="text"
-                  id="ward"
-                  name="ward"
-                  value={formData.ward}
-                  onChange={handleChange}
-                  className="form-input w-full border border-gray-300 text-[#14213d] rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter Ward"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="village" className="block text-[#14213d] font-medium mb-1">Village Unit</label>
-                <input
-                  type="text"
-                  id="village"
-                  name="village"
-                  value={formData.village}
-                  onChange={handleChange}
-                  className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                  placeholder="Enter your village"
-                  required
-                />
+                 {/* Village Dropdown */}
+      <label htmlFor="village" className="block text-[#14213d] font-medium mb-1">
+        Village Unit
+      </label>
+      <select
+        id="village"
+        name="village"
+        value={formData.village}
+        onChange={handleChange}
+        className="form-select w-full border border-gray-300 text-[#14213d] rounded px-3 py-2 focus:border-blue-500"
+        required
+        disabled={!formData.ward}
+      >
+        <option value="">Select Village</option>
+        {formData.ward &&
+          villages[formData.ward]?.map((village) => (
+            <option key={village} value={village}>
+              {village}
+            </option>
+          ))}
+      </select>
               </div>
               <div>
                 <label htmlFor="birth" className="block text-[#14213d] font-medium mb-1">Date of Birth</label>
