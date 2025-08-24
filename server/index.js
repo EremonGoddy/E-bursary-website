@@ -47,7 +47,7 @@ const { userId } = req.user;
 const { password } = req.query;
 
 try {
-const result = await pool.query("SELECT password FROM users WHERE id = $1", [userId]);
+const result = await pool.query("SELECT password FROM bursary.users WHERE id = $1", [userId]);
 
 if (result.rows.length === 0) {
 return res.status(404).json({ message: "User not found" });
@@ -80,7 +80,7 @@ app.post('/api/send-otp', async (req, res) => {
     let user;
 
     if (email) {
-      const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      const result = await pool.query('SELECT * FROM bursary.users WHERE email = $1', [email]);
       if (result.rows.length === 0) {
         return res.status(404).json({ message: 'User with this email not found' });
       }
@@ -88,7 +88,7 @@ app.post('/api/send-otp', async (req, res) => {
     }
 
     if (phoneNumber) {
-      const result = await pool.query('SELECT * FROM users WHERE phone_number = $1', [phoneNumber]);
+      const result = await pool.query('SELECT * FROM bursary.users WHERE phone_number = $1', [phoneNumber]);
       if (result.rows.length === 0) {
         return res.status(404).json({ message: 'User with this phone number not found' });
       }
@@ -100,7 +100,7 @@ app.post('/api/send-otp', async (req, res) => {
 
     if (email) {
       await pool.query(
-        'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE email = $3',
+        'UPDATE bursary.users SET otp_code = $1, otp_expires = $2 WHERE email = $3',
         [otp, expiresAt, email]
       );
 
@@ -124,7 +124,7 @@ app.post('/api/send-otp', async (req, res) => {
 
     if (phoneNumber) {
       await pool.query(
-        'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE phone_number = $3',
+        'UPDATE bursary.users SET otp_code = $1, otp_expires = $2 WHERE phone_number = $3',
         [otp, expiresAt, phoneNumber]
       );
 
@@ -152,9 +152,9 @@ app.post('/api/verify-otp', async (req, res) => {
     let userResult;
 
     if (email) {
-      userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      userResult = await pool.query('SELECT * FROM bursary.users WHERE email = $1', [email]);
     } else if (phoneNumber) {
-      userResult = await pool.query('SELECT * FROM users WHERE phone_number = $1', [phoneNumber]);
+      userResult = await pool.query('SELECT * FROM bursary.users WHERE phone_number = $1', [phoneNumber]);
     }
 
     if (!userResult || userResult.rows.length === 0) {
@@ -193,7 +193,7 @@ app.post("/api/signin", async (req, res) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const userQuery = "SELECT * FROM users WHERE email = $1";
+    const userQuery = "SELECT * FROM bursary.users WHERE email = $1";
     const userResult = await pool.query(userQuery, [email]);
 
     if (userResult.rows.length === 0) {
@@ -211,8 +211,8 @@ app.post("/api/signin", async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const studentResult = await pool.query("SELECT * FROM personal_details WHERE email = $1", [email]);
-    const committeeResult = await pool.query("SELECT * FROM profile_committee WHERE email = $1", [email]);
+    const studentResult = await pool.query("SELECT * FROM bursary.personal_details WHERE email = $1", [email]);
+    const committeeResult = await pool.query("SELECT * FROM bursary.profile_committee WHERE email = $1", [email]);
 
     const token = jwt.sign({ userId: user.id, email: user.email }, secret, { expiresIn: "1h" });
 
@@ -261,7 +261,7 @@ app.post('/api/logout', authenticateToken, async (req, res) => {
   console.log("Decoded user on logout:", req.user); // ✅ Add this
 
   try {
-    const result = await pool.query("SELECT name FROM users WHERE id = $1", [userId]);
+    const result = await pool.query("SELECT name FROM bursary.users WHERE id = $1", [userId]);
 
     if (result.rows.length > 0) {
       const userName = result.rows[0].name;
@@ -288,7 +288,7 @@ app.post("/api/approve-student", async (req, res) => {
     }
 
     const updateQuery = `
-      UPDATE personal_details
+      UPDATE bursary.personal_details
       SET approved_by_committee = $1
       WHERE user_id = $2
       RETURNING *;
@@ -323,7 +323,7 @@ app.get('/api/status-message/user/:userId', async (req, res) => {
   const userId = req.params.userId;
   const sql = `
     SELECT status_message 
-    FROM personal_details 
+    FROM bursary.personal_details 
     WHERE user_id = $1
   `;
   try {
@@ -348,19 +348,19 @@ app.post("/api/post", async (req, res) => {
 
   try {
     // Check if email already exists
-    const existingEmail = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const existingEmail = await pool.query("SELECT * FROM bursary.users WHERE email = $1", [email]);
     if (existingEmail.rows.length > 0) {
       return res.status(400).json({ message: "Email is already registered" });
     }
 
     // Check if name already exists
-    const existingName = await pool.query("SELECT * FROM users WHERE name = $1", [name]);
+    const existingName = await pool.query("SELECT * FROM bursary.users WHERE name = $1", [name]);
     if (existingName.rows.length > 0) {
       return res.status(400).json({ message: "Name is already registered" });
     }
 
      // Check if name already exists
-    const existingphoneNumber = await pool.query("SELECT * FROM users WHERE phone_number = $1", [phoneNumber]);
+    const existingphoneNumber = await pool.query("SELECT * FROM bursary.users WHERE phone_number = $1", [phoneNumber]);
     if (existingphoneNumber.rows.length > 0) {
       return res.status(400).json({ message: "Phone Number is already registered" });
     }
@@ -370,7 +370,7 @@ app.post("/api/post", async (req, res) => {
 
     // Insert the new user
     const result = await pool.query(
-      "INSERT INTO users (name, email, password, role, phone_number) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      "INSERT INTO bursary.users (name, email, password, role, phone_number) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [name, email, hashedPassword, role, phoneNumber]
     );
 
@@ -396,7 +396,7 @@ app.post('/api/reset-password', async (req, res) => {
   try {
     // Check if the user exists by email or phone number
     const result = await pool.query(
-      'SELECT * FROM users WHERE email = $1 OR phone_number = $1',
+      'SELECT * FROM bursary.users WHERE email = $1 OR phone_number = $1',
       [contactValue]
     );
 
@@ -410,7 +410,7 @@ app.post('/api/reset-password', async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update password
-    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+    await pool.query('UPDATE bursary.users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
 
     /* Log activity
     const logMessage = `User ${userName} (${contactValue}) reset their password.`;
@@ -430,7 +430,7 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
   try {
-    const result = await pool.query("SELECT password FROM users WHERE id = $1", [userId]);
+    const result = await pool.query("SELECT password FROM bursary.users WHERE id = $1", [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -444,7 +444,7 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
+    await pool.query("UPDATE bursary.users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
 
     /* Insert into activity log
     const logMessage = `User ${name} changed their password successfully.`;
@@ -459,23 +459,23 @@ app.post("/api/change-password", authenticateToken, async (req, res) => {
 
 // Helper functions for each step
 async function hasPersonalDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM personal_details WHERE user_id = $1', [userId]);
+  const res = await pool.query('SELECT 1 FROM bursary.personal_details WHERE user_id = $1', [userId]);
   return res.rows.length > 0;
 }
 async function hasAmountDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM amount_details WHERE user_id = $1', [userId]);
+  const res = await pool.query('SELECT 1 FROM bursary.amount_details WHERE user_id = $1', [userId]);
   return res.rows.length > 0;
 }
 async function hasFamilyDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM family_details WHERE user_id = $1', [userId]);
+  const res = await pool.query('SELECT 1 FROM bursary.family_details WHERE user_id = $1', [userId]);
   return res.rows.length > 0;
 }
 async function hasDisclosureDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM disclosure_details WHERE user_id = $1', [userId]);
+  const res = await pool.query('SELECT 1 FROM bursary.disclosure_details WHERE user_id = $1', [userId]);
   return res.rows.length > 0;
 }
 async function hasUploadedDocuments(userId) {
-  const res = await pool.query('SELECT 1 FROM uploaded_document WHERE user_id = $1', [userId]);
+  const res = await pool.query('SELECT 1 FROM bursary.uploaded_document WHERE user_id = $1', [userId]);
   return res.rows.length > 0;
 }
 
@@ -503,7 +503,7 @@ app.get('/api/application-progress/:userId', async (req, res) => {
     if (completedSteps.length === 5) {
       // Fetch user's full name from personal_details
       const nameResult = await pool.query(
-        'SELECT fullname FROM personal_details WHERE user_id = $1',
+        'SELECT fullname FROM bursary.personal_details WHERE user_id = $1',
         [userId]
       );
 
@@ -513,13 +513,13 @@ app.get('/api/application-progress/:userId', async (req, res) => {
 
         // Avoid duplicate log entry
         const existingLog = await pool.query(
-          'SELECT 1 FROM activity_log WHERE log_message = $1',
+          'SELECT 1 FROM bursary.activity_log WHERE log_message = $1',
           [logMessage]
         );
 
         if (existingLog.rows.length === 0) {
           await pool.query(
-            'INSERT INTO activity_log (log_message) VALUES ($1)',
+            'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
             [logMessage]
           );
         }
@@ -537,7 +537,7 @@ app.get('/api/application-progress/:userId', async (req, res) => {
 // GET personal details by user_id (PostgreSQL version with pool)
 app.get('/api/personal-details/user/:userId', async (req, res) => {
   const userId = req.params.userId;
-  const sql = `SELECT * FROM personal_details WHERE user_id = $1 LIMIT 1`;
+  const sql = `SELECT * FROM bursary.personal_details WHERE user_id = $1 LIMIT 1`;
   try {
     const result = await pool.query(sql, [userId]);
     if (result.rows.length > 0) {
@@ -555,7 +555,7 @@ app.post('/api/personal-details', async (req, res) => {
 
   // Duplicate check (case-insensitive for both name and email)
   const checkSql = `
-    SELECT 1 FROM personal_details 
+    SELECT 1 FROM bursary.personal_details 
     WHERE LOWER(fullname) = LOWER($1) OR LOWER(email) = LOWER($2)
   `;
   try {
@@ -565,7 +565,7 @@ app.post('/api/personal-details', async (req, res) => {
     }
 
     const sql = `
-      INSERT INTO personal_details 
+      INSERT INTO bursary.personal_details 
       (fullname, email, subcounty, ward, village, birth, gender, institution, year, admission, status) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')
       RETURNING user_id
@@ -581,7 +581,7 @@ app.post('/api/personal-details', async (req, res) => {
 // Get all fullnames from personal_details table (case-insensitive, optional)
 app.get('/students/all-names', async (req, res) => {
   try {
-    const result = await pool.query('SELECT fullname, email FROM personal_details');
+    const result = await pool.query('SELECT fullname, email FROM bursary.personal_details');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -591,7 +591,7 @@ app.get('/students/all-names', async (req, res) => {
 // GET /api/amount-details/user/:userId
 app.get('/api/amount-details/user/:userId', async (req, res) => {
   const userId = req.params.userId;
-  const sql = `SELECT * FROM amount_details WHERE user_id = $1 LIMIT 1`;
+  const sql = `SELECT * FROM bursary.amount_details WHERE user_id = $1 LIMIT 1`;
   try {
     const result = await pool.query(sql, [userId]);
     if (result.rows.length > 0) {
@@ -609,7 +609,7 @@ app.post('/api/amount-details', async (req, res) => {
   const { userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch } = req.body;
 
   const sql = `
-    INSERT INTO amount_details 
+    INSERT INTO bursary.amount_details 
     (user_id, payable_words, payable_figures, outstanding_words, outstanding_figures, school_accountname, school_accountnumber, school_branch) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
   `;
@@ -626,7 +626,7 @@ app.post('/api/amount-details', async (req, res) => {
 // ✅ Get family details by user ID (for frontend check/redirect)
 app.get('/api/family-details/user/:userId', async (req, res) => {
   const userId = req.params.userId;
-  const sql = `SELECT * FROM family_details WHERE user_id = $1 LIMIT 1`;
+  const sql = `SELECT * FROM bursary.family_details WHERE user_id = $1 LIMIT 1`;
   try {
     const result = await pool.query(sql, [userId]);
     if (result.rows.length > 0) {
@@ -644,7 +644,7 @@ app.post('/api/family-details', async (req, res) => {
   const { userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income } = req.body;
 
   const sql = `
-    INSERT INTO family_details 
+    INSERT INTO bursary.family_details 
     (user_id, family_status, disability, parent_guardian_name, relationship, contact_info, occupation, guardian_children, working_siblings, studying_siblings, monthly_income) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
   `;
@@ -661,7 +661,7 @@ app.post('/api/family-details', async (req, res) => {
 // ✅ Get disclosure details by user ID (for frontend check/redirect)
 app.get('/api/disclosure-details/user/:userId', async (req, res) => {
   const userId = req.params.userId;
-  const sql = `SELECT * FROM disclosure_details WHERE user_id = $1 LIMIT 1`;
+  const sql = `SELECT * FROM bursary.disclosure_details WHERE user_id = $1 LIMIT 1`;
   try {
     const result = await pool.query(sql, [userId]);
     if (result.rows.length > 0) {
@@ -679,7 +679,7 @@ app.post('/api/disclosure-details', async (req, res) => {
   const { userId, bursary, bursarysource, bursaryamount, helb, granted, noreason } = req.body;
 
   const sql = `
-    INSERT INTO disclosure_details 
+    INSERT INTO bursary.disclosure_details 
     (user_id, receiving_bursary, bursary_source, bursary_amount, applied_helb, helb_outcome, helb_noreason) 
     VALUES ($1, $2, $3, $4, $5, $6, $7)
   `;
@@ -699,7 +699,7 @@ app.get('/api/upload/status/:userId', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT * FROM uploaded_document WHERE user_id = $1',
+      'SELECT * FROM bursary.uploaded_document WHERE user_id = $1',
       [userId]
     );
 
@@ -719,7 +719,7 @@ app.get('/api/upload/status/:userId', async (req, res) => {
     // ✅ Log the check
     const logMessage = `Checked document upload status for user ID ${userId}: ${uploaded ? 'Uploaded' : 'Not Uploaded'}`;
     await pool.query(
-      'INSERT INTO activity_log (log_message) VALUES ($1)',
+      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
       [logMessage]
     );
 
@@ -767,7 +767,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     : path.relative(__dirname, document.path);
 
   const query = `
-    INSERT INTO uploaded_document (user_id, document_name, file_path) 
+    INSERT INTO bursary.uploaded_document (user_id, document_name, file_path) 
     VALUES ($1, $2, $3)
   `;
 
@@ -782,7 +782,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
 
 app.get('/api/admin-details', async (req, res) => {
   const role = 'Admin';
-  const sql = 'SELECT name, email FROM users WHERE role = $1';
+  const sql = 'SELECT name, email FROM bursary.users WHERE role = $1';
 
   try {
     const result = await pool.query(sql, [role]);
@@ -831,7 +831,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
      // ✅ Log the activity
     const logMessage = `Password reset code sent to ${identifier}`;
-    await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
+    await pool.query('INSERT INTO bursary.activity_log (log_message) VALUES ($1)', [logMessage]);
 
     res.status(200).json({ message: 'Reset code sent successfully.' });
   } catch (error) {
@@ -851,7 +851,7 @@ app.get('/api/student', (req, res) => {
       SELECT fullname, email, subcounty, ward, village, 
       TO_CHAR(birth, 'YYYY-MM-DD') AS birth, 
       gender, institution, year, admission, status, bursary
-      FROM personal_details 
+      FROM bursary.personal_details 
       WHERE email = $1
     `;
 
@@ -894,7 +894,7 @@ app.get('/api/reports', (req, res) => {
         bursary,
         approved_by_committee,
         allocation_date
-      FROM personal_details 
+      FROM bursary.personal_details 
       WHERE email = $1
     `;
 
@@ -950,7 +950,7 @@ app.put('/api/student/update', (req, res) => {
     const formattedBirth = birth ? new Date(birth).toISOString().split('T')[0] : null;
 
     const sqlUpdate = `
-      UPDATE personal_details 
+      UPDATE bursary.personal_details 
       SET fullname = $1, email = $2, subcounty = $3, ward = $4, village = $5,
           birth = $6, gender = $7, institution = $8, year = $9, admission = $10
       WHERE email = $11
@@ -986,8 +986,8 @@ app.put('/api/student/update', (req, res) => {
 
 // Committee Count Route
 app.get('/api/committee-count', async (req, res) => {
-  const queryTotalFunds = 'SELECT amount FROM bursary_funds WHERE id = 1';
-  const queryAllocatedFunds = 'SELECT SUM(bursary) AS total_allocated FROM personal_details';
+  const queryTotalFunds = 'SELECT amount FROM bursary.bursary_funds WHERE id = 1';
+  const queryAllocatedFunds = 'SELECT SUM(bursary) AS total_allocated FROM bursary.personal_details';
 
   try {
     const totalResult = await pool.query(queryTotalFunds);
@@ -1014,11 +1014,11 @@ app.get('/api/committee-count', async (req, res) => {
 
 // Quick Statistics Route
 app.get('/api/quick-statistics', async (req, res) => {
-  const queryTotal = 'SELECT COUNT(*) AS total FROM personal_details';
-  const queryApproved = "SELECT COUNT(*) AS approved FROM personal_details WHERE status = 'Approved'";
-  const queryRejected = "SELECT COUNT(*) AS rejected FROM personal_details WHERE status = 'rejected'";
-  const queryPending = "SELECT COUNT(*) AS pending FROM personal_details WHERE status = 'pending'";
-  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM personal_details WHERE status = 'Incomplete'";
+  const queryTotal = 'SELECT COUNT(*) AS total FROM bursary.personal_details';
+  const queryApproved = "SELECT COUNT(*) AS approved FROM bursary.personal_details WHERE status = 'Approved'";
+  const queryRejected = "SELECT COUNT(*) AS rejected FROM bursary.personal_details WHERE status = 'rejected'";
+  const queryPending = "SELECT COUNT(*) AS pending FROM bursary.personal_details WHERE status = 'pending'";
+  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM bursary.personal_details WHERE status = 'Incomplete'";
 
   try {
     const totalResult = await pool.query(queryTotal);
@@ -1044,7 +1044,7 @@ app.get('/api/quick-statistics', async (req, res) => {
 
 app.get("/api/personalInformation", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM personal_details");
+    const result = await pool.query("SELECT * FROM bursary.personal_details");
     res.send(result.rows);
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -1056,7 +1056,7 @@ app.get("/api/personalInformation/:id", async (req, res) => {
   const userId = req.params.id;
   console.log(userId);
 
-  const sqlGet = "SELECT * FROM personal_details WHERE user_id = $1";
+  const sqlGet = "SELECT * FROM bursary.personal_details WHERE user_id = $1";
 
   try {
     const result = await pool.query(sqlGet, [userId]);
@@ -1075,9 +1075,9 @@ app.get("/api/amountInformation/:id", async (req, res) => {
     SELECT 
       ad.*, pd.fullname, pd.admission, pd.institution 
     FROM 
-      amount_details ad
+      bursary.amount_details ad
     JOIN 
-      personal_details pd 
+      bursary.personal_details pd 
     ON 
       ad.user_id = pd.user_id
     WHERE pd.user_id = $1
@@ -1100,9 +1100,9 @@ app.get("/api/familyInformation/:id", async (req, res) => {
     SELECT 
       fd.*, pd.fullname, pd.admission, pd.institution 
     FROM 
-      family_details fd
+      bursary.family_details fd
     JOIN 
-      personal_details pd 
+      bursary.personal_details pd 
     ON 
       fd.user_id = pd.user_id
     WHERE pd.user_id = $1
@@ -1125,9 +1125,9 @@ app.get("/api/disclosureInformation/:id", (req, res) => {
     SELECT 
       dd.*, pd.fullname, pd.admission, pd.institution 
     FROM 
-      disclosure_details dd
+      bursary.disclosure_details dd
     JOIN 
-      personal_details pd 
+      bursary.personal_details pd 
     ON 
       dd.user_id = pd.user_id
     WHERE pd.user_id = $1
@@ -1151,9 +1151,9 @@ app.get("/api/get-document/:id", (req, res) => {
     SELECT 
       ud.*, pd.fullname, pd.admission, pd.institution 
     FROM 
-      uploaded_document ud
+      bursary.uploaded_document ud
     JOIN 
-      personal_details pd 
+      bursary.personal_details pd 
     ON 
       ud.user_id = pd.user_id
     WHERE pd.user_id = $1
@@ -1174,7 +1174,7 @@ app.put('/api/update-status/:id', (req, res) => {
   const { status, status_message } = req.body;  // 🆕 Added status_message
 
   const query = `
-    UPDATE personal_details 
+    UPDATE bursary.personal_details 
     SET status = $1, status_message = $2  -- 🆕 Update both columns
     WHERE user_id = $3
   `;
@@ -1197,9 +1197,9 @@ app.get("/api/get-bursary/:id", (req, res) => {
     SELECT 
       ud.*, pd.fullname, pd.admission, pd.institution 
     FROM 
-      uploaded_document ud
+      bursary.uploaded_document ud
     JOIN 
-      personal_details pd 
+      bursary.personal_details pd 
     ON 
       ud.user_id = pd.user_id
     WHERE pd.user_id = $1
@@ -1220,9 +1220,9 @@ app.get("/api/get-bursary", (req, res) => {
     SELECT 
       ud.*, pd.fullname, pd.admission, pd.institution 
     FROM 
-      uploaded_document ud
+      bursary.uploaded_document ud
     JOIN 
-      personal_details pd 
+      bursary.personal_details pd 
     ON 
       ud.user_id = pd.user_id
   `;
@@ -1249,7 +1249,7 @@ app.put('/api/update-bursary/:id', async (req, res) => {
   }
 
   const updateQuery = `
-    UPDATE personal_details 
+    UPDATE bursary.personal_details 
     SET bursary = $1, allocation_date = CURRENT_TIMESTAMP 
     WHERE user_id = $2
   `;
@@ -1257,7 +1257,7 @@ app.put('/api/update-bursary/:id', async (req, res) => {
   try {
     // Step 1: Get student's name
     const nameResult = await pool.query(
-      'SELECT fullname FROM personal_details WHERE user_id = $1',
+      'SELECT fullname FROM bursary.personal_details WHERE user_id = $1',
       [userId]
     );
 
@@ -1273,7 +1273,7 @@ app.put('/api/update-bursary/:id', async (req, res) => {
     // Step 3: Log activity using name
     const logMessage = `Allocated Ksh ${bursary} to ${studentName} (user ID: ${userId})`;
     await pool.query(
-      'INSERT INTO activity_log (log_message) VALUES ($1)',
+      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
       [logMessage]
     );
 
@@ -1286,7 +1286,7 @@ app.put('/api/update-bursary/:id', async (req, res) => {
 
 
 app.get('/api/users', (req, res) => {
-  const query = 'SELECT * FROM users';
+  const query = 'SELECT * FROM bursary.users';
   pool.query(query, (err, results) => {
     if (err) return res.status(500).send(err);
     res.json(results.rows);
@@ -1303,11 +1303,11 @@ app.post('/api/users', (req, res) => {
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) return res.status(500).json({ message: 'Error hashing password' });
 
-    const query = 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id';
+    const query = 'INSERT INTO bursary.users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id';
     pool.query(query, [fullname, email, hashedPassword, role], (err, result) => {
       if (err) return res.status(500).send(err);
 
-      const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
+      const logQuery = 'INSERT INTO bursary.activity_log (log_message) VALUES ($1)';
       pool.query(logQuery, [`Added new user ${fullname}`]);
 
       res.status(201).json({ message: 'User added', userId: result.rows[0].id });
@@ -1318,7 +1318,7 @@ app.post('/api/users', (req, res) => {
 app.delete('/api/users/:id', (req, res) => {
   const userId = req.params.id;
 
-  const selectQuery = 'SELECT name FROM users WHERE id = $1';
+  const selectQuery = 'SELECT name FROM bursary.users WHERE id = $1';
   pool.query(selectQuery, [userId], (err, result) => {
     if (err || result.rows.length === 0) {
       return res.status(500).json({ message: 'Error fetching user or user not found' });
@@ -1326,11 +1326,11 @@ app.delete('/api/users/:id', (req, res) => {
 
     const userFullName = result.rows[0].name;
 
-    const deleteQuery = 'DELETE FROM users WHERE id = $1';
+    const deleteQuery = 'DELETE FROM bursary.users WHERE id = $1';
     pool.query(deleteQuery, [userId], (err) => {
       if (err) return res.status(500).send(err);
 
-      const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
+      const logQuery = 'INSERT INTO bursary.activity_log (log_message) VALUES ($1)';
       pool.query(logQuery, [`Deleted user ${userFullName}`], (logErr) => {
         if (logErr) return res.status(500).json({ message: 'Error logging activity' });
 
@@ -1341,7 +1341,7 @@ app.delete('/api/users/:id', (req, res) => {
 });
 
 app.get('/api/activity-logs', (req, res) => {
-  const query = 'SELECT * FROM activity_log';
+  const query = 'SELECT * FROM bursary.activity_log';
   pool.query(query, (err, results) => {
     if (err) return res.status(500).send(err);
     res.json(results.rows);
@@ -1355,7 +1355,7 @@ app.post('/api/bursary-funds', (req, res) => {
     return res.status(400).json({ message: 'Invalid amount provided' });
   }
 
-  const query = 'INSERT INTO bursary_funds (amount) VALUES ($1)';
+  const query = 'INSERT INTO bursary.bursary_funds (amount) VALUES ($1)';
   pool.query(query, [amount], (err) => {
     if (err) {
       console.error('Error inserting data:', err);
@@ -1369,14 +1369,14 @@ app.put('/api/adjust-funds', (req, res) => {
   const { amount } = req.body;
   const id = 1;
 
-  const updateQuery = 'UPDATE bursary_funds SET amount = $1 WHERE id = $2';
+  const updateQuery = 'UPDATE bursary.bursary_funds SET amount = $1 WHERE id = $2';
 
   pool.query(updateQuery, [amount, id], async (err) => {
     if (err) return res.status(500).send(err);
 
     try {
       const logMessage = `Bursary fund adjusted to ${amount} shillings.`;
-      await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
+      await pool.query('INSERT INTO bursary.activity_log (log_message) VALUES ($1)', [logMessage]);
 
       res.status(200).json({ message: 'Fund allocation adjusted successfully!' });
     } catch (logErr) {
@@ -1392,7 +1392,7 @@ app.get('/api/user-report/:id', (req, res) => {
   const query = `
     SELECT fullname, admission_number AS admission, institution, status, 
            bursary AS "amountAllocated"
-    FROM personal_details 
+    FROM bursary.personal_details 
     WHERE user_id = $1
   `;
 
@@ -1427,7 +1427,7 @@ app.get('/api/profile-committee', (req, res) => {
                WHEN fullname IS NULL OR phone_no IS NULL OR national_id IS NULL THEN 0
                ELSE 1
              END AS is_complete
-      FROM profile_committee 
+      FROM bursary.profile_committee 
       WHERE email = $1
     `;
 
@@ -1466,7 +1466,7 @@ app.post('/api/profile-form', (req, res) => {
     });
 
     const sqlInsert = `
-      INSERT INTO profile_committee (fullname, email, phone_no, national_id, subcounty, ward, position) 
+      INSERT INTO bursary.profile_committee (fullname, email, phone_no, national_id, subcounty, ward, position) 
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
@@ -1521,7 +1521,7 @@ app.get('/api/comreport', (req, res) => {
         subcounty, 
         ward, 
         position
-      FROM profile_committee 
+      FROM bursary.profile_committee 
       WHERE email = $1
     `;
 
