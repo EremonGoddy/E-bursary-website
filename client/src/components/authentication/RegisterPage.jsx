@@ -204,14 +204,14 @@ const RegisterPage = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="text-white w-full py-2 rounded-lg bg-[#14213d] hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#fca311]"
+            className="text-white w-full py-2 cursor-pointer rounded-lg bg-[#14213d] hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#fca311]"
           >
             Register
           </button>
 
           <div className="text-center mt-4">
             <span className="text-[#14213d]">Already have an account? </span>
-            <Link to="/login" className="text-blue-600 hover:text-blue-800">Sign in</Link>
+            <Link to="/login" className="text-blue-600 cursor-pointer hover:text-blue-800">Sign in</Link>
           </div>
         </form>
         <ToastContainer position="top-right" autoClose={4000} />
