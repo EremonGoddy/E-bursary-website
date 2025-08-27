@@ -138,9 +138,9 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 className={`
 fixed top-0 left-0 z-30 bg-[#1F2937] 
 h-screen 
-${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
+${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[45px]'} 
 mt-10
-text-white p-4 
+text-white p-3 
 flex flex-col
 transition-all duration-300
 min-h-screen
@@ -309,32 +309,32 @@ Logout
 ${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Bursary Fund Details & Statistics */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div className="bg-white w-full max-w-[300px]  mb:2 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+<div className=" w-full  mb-3 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 ">
 <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
 <div className="flex justify-around">
-<div className="text-center text[0.8rem] md:text[1rem] font-semibold">
+<div className="text-center backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-3 text[0.8rem] md:text[1rem] w-[230px] font-semibold">
 <p>Total Funds Available:</p>
 <strong>{bursaryAmount}</strong>
 </div>
-<div className="text-center text[0.8rem]  text[1rem] font-semibold">
+<div className="text-center backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-3 text[0.8rem] md:text[1rem] w-[230px] font-semibold">
 <p>Amount Allocated to Students:</p>
 <strong>{allocatedAmount}</strong>
 </div>
-<div className="text-center  text[0.8rem]  text[1rem] font-semibold">
+<div className="text-center backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-3 text[0.8rem] md:text[1rem] w-[230px] font-semibold">
 <p>Remaining Funds:</p>
 <strong>{remainingAmount}</strong>
 </div>
 </div>
 </div>
-<div className="bg-white w-full max-w-[300px] mb-4 md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md">
+<div className=" w-full max-w-[300px] mb-3 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] md:mb-10 sm:max-w-[500px] md:max-w-none mx-auto p-3 sm:p-4 md:p-6">
 <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Quick Statistics</h2>
 <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2">
 <div className="text-center bg-blue-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Pending Application</p>
 <strong>{pendingApplications}</strong>
 </div>
-<div className="text-center bg-yellow-500 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
+<div className="text-center bg-yellow-200 text-[0.8rem] md:text-[1rem] font-semibold md:bold text-white p-2 rounded shadow max-w-[100px] md:max-w-[140px]">
 <p>Incomplete Application</p>
 <strong>{incompleteApplications}</strong>
 </div>
