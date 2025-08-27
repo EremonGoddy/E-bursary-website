@@ -223,11 +223,11 @@ const StudentSetting = () => {
         {/* Sidebar */}
        <div
          className={`
-           fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-15
+           fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
            transition-all duration-100 ease-in-out
            overflow-visible
            ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-           ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[50px] md:p-2'}
+           ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
          `}
        >
          {/* Toggle Button for Desktop View */}
@@ -242,12 +242,12 @@ const StudentSetting = () => {
          </div>
        
          {/* Navigation Menu */}
-         <ul className="flex flex-col h-full mt-6 space-y-14">
+         <ul className="flex flex-col h-full mt-6 space-y-10">
            {[
              {
                icon: faHouse,
                label: 'Dashboard',
-               to: '/student'
+               to: '/studentdashboard'
              },
              {
                icon: faFileAlt,
@@ -377,7 +377,7 @@ const StudentSetting = () => {
                )}
        
                {!sidebarActive && (
-                 <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+                 <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
                    {item.label}
                  </span>
                )}
@@ -472,7 +472,7 @@ const StudentSetting = () => {
               <div className="flex justify-end mt-6">
                 <button
                   type="submit"
-                  className="bg-[#14213d] text-white px-6 py-2 rounded hover:bg-gray-700 transition duration-200"
+                  className="bg-[#14213d] text-white px-6 py-2 cursor-pointer rounded hover:bg-gray-700 transition duration-200"
                 >
                   Update Password
                 </button>

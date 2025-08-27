@@ -25,13 +25,13 @@ return (
 <div className="w-full overflow-x-hidden">
 {/* Navbar - Fixed */}
 <nav className=" bg-[#FFFFFF] fixed top-0 left-0 w-full shadow-lg z-20 md:pl-20 md:pr-20">
-<div className=" mx-auto  px-4 sm:px-0 py-2 flex justify-between items-center">
-<Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1d3557]" to="/">
+<div className=" mx-auto  px-4 sm:px-0 py-0.5 flex justify-between items-center">
+<Link className="text-3xl sm:text-3xl md:text-3xl font-bold text-[#1d3557]" to="/">
 Ebursary
 </Link>
 <div className="space-x-4 hidden md:flex">
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-1 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -39,7 +39,7 @@ to="/">
 Home
 </Link>
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -47,7 +47,7 @@ to="/about">
 About
 </Link>
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -55,7 +55,7 @@ to="/services">
 Services
 </Link>
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -106,7 +106,7 @@ Contact
 </nav>
 
 {/* Image Slider */}
-<div id="carouselExample" className="relative mt-[60px]">
+<div id="carouselExample" className="relative mt-[50px]">
 <div className="carousel-inner">
 {images.map((image, index) => (
 <div
@@ -119,8 +119,8 @@ key={index}
 src={image}
 className="w-full object-cover h-[40vh] md:h-[65vh]"
 alt="Bursary program"/>
-<div className="empowering absolute bottom-0 left-0 w-full h-[60px] sm:h-[120px] md:h-[80px]  flex justify-center items-center">
-<h2 className="text-[1.2rem] md:text-4xl text-white mt-[1px] font-bold text-center">
+<div className="empowering absolute bottom-0 left-0 w-full h-[60px] sm:h-[120px] md:h-[60px]  flex justify-center items-center">
+<h2 className="text-[1.2rem] md:text-4xl text-white mt-[0px] font-bold text-center">
 Empowering Education in Turkana Through Bursaries: Your Path to Success
 </h2>
 </div>
@@ -128,7 +128,7 @@ Empowering Education in Turkana Through Bursaries: Your Path to Success
 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 <Link
   to="/login"
-  className=" getting-started text-[1rem] md:text-[1.2rem]   flex items-center gap-2 font-bold  text-white px-4 py-2 md:px-7 md:py-2 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
+  className=" getting-started text-[1rem] md:text-[1.1rem]   flex items-center gap-2 font-bold  text-white px-4 py-2 md:px-5 md:py-1.1 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
 >
   Get Started
   <FontAwesomeIcon icon={faArrowRight} className="text-white text-base text-[1.2rem] md:text-2xl  font-bold" />

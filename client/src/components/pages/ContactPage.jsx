@@ -18,13 +18,13 @@ return (
 <div className="w-full overflow-x-hidden">
 {/* Navbar - Fixed */}
 <nav className=" bg-white fixed top-0 left-0 w-full shadow-lg z-20 md:pl-20 md:pr-20">
-<div className=" mx-auto px-4 sm:px-0 py-2 flex justify-between items-center">
-<Link className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#1d3557]" to="/">
+<div className=" mx-auto px-4 sm:px-0 py-0.5 flex justify-between items-center">
+<Link className="text-3xl sm:text-3xl md:text-3xl font-bold text-[#1d3557]" to="/">
 Ebursary
 </Link>
 <div className="space-x-4 hidden md:flex">
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -32,7 +32,7 @@ to="/">
 Home
 </Link>
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -40,7 +40,7 @@ to="/about">
 About
 </Link>
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -49,7 +49,7 @@ to="/services"
 Services
 </Link>
 <Link
-className="relative text-[1.35rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -101,7 +101,7 @@ Contact
 </nav>
 
 {/* Hero Section with Tailwind Styling */}
-<div className="relative mt-[60px]">
+<div className="relative mt-[50px]">
 <img
 src="/images/contact.jpg"
 alt="About Us"
@@ -186,7 +186,7 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
       </div>
       <button
         type="submit"
-        className="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
+        className="bg-gray-700 hover:bg-gray-900 text-white cursor-pointer font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
       >
         Send Message
       </button>

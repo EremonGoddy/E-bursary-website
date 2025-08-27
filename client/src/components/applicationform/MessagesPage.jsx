@@ -182,11 +182,11 @@ const StatusMessagePage = () => {
       {/* Sidebar */}
       <div
   className={`
-    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-15
+    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
     transition-all duration-100 ease-in-out
     overflow-visible
     ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-    ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[50px] md:p-2'}
+    ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
   `}
 >
   {/* Toggle Button for Desktop View */}
@@ -201,12 +201,12 @@ const StatusMessagePage = () => {
   </div>
 
   {/* Navigation Menu */}
-  <ul className="flex flex-col h-full mt-6 space-y-14">
+  <ul className="flex flex-col h-full mt-6 space-y-10">
     {[
       {
         icon: faHouse,
         label: 'Dashboard',
-        to: '/student'
+        to: '/studentdashboard'
       },
       {
         icon: faFileAlt,
@@ -336,7 +336,7 @@ const StatusMessagePage = () => {
         )}
 
         {!sidebarActive && (
-          <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+          <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
             {item.label}
           </span>
         )}
@@ -356,17 +356,18 @@ const StatusMessagePage = () => {
           ) : (
             <div className=" bg-white  p-6 text-center">
               <h2 className="text-2xl font-bold mb-4">Application Status Message</h2>
-             <p
+ <p
   className={`text-lg font-semibold ${
-    statusMessage.toLowerCase().includes('approved')
+    (statusMessage || '').toLowerCase().includes('approved')
       ? 'text-green-600'
-      : statusMessage.toLowerCase().includes('rejected')
+      : (statusMessage || '').toLowerCase().includes('rejected')
       ? 'text-red-600'
       : 'text-gray-800'
   }`}
 >
   {statusMessage ? statusMessage : 'No status message available.'}
 </p>
+
 
             </div>
           )}

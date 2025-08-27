@@ -210,7 +210,7 @@ const StudentDashboard = () => {
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       {/* Top Bar */}
-      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
+      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
         
 
@@ -253,11 +253,11 @@ const StudentDashboard = () => {
 {/* Sidebar */}
 <div
   className={`
-    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-15
+    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
     transition-all duration-100 ease-in-out
     overflow-visible
     ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-    ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[50px] md:p-2'}
+    ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
   `}
 >
   
@@ -276,12 +276,12 @@ const StudentDashboard = () => {
 
 
   {/* Navigation */}
-<ul className="flex flex-col h-full mt-6 space-y-14">
+<ul className="flex flex-col h-full mt-6 space-y-10">
   {[
     {
       icon: faHouse,
       label: 'Dashboard',
-      to: '/student'
+      to: '/studentdashboard'
     },
     {
       icon: faFileAlt,
@@ -385,7 +385,7 @@ const StudentDashboard = () => {
       )}
 
       {!sidebarActive && (
-        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
           {item.label}
         </span>
       )}
@@ -464,7 +464,7 @@ const StudentDashboard = () => {
                     <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl md:text-2xl mr-2" />
                     <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem] text-[#14213d]">Personal Information</h2>
                     <button
-                      className="bg-blue-500 text-white px-3  md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
+                      className="bg-blue-500 text-white px-3 cursor-pointer md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
                       onClick={handleEditClick}
                     >
                       <FontAwesomeIcon icon={faEdit} className="text-[1rem] md:text-[1.2rem]" /> Update Profile
@@ -518,6 +518,7 @@ const StudentDashboard = () => {
                 </div>
               </>
             ) : (
+               // Empty state when no student details are available
               <div
                 className={`
                    p-6 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]
@@ -526,10 +527,10 @@ const StudentDashboard = () => {
                   md:w-[500px]
                   mx-auto
                   mt-30
-                  md:mt-60
+                  md:mt-40
                   ${sidebarActive
-                    ? 'ml-[3px] md:ml-[480px]'
-                    : 'ml-[3px] md:ml-[600px]'
+                    ? 'ml-[3px] md:ml-[450px]'
+                    : 'ml-[3px] md:ml-[500px]'
                   }
                 `}
               >

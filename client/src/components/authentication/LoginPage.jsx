@@ -138,7 +138,7 @@ icon: <FontAwesomeIcon icon={faTriangleExclamation} style={{ color: '#fca311' }}
                 type="checkbox"
                 id="rememberMe"
                 name="rememberMe"
-                className="h-4 w-4 md:h-4.5 md:w-4.5 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
+                className="h-4 w-4 md:h-4.5 md:w-4.5 text-gray-600 cursor-pointer border-gray-300 rounded focus:ring-gray-500"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />

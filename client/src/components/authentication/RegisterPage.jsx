@@ -24,7 +24,7 @@ const RegisterPage = () => {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
-    role: 'Student',
+    role: 'Committee',
   });
   const [errors, setErrors] = useState({});
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
@@ -192,7 +192,7 @@ const RegisterPage = () => {
             <input
               type="checkbox"
               id="terms"
-              className="h-4 w-4 text-gray-600 border-gray-300 rounded"
+              className="h-4 w-4 text-gray-600 cursor-pointer border-gray-300 rounded"
               checked={isTermsAccepted}
               onChange={(e) => setIsTermsAccepted(e.target.checked)}
             />
