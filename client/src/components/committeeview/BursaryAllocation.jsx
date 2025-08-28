@@ -251,7 +251,7 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
                   leading-[35px] h-[35px] block
                   ${sidebarActive ? 'hidden' : 'block'}
                 `}>
-                  Analysis
+                  
                 </span>
               </div>
             </li>
