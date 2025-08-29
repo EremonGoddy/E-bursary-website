@@ -108,19 +108,18 @@ const CommitteeDashboard = () => {
     }
   };
 
-  // Sidebar navigation items
   const navItems = [
-  { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
-  { icon: faUser, label: 'Profile', to: '/committeeprofile' },
-  { icon: faUsers, label: 'Student Info', to: '/userdetails' },
-  { icon: faBell, label: 'Analysis', to: '/committeereport' },
-  { icon: faChartBar, label: 'Notification', to: '/committeereport' },
-  { icon: faCog, label: 'Settings', to: '/committeesetting' },
-  { icon: faSignOutAlt, label: 'Logout', isLogout: true }
+    { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
+    { icon: faUser, label: 'Profile', to: '/committeeprofile' },
+    { icon: faUsers, label: 'Student Info', to: '/userdetails' },
+    { icon: faBell, label: 'Analysis', to: '/committeereport' },
+    { icon: faChartBar, label: 'Notification', to: '/committeereport' },
+    { icon: faCog, label: 'Settings', to: '/committeesetting' },
+    { icon: faSignOutAlt, label: 'Logout', isLogout: true }
   ];
 
   return (
-    <div className="w-full min-h-screen relative">
+    <div className="w-full min-h-screen relative bg-gray-50">
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
@@ -142,7 +141,6 @@ const CommitteeDashboard = () => {
                 className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
               />
             </div>
-            {/* Sidebar toggle only visible on small screens */}
             <div className="block md:hidden">
               <FontAwesomeIcon
                 icon={faBars}
@@ -154,7 +152,7 @@ const CommitteeDashboard = () => {
         </div>
       </div>
 
-      <div className="flex pt-20 min-h-screen">
+      <div className="flex flex-col md:flex-row pt-20 min-h-screen">
         {/* Sidebar */}
         <div
           className={`
@@ -165,7 +163,6 @@ const CommitteeDashboard = () => {
             ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
           `}
         >
-          {/* Toggle Button for Desktop View */}
           <div className="hidden md:flex justify-end mb-4">
             <FontAwesomeIcon
               icon={faBars}
@@ -173,8 +170,6 @@ const CommitteeDashboard = () => {
               onClick={toggleSidebar}
             />
           </div>
-
-          {/* Navigation */}
           <ul className="flex flex-col h-full mt-6 space-y-10">
             {navItems.map((item, index) => (
               <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
@@ -235,86 +230,84 @@ const CommitteeDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-          ${sidebarActive ? 'ml-[0px] md:ml-[190px]' : 'ml-[5px] md:ml-[30px]'}
+        <div className={`flex-1 w-full md:ml-64 p-4 md:p-10 -mt-6 md:-mt-10 transition-all duration-100
+          ${sidebarActive ? 'ml-[0px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
         `}>
-          {/* Bursary Fund Details & Statistics */}
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  {/* Bursary Fund Details */}
-  <div className="w-full mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-    transition-all duration-300 transform hover:scale-[1.01] p-3">
-    <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
-    <div className="flex flex-col md:flex-row justify-around gap-4">
-      <div className="text-center bg-blue-50 border border-blue-200 text-blue-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-        <p>Total Funds Available:</p>
-        <strong className="text-blue-700 text-3xl">{bursaryAmount}</strong>
-      </div>
-      <div className="text-center bg-green-50 border border-green-200 text-green-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-        <p>Amount Allocated to Students:</p>
-        <strong className="text-green-700 text-3xl">{allocatedAmount}</strong>
-      </div>
-      <div className="text-center bg-yellow-50 border border-yellow-200 text-yellow-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-        <p>Remaining Funds:</p>
-        <strong className="text-yellow-400 text-3xl">{remainingAmount}</strong>
-      </div>
-    </div>
+          {/* Grid: stack on mobile */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* Bursary Fund Details */}
+            <div className="w-full mb-1 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+              transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+              <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Bursary Fund Details</h2>
+              <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-4">
+              <div className="flex-1 text-center bg-white border-2 border-blue-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-blue-800 font-semibold mb-1">Total Funds Available</p>
+    <strong className="text-blue-600 text-2xl">{bursaryAmount}</strong>
   </div>
-
-  {/* Quick Statistics */}
-  {/* Quick Statistics */}
-<div className="w-full mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-  transition-all duration-300 transform hover:scale-[1.01] p-3">
-  <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Quick Statistics</h2>
-  
-  <div className="flex flex-col md:flex-row justify-around gap-2">
-    <div className="text-center bg-yellow-50 border border-yellow-200 text-yellow-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-      <p>Pending</p>
-      <strong className="text-yellow-500 text-2xl md:text-3xl">{pendingApplications}</strong>
-    </div>
-    <div className="text-center bg-gray-50 border border-gray-200 text-gray-600 shadow-md rounded-2xl p-3 font-semibold w-full">
-      <p>Incomplete</p>
-      <strong className="text-gray-500 text-2xl md:text-3xl">{incompleteApplications}</strong>
-    </div>
-    <div className="text-center bg-indigo-50 border border-indigo-200 text-blue-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-      <p>Total Student</p>
-      <strong className="text-blue-500 text-2xl md:text-3xl">{totalApplications}</strong>
-    </div>
-    <div className="text-center bg-green-50 border border-green-200 text-green-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-      <p>Approved</p>
-      <strong className="text-green-500 text-2xl md:text-3xl">{approvedApplications}</strong>
-    </div>
-    <div className="text-center bg-red-50 border border-red-200 text-red-700 shadow-md rounded-2xl p-3 font-semibold w-full">
-      <p>Rejected</p>
-      <strong className="text-red-500 text-2xl md:text-3xl">{rejectedApplications}</strong>
-    </div>
+                <div className="flex-1 text-center bg-white border-2 border-green-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-green-800 font-semibold mb-1">Allocated to Students</p>
+    <strong className="text-green-600 text-2xl">{allocatedAmount}</strong>
   </div>
-</div>
-</div>
+                <div className="flex-1 text-center bg-white border-2 border-yellow-400 rounded-xl p-2 md:p-4  shadow-sm">
+    <p className="text-yellow-800 font-semibold mb-1">Remaining Funds</p>
+    <strong className="text-yellow-600 text-2xl">{remainingAmount}</strong>
+  </div>
+              </div>
+            </div>
 
-          {/* Personal Information Table */}
-          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] w-full max-w-[370px] sm:max-w-[500px] md:max-w-none mx-auto p-2 sm:p-4 md:p-2 ">
-            <h2 className="text-center text-lg md:text-2xl font-bold mb-3 md:mb-4">Personal Information</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-[400px] md:min-w-full w-full border-collapse border border-gray-300 text-sm md:text-base">
+            {/* Quick Statistics */}
+            <div className="w-full mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+              transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+              <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Quick Statistics</h2>
+              <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-2">
+                <div className="flex-1 text-center bg-white border-2 border-yellow-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-yellow-700 font-semibold mb-1">Pending</p>
+    <strong className="text-yellow-600 text-2xl">{pendingApplications}</strong>
+  </div>
+                 <div className="flex-1 text-center bg-white border-2 border-gray-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-gray-700 font-semibold mb-1">Incomplete</p>
+    <strong className="text-gray-600 text-2xl">{incompleteApplications}</strong>
+  </div>
+       <div className="flex-1 text-center bg-white border-2 border-indigo-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-indigo-700 font-semibold mb-1">Total Student</p>
+    <strong className="text-indigo-600 text-2xl">{totalApplications}</strong>
+  </div>
+      <div className="flex-1 text-center bg-white border-2 border-green-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-green-700 font-semibold mb-1">Approved</p>
+    <strong className="text-green-600 text-2xl">{approvedApplications}</strong>
+  </div>
+    <div className="flex-1 text-center bg-white border-2 border-red-400 rounded-xl p-2 md:p-4 shadow-sm">
+    <p className="text-red-700 font-semibold mb-1">Rejected</p>
+    <strong className="text-red-600 text-2xl">{rejectedApplications}</strong>
+  </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Table: fully scrollable on mobile, cells shrink */}
+          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] w-full mx-auto p-2 md:p-4">
+            <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Personal Information</h2>
+            <div className="overflow-x-auto w-full">
+              <table className="min-w-[600px] w-full border-collapse border border-gray-300 text-xs md:text-base">
                 <thead className="bg-gray-200">
                   <tr>
-                    <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Full Name</th>
-                    <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Email</th>
-                    <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Institution</th>
-                    <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Admission</th>
-                    <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Sub County</th>
-                    <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2">Action</th>
+                    <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Full Name</th>
+                    <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Email</th>
+                    <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Institution</th>
+                    <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Admission</th>
+                    <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Sub County</th>
+                    <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-100">
-                      <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.fullname}</td>
-                      <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.email}</td>
-                      <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.institution}</td>
-                      <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.admission}</td>
-                      <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1">{item.subcounty}</td>
-                      <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 text-center">
+                      <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.fullname}</td>
+                      <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.email}</td>
+                      <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.institution}</td>
+                      <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.admission}</td>
+                      <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.subcounty}</td>
+                      <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 text-center whitespace-nowrap">
                         {(item.approved_by_committee && item.approved_by_committee !== userName) ? (
                           <span className="text-gray-500 text-[0.85rem] italic">
                             Approved by {item.approved_by_committee}
@@ -333,6 +326,8 @@ const CommitteeDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {/* Table responsive hint for mobile */}
+              <div className="md:hidden text-center text-xs text-gray-500 mt-2">Swipe left/right to see all columns</div>
             </div>
           </div>
         </div>
