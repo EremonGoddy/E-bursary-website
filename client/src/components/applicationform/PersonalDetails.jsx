@@ -28,7 +28,7 @@ const PersonalDetails = () => {
   });
 
    const subCounties = {
-    "Turkana Central": ["Kanamkemer", "Kerio Delta", "Kalokol", "Lodwar Township"],
+    "Turkana Central": ["Kanamkemer", "Kerio Delta", "Kalokol", "Township"],
     "Turkana East": ["Lokori/Kochodin", "Katilia", "Kapedo/Napeitom"],
     "Turkana South": ["Kaputir", "Katilu", "Lobokat", "Lokichar"],
     "Loima": ["Lokiriama/Lorengippi", "Lomelo", "Loima", "Turkwel"],
@@ -44,10 +44,10 @@ const PersonalDetails = () => {
     Lapur: ["Lowareng'ak", "Todonyang", "Nachukui"],
     "Lake Zone": ["Namadak", "Lorengippi", "Kalokol East"],
     // Example villages for others
-    Kanamkemer: ["Kanamkemer A", "Kanamkemer B"],
+    Kanamkemer: ["Nawoitorong", "Canaan"],
     "Kerio Delta": ["Kerio East", "Kerio West"],
     Kalokol: ["Kalokol North", "Kalokol South"],
-    "Lodwar Township": ["Town East", "Town West"],
+    Township: ["Nakwamekwi", "Town"],
     // Add the rest as needed...
   };
 
