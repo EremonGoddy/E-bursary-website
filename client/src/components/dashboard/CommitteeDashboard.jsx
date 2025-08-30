@@ -119,7 +119,7 @@ const navItems = [
 ];
 
 return (
-<div className="w-full min-h-screen relative bg-gray-50">
+<div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
 {/* Top Bar */}
 <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
 <div className="flex justify-between items-center">
@@ -236,20 +236,20 @@ ${sidebarActive ? 'ml-[0px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 {/* Grid: stack on mobile */}
 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 {/* Bursary Fund Details */}
-<div className="w-full mb-1 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+<div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
 transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Bursary Fund Details</h2>
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-4">
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-blue-700 font-semibold mb-1">Total Funds Available</p>
+<p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Funds Available</p>
 <strong className="text-blue-700 text-2xl">{bursaryAmount}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-green-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-green-700 font-semibold mb-1">Allocated to Students</p>
+<p className="text-green-700 font-semibold mb-0 md:mb-1">Allocated to Students</p>
 <strong className="text-green-700 text-2xl">{allocatedAmount}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-400 rounded-xl p-0 md:p-3  shadow-sm">
-<p className="text-yellow-700 font-semibold mb-1">Remaining Funds</p>
+<p className="text-yellow-700 font-semibold mb-0 md:mb-1">Remaining Funds</p>
 <strong className="text-yellow-700 text-2xl">{remainingAmount}</strong>
 </div>
 </div>
@@ -261,23 +261,23 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Quick Statistics</h2>
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-2">
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-yellow-700 font-semibold mb-1">Pending</p>
+<p className="text-yellow-700 font-semibold mb-0 md:mb-1">Pending</p>
 <strong className="text-yellow-700 text-2xl">{pendingApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-gray-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-gray-700 font-semibold mb-1">Incomplete</p>
+<p className="text-gray-700 font-semibold mb-0 md:mb-1">Incomplete</p>
 <strong className="text-gray-600 text-2xl">{incompleteApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-blue-700 font-semibold mb-1">Total Student</p>
+<p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Student</p>
 <strong className="text-blue-700 text-2xl">{totalApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-green-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-green-700 font-semibold mb-1">Approved</p>
+<p className="text-green-700 font-semibold mb-0 md:mb-1">Approved</p>
 <strong className="text-green-700 text-2xl">{approvedApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-4  border-red-400 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-red-700 font-semibold mb-1">Rejected</p>
+<p className="text-red-700 font-semibold mb-0 md:mb-1">Rejected</p>
 <strong className="text-red-700 text-2xl">{rejectedApplications}</strong>
 </div>
 </div>
