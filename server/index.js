@@ -1447,27 +1447,30 @@ app.get('/api/profile-committee', (req, res) => {
 });
 
 // POST profile-form
-app.post('/api/profile-form', (req, res) => {
+// POST profile-form with gender + digital_signature
+app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token is required');
 
   jwt.verify(token, secret, (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
 
-    const { fullname, phone_no, national_id, subcounty, ward, position } = req.body;
-    if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position) {
+    const { fullname, phone_no, national_id, subcounty, ward, position, gender } = req.body;
+    if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position || !gender) {
       return res.status(400).send('All profile fields are required');
     }
 
     const email = decoded.email;
+    const digital_signature = req.file ? req.file.filename : null; // save filename
 
     console.log('Insert data:', {
-      fullname, email, phone_no, national_id, subcounty, ward, position
+      fullname, email, phone_no, national_id, subcounty, ward, position, gender, digital_signature
     });
 
     const sqlInsert = `
-      INSERT INTO bursary.profile_committee (fullname, email, phone_no, national_id, subcounty, ward, position) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO bursary.profile_committee 
+      (fullname, email, phone_no, national_id, subcounty, ward, position, gender, digital_signature) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
 
     pool.query(sqlInsert, [
@@ -1477,12 +1480,13 @@ app.post('/api/profile-form', (req, res) => {
       national_id,
       subcounty,
       ward,
-      position
+      position,
+      gender,
+      digital_signature
     ], (err, result) => {
       if (err) {
         console.error('Error inserting committee data:', err);
         if (err.code === '23505') {
-          // Unique violation
           return res.status(409).send('Profile already exists with this email or national ID');
         }
         return res.status(500).send('Error submitting data');
@@ -1497,12 +1501,15 @@ app.post('/api/profile-form', (req, res) => {
           national_id,
           subcounty,
           ward,
-          position
+          position,
+          gender,
+          digital_signature
         }
       });
     });
   });
 });
+
 // GET committee report with generated REFNO
 app.get('/api/comreport', (req, res) => {
   const token = req.headers['authorization'];

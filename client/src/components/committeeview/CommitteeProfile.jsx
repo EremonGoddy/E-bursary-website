@@ -25,6 +25,7 @@ const CommitteeProfile = () => {
     email: '',
     phone_no: '',
     national_id: '',
+    gender: '',
     subcounty: '',
     ward: '',
     position: '',
@@ -34,6 +35,11 @@ const CommitteeProfile = () => {
 
   const navigate = useNavigate();
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
+
+  // Dropdown options
+  const subcounties = ["Turkana Central", "Turkana South", "Turkana North", "Loima"];
+  const wards = ["Kanamkemer", "Kerio Delta", "Kapua", "Letea"];
+  const positions = ["Chairperson", "Secretary", "Treasurer", "Member"];
 
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
@@ -149,127 +155,262 @@ const CommitteeProfile = () => {
 
       <div className="flex flex-col md:flex-row pt-20 min-h-screen">
         {/* Sidebar */}
-        <div
-          className={`
-            fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
-            transition-all duration-100 ease-in-out
-            overflow-visible
-            ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-            ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
-          `}
-        >
-          <div className="hidden md:flex justify-end mb-4">
-            <FontAwesomeIcon
-              icon={faBars}
-              className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
-              onClick={toggleSidebar}
-            />
-          </div>
-          <ul className="flex flex-col h-full mt-6 space-y-10">
-            {navItems.map((item, index) => (
-              <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
-                {item.isLogout ? (
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const token = sessionStorage.getItem('authToken');
-                      axios
-                        .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-                          headers: { Authorization: `Bearer ${token}` }
-                        })
-                        .catch(() => {})
-                        .finally(() => {
-                          sessionStorage.clear();
-                          navigate('/');
-                        });
-                    }}
-                    className={`flex items-center space-x-2 transition-all duration-200 ${
-                      sidebarActive ? 'justify-start' : 'justify-center'
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-                    <span
-                      className={`${
-                        sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                  </a>
-                ) : (
-                  <Link
-                    to={item.to}
-                    className={`flex items-center space-x-2 transition-all duration-200 ${
-                      sidebarActive ? 'justify-start' : 'justify-center'
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-                    <span
-                      className={`${
-                        sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                  </Link>
-                )}
-                {!sidebarActive && (
-                  <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
-                    {item.label}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-
+        {/* ... (unchanged sidebar code) ... */}
+<div
+className={`
+fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
+transition-all duration-100 ease-in-out
+overflow-visible
+${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
+${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
+`}
+>
+<div className="hidden md:flex justify-end mb-4">
+<FontAwesomeIcon
+icon={faBars}
+className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+onClick={toggleSidebar}
+/>
+</div>
+<ul className="flex flex-col h-full mt-6 space-y-10">
+{navItems.map((item, index) => (
+<li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
+{item.isLogout ? (
+<a
+href="#"
+onClick={(e) => {
+e.preventDefault();
+const token = sessionStorage.getItem('authToken');
+axios
+.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+headers: { Authorization: `Bearer ${token}` }
+})
+.catch(() => {})
+.finally(() => {
+sessionStorage.clear();
+navigate('/');
+});
+}}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</a>
+) : (
+<Link
+to={item.to}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</Link>
+)}
+{!sidebarActive && (
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+{item.label}
+</span>
+)}
+</li>
+))}
+</ul>
+</div>
         {/* Main Content */}
         <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-10 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[40px] md:ml-[30px]'}`}>
           <div className="w-[98%] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto pt-1 pr-6 pl-6 pb-4">
             {isProfileFetched ? (
               profileExists ? (
                 <div>
-                    <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl mt-4 md:text-2xl mr-2" />
-                  <h2 className="text-xl font-bold ml-7 -mt-7  text-[1.2rem] md:text-[1.3rem] text-[#14213d]">Committee Profile</h2>
-                   <button
+                  {/* Profile display */}
+                  <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl mt-4 md:text-2xl mr-2" />
+                  <h2 className="text-xl font-bold ml-7 -mt-7 text-[#14213d]">Committee Profile</h2>
+                  <button
                     onClick={() => setEditFormVisible(true)}
-                    className="bg-blue-500 text-white px-3 cursor-pointer md:px-1 md:py-1 text-[1rem] md:text-[1.1rem] font-bold -mt-7 rounded hover:bg-blue-600 ml-auto flex items-center"
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 ml-auto flex items-center"
                   >
-                    <FontAwesomeIcon icon={faEdit} className="text-[1rem] md:text-[1.1rem]" /> Edit Profile
+                    <FontAwesomeIcon icon={faEdit} className="mr-1" /> Edit Profile
                   </button>
-                   <hr className="my-4" />
-                  <div className="space-y-5 text-[1rem] md:text-[1.1rem] text-[#14213d]">
+                  <hr className="my-4" />
+                  <div className="space-y-5 text-[#14213d]">
                     {Object.entries(formData).map(([key, value]) => (
                       <div className="flex gap-10" key={key}>
-                        <span className="  font-semibold w-30 capitalize">{key.replace('_', ' ')}:</span>
+                        <span className="font-semibold capitalize">{key.replace('_', ' ')}:</span>
                         <span>{value}</span>
                       </div>
                     ))}
                   </div>
-                
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <h2 className="text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-1">Create Profile</h2>
-                  {['fullname','email','phone_no','national_id','subcounty','ward','position'].map((field) => (
-                    <div className="mb-2" key={field}>
-                      <label className="block text-[#14213d] font-semibold mb-1 capitalize">{field.replace('_', ' ')}</label>
-                      <div className="flex items-center border border-gray-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-[#14213d]">
+                  <h2 className="text-[#14213d] text-2xl font-bold text-center mb-5">Create Profile</h2>
+
+                  {/* Fullname */}
+                  <div className="flex items-center gap-3 mb-5">
+  <label className="text-[#14213d] font-semibold w-[110px]">
+    Fullname:
+  </label>
+  <input
+    type="text"
+    name="fullname"
+    value={formData.fullname}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
+    required
+  />
+</div>
+
+                  {/* Email */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Email:</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    />
+                  </div>
+
+                  {/* Phone */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Phone No:</label>
+                    <input
+                      type="text"
+                      name="phone_no"
+                      value={formData.phone_no}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
+                      required
+                    />
+                  </div>
+
+                  {/* National ID */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">National ID:</label>
+                    <input
+                      type="text"
+                      name="national_id"
+                      value={formData.national_id}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    />
+                  </div>
+
+                  {/* Gender */}
+                  <div className="flex items-center mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Gender:</label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2">
                         <input
-                          type={field === 'email' ? 'email' : 'text'}
-                          name={field}
-                          value={formData[field]}
+                          type="radio"
+                          name="gender"
+                          value="Male"
+                          checked={formData.gender === 'Male'}
                           onChange={handleChange}
-                          placeholder={`Enter ${field.replace('_',' ')}`}
-                          className="w-full py-2 focus:outline-none"
+                          className="accent-[#14213d]"
                         />
-                      </div>
+                        Male
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Female"
+                          checked={formData.gender === 'Female'}
+                          onChange={handleChange}
+                          className="accent-[#14213d] "
+                        />
+                        Female
+                      </label>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Subcounty */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Subcounty:</label>
+                    <select
+                      name="subcounty"
+                      value={formData.subcounty}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    >
+                      <option value="">Select Subcounty:</option>
+                      {subcounties.map((s, i) => (
+                        <option key={i} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Ward */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Ward:</label>
+                    <select
+                      name="ward"
+                      value={formData.ward}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
+                      required
+                    >
+                      <option value="">Select Ward</option>
+                      {wards.map((w, i) => (
+                        <option key={i} value={w}>{w}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Position */}
+              {/* Position */}
+<div className="flex items-center gap-3 mb-5">
+  <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
+  <select
+    name="position"
+    value={formData.position}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+    required
+  >
+    <option value="">Select Position</option>
+    {positions.map((p, i) => (
+      <option key={i} value={p}>{p}</option>
+    ))}
+  </select>
+</div>
+
+{/* Upload digital signature if Chairman */}
+{formData.position === "Chairperson" && (
+<div className="flex items-center gap-3 mb-5">
+<label className="text-[#14213d] font-semibold w-[110px]">Signature:</label>
+<input
+type="file"
+name="digital_signature"
+      accept=".png,.jpg,.jpeg,.pdf"
+      onChange={(e) => setFormData({ ...formData, digital_signature: e.target.files[0] })}
+      className="flex-1 border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+    />
+  </div>
+)}
+
                   <button
                     type="submit"
-                    className="text-white w-full py-2 cursor-pointer rounded-lg bg-[#14213d] hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#fca311]"
+                    className="text-white w-full py-2 cursor-pointer rounded-lg bg-[#14213d] hover:bg-gray-700"
                   >
                     Create Profile
                   </button>
@@ -282,50 +423,153 @@ const CommitteeProfile = () => {
         </div>
       </div>
 
-      {/* 🔹 Overlay Edit Form with CSS animation */}
+      {/* Overlay Edit Form */}
       {isEditFormVisible && (
-        <div className={`shadow-overlay ${isEditFormVisible ? 'fade-in' : 'fade-out'} flex justify-center items-center`}>
-<div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[330px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
-  <button
-    onClick={() => setEditFormVisible(false)}
-    className="absolute top-1 right-1 md:right-2 w-8 h-8 flex items-center justify-center 
-             text-[#14213d] font-bold hover:text-[#14213d] hover:bg-gray-200 
-             rounded-full text-xl md:text-[1.7rem] cursor-pointer 
-             transition duration-200 ease-in-out active:scale-90"
-  >
-    ✕
-  </button>
-  <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
-  <form onSubmit={handleSubmit} className="space-y-3">
-    {['fullname','email','phone_no','national_id','subcounty','ward','position'].map((field) => (
-      <div key={field} className="flex items-center gap-3">
-        <label 
-          htmlFor={field} 
-          className="block font-medium text-[1rem] md:text-[1.05rem] w-[110px] text-[#14213d]"
-        >
-          {field.replace('_',' ')}:
-        </label>
-        <input
-          id={field}
-          type={field === 'email' ? 'email' : 'text'}
-          name={field}
-          value={formData[field]}
-          onChange={handleChange}
-          placeholder={field.replace('_',' ')}
-          className="flex-1 max-w-[320px] text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
-          required
-        />
-      </div>
-    ))}
-    <button
-      type="submit"
-      className="px-3 py-1 md:px-4 md:py-2 bg-[#14213d] text-white font-medium rounded-md hover:bg-gray-800 transition"
-    >
-      Update Profile
-    </button>
-  </form>
-</div>
+        <div className="shadow-overlay fade-in flex justify-center items-center">
+          <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[500px] relative">
+            <button
+              onClick={() => setEditFormVisible(false)}
+              className="absolute top-1 right-1 w-8 h-8 flex items-center justify-center 
+                         text-[#14213d] font-bold hover:bg-gray-200 
+                         rounded-full text-xl cursor-pointer transition active:scale-90"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {/* Fullname */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Fullname:</label>
+                <input
+                  type="text"
+                  name="fullname"
+                  value={formData.fullname}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                />
+              </div>
 
+              {/* Email */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Email:</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Phone:</label>
+                <input
+                  type="text"
+                  name="phone_no"
+                  value={formData.phone_no}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                />
+              </div>
+
+              {/* National ID */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">National ID:</label>
+                <input
+                  type="text"
+                  name="national_id"
+                  value={formData.national_id}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                />
+              </div>
+
+              {/* Gender */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Gender:</label>
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Male"
+                      checked={formData.gender === 'Male'}
+                      onChange={handleChange}
+                      className="accent-[#14213d]"
+                    />
+                    Male
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Female"
+                      checked={formData.gender === 'Female'}
+                      onChange={handleChange}
+                      className="accent-[#14213d]"
+                    />
+                    Female
+                  </label>
+                </div>
+              </div>
+
+              {/* Subcounty */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Subcounty:</label>
+                <select
+                  name="subcounty"
+                  value={formData.subcounty}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                >
+                  <option value="">Select Subcounty</option>
+                  {subcounties.map((s, i) => (
+                    <option key={i} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Ward */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Ward:</label>
+                <select
+                  name="ward"
+                  value={formData.ward}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                >
+                  <option value="">Select Ward</option>
+                  {wards.map((w, i) => (
+                    <option key={i} value={w}>{w}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Position */}
+              <div className="flex items-center gap-3">
+                <label className="w-[110px] font-medium">Position:</label>
+                <select
+                  name="position"
+                  value={formData.position}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-3 py-2"
+                >
+                  <option value="">Select Position</option>
+                  {positions.map((p, i) => (
+                    <option key={i} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="px-4 py-2 bg-[#14213d] text-white rounded hover:bg-gray-800"
+              >
+                Update Profile
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
