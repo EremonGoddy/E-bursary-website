@@ -13,11 +13,13 @@ import {
   faSignOutAlt,
   faEdit,
 } from '@fortawesome/free-solid-svg-icons';
+import "./Overlay.css";
 
 const CommitteeProfile = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [committeeDetails, setCommitteeDetails] = useState({});
   const [userName, setUserName] = useState('');
+  const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
@@ -29,7 +31,6 @@ const CommitteeProfile = () => {
   });
   const [isProfileFetched, setIsProfileFetched] = useState(false);
   const [profileExists, setProfileExists] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   const navigate = useNavigate();
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
@@ -76,7 +77,7 @@ const CommitteeProfile = () => {
       .then(() => {
         alert('Profile created/updated successfully');
         setProfileExists(true);
-        setEditing(false);
+        setEditFormVisible(false);
       })
       .catch((error) => {
         console.error('Error submitting committee data:', error);
@@ -223,120 +224,54 @@ const CommitteeProfile = () => {
           </ul>
         </div>
 
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-8 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[40px] md:ml-[30px]'}`}>
-          <div className="w-[98%] max-w-[500px] mx-auto bg-white p-6 shadow rounded-md">
+        {/* Main Content */}
+        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-10 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[40px] md:ml-[30px]'}`}>
+          <div className="w-[98%] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto pt-1 pr-6 pl-6 pb-4">
             {isProfileFetched ? (
-              profileExists && !editing ? (
+              profileExists ? (
                 <div>
-                  <h2 className="md:text-2xl text-[1.2rem] font-bold mb-2 text-center">Committee Profile</h2>
-                  <div className="space-y-4">
+                    <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl mt-4 md:text-2xl mr-2" />
+                  <h2 className="text-xl font-bold ml-7 -mt-7  text-[1.2rem] md:text-[1.3rem] text-[#14213d]">Committee Profile</h2>
+                   <button
+                    onClick={() => setEditFormVisible(true)}
+                    className="bg-blue-500 text-white px-3 cursor-pointer md:px-1 md:py-1 text-[1rem] md:text-[1.1rem] font-bold -mt-7 rounded hover:bg-blue-600 ml-auto flex items-center"
+                  >
+                    <FontAwesomeIcon icon={faEdit} className="text-[1rem] md:text-[1.1rem]" /> Edit Profile
+                  </button>
+                   <hr className="my-4" />
+                  <div className="space-y-5 text-[1rem] md:text-[1.1rem] text-[#14213d]">
                     {Object.entries(formData).map(([key, value]) => (
-                      <div className="flex" key={key}>
-                        <span className="font-semibold w-30 capitalize">{key.replace('_', ' ')}:</span>
+                      <div className="flex gap-10" key={key}>
+                        <span className="  font-semibold w-30 capitalize">{key.replace('_', ' ')}:</span>
                         <span>{value}</span>
                       </div>
                     ))}
                   </div>
-                  <button onClick={() => setEditing(true)} className="mt-4 w-full bg-blue-500 text-white rounded py-2 hover:bg-blue-700 font-semibold">
-                    <FontAwesomeIcon icon={faEdit} className="mr-2" /> Edit Profile
-                  </button>
+                
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <h2 className="text-[1.2rem] md:text-2xl font-bold mb-2 text-center">{profileExists ? 'Edit Profile' : 'Create Profile'}</h2>
-                  <div>
-                    <label htmlFor="fullname" className="block text-[#14213d] font-medium mb-0">Full Name</label>
-                    <input
-                      type="text"
-                      id="fullname"
-                      name="fullname"
-                      value={formData.fullname}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter Full Name"
-                      required
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <label htmlFor="email" className="block text-[#14213d] font-medium mb-1">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter Email"
-                      required
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <label htmlFor="phone_no" className="block text-[#14213d] font-medium mb-1">Phone Number</label>
-                    <input
-                      type="text"
-                      id="phone_no"
-                      name="phone_no"
-                      value={formData.phone_no}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter Phone Number"
-                      required
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <label htmlFor="national_id" className="block text-[#14213d] font-medium mb-1">National ID</label>
-                    <input
-                      type="text"
-                      id="national_id"
-                      name="national_id"
-                      value={formData.national_id}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter National ID"
-                      required
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <label htmlFor="subcounty" className="block text-[#14213d] font-medium mb-1">Subcounty</label>
-                    <input
-                      type="text"
-                      id="subcounty"
-                      name="subcounty"
-                      value={formData.subcounty}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter Subcounty"
-                      required
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <label htmlFor="ward" className="block text-[#14213d] font-medium mb-1">Ward</label>
-                    <input
-                      type="text"
-                      id="ward"
-                      name="ward"
-                      value={formData.ward}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter Ward"
-                      required
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <label htmlFor="position" className="block text-[#14213d] font-medium mb-1">Position</label>
-                    <input
-                      type="text"
-                      id="position"
-                      name="position"
-                      value={formData.position}
-                      onChange={handleChange}
-                      className="form-input w-full border text-[#14213d] border-gray-300 rounded px-3 py-2 focus:border-blue-500"
-                      placeholder="Enter Position"
-                      required
-                    />
-                  </div>
-                  <button type="submit" className="mt-5 w-full bg-[#14213d] cursor-pointer hover:bg-gray-600 text-white rounded py-2 hover:bg-blue-700 font-semibold">
-                    {profileExists ? 'Update Profile' : 'Submit'}
+                  <h2 className="text-[#14213d] text-2xl md:text-3xl font-bold text-center mb-1">Create Profile</h2>
+                  {['fullname','email','phone_no','national_id','subcounty','ward','position'].map((field) => (
+                    <div className="mb-2" key={field}>
+                      <label className="block text-[#14213d] font-semibold mb-1 capitalize">{field.replace('_', ' ')}</label>
+                      <div className="flex items-center border border-gray-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-[#14213d]">
+                        <input
+                          type={field === 'email' ? 'email' : 'text'}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleChange}
+                          placeholder={`Enter ${field.replace('_',' ')}`}
+                          className="w-full py-2 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="submit"
+                    className="text-white w-full py-2 cursor-pointer rounded-lg bg-[#14213d] hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#fca311]"
+                  >
+                    Create Profile
                   </button>
                 </form>
               )
@@ -346,6 +281,53 @@ const CommitteeProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* 🔹 Overlay Edit Form with CSS animation */}
+      {isEditFormVisible && (
+        <div className={`shadow-overlay ${isEditFormVisible ? 'fade-in' : 'fade-out'} flex justify-center items-center`}>
+<div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[330px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
+  <button
+    onClick={() => setEditFormVisible(false)}
+    className="absolute top-1 right-1 md:right-2 w-8 h-8 flex items-center justify-center 
+             text-[#14213d] font-bold hover:text-[#14213d] hover:bg-gray-200 
+             rounded-full text-xl md:text-[1.7rem] cursor-pointer 
+             transition duration-200 ease-in-out active:scale-90"
+  >
+    ✕
+  </button>
+  <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
+  <form onSubmit={handleSubmit} className="space-y-3">
+    {['fullname','email','phone_no','national_id','subcounty','ward','position'].map((field) => (
+      <div key={field} className="flex items-center gap-3">
+        <label 
+          htmlFor={field} 
+          className="block font-medium text-[1rem] md:text-[1.05rem] w-[110px] text-[#14213d]"
+        >
+          {field.replace('_',' ')}:
+        </label>
+        <input
+          id={field}
+          type={field === 'email' ? 'email' : 'text'}
+          name={field}
+          value={formData[field]}
+          onChange={handleChange}
+          placeholder={field.replace('_',' ')}
+          className="flex-1 max-w-[320px] text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          required
+        />
+      </div>
+    ))}
+    <button
+      type="submit"
+      className="px-3 py-1 md:px-4 md:py-2 bg-[#14213d] text-white font-medium rounded-md hover:bg-gray-800 transition"
+    >
+      Update Profile
+    </button>
+  </form>
+</div>
+
+        </div>
+      )}
     </div>
   );
 };

@@ -229,7 +229,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
-<div className="max-w-lg mx-auto bg-white p-8 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-10">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-lg mx-auto  p-8  mt-10">
 <h2 className="text-center text-2xl font-bold mb-6">Change Password</h2>
 <form onSubmit={handleChangePassword}>
 <div className="mb-5">

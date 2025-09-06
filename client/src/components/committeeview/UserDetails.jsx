@@ -182,7 +182,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </div>
         {/* Main Content */}
         <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[60px]'}`}>
-          <div className="bg-white w-full max-w-[300px] sm:max-w-[500px] md:max-w-none mx-auto p-2 sm:p-4 md:p-6 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded-md mt-3 md:mt-0">
+          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]  w-full max-w-[300px] sm:max-w-[500px] md:max-w-none mx-auto p-2 sm:p-4 md:p-6 mt-3 md:mt-0">
             <h2 className="text-center text-lg md:text-2xl font-bold mb-3 md:mb-4">Personal Information</h2>
             <div className="overflow-x-auto">
               <table className="min-w-[400px] md:min-w-full w-full border-collapse border border-gray-300 text-sm md:text-base">

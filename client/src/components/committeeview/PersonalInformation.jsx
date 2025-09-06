@@ -270,12 +270,12 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </div>
 
 {/* Main Content */}
-<div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
+<div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 -md:mt-10 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 `}>
 {/* Header Info */}
 {personalData.length > 0 && (
-<div className="mb-4 bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded text-center">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] mb-4  p-4 text-center">
 <h1 className="text-2xl font-bold">{personalData[0].fullname}</h1>
 <p className="font-semibold text-[1.2rem]">Admission Number: {personalData[0].admission}</p>
 <p className="font-semibold text-[1.2rem]">Institution: {personalData[0].institution}</p>
@@ -284,7 +284,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Personal Info */}
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-0 md:mb-4">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4  mb-0 md:mb-4">
 <h2 className="text-xl font-bold mb-2">Personal Information</h2>
 {personalData.map((item) => (
 <div key={item.user_id} className="mb-2">
@@ -301,7 +301,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 ))}
 </div>
 {/* Amount Info */}
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-4">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-4">
 <h2 className="text-xl font-bold mb-2">Amount Information</h2>
 {amountData.map((item) => (
 <div key={item.user_id} className="mb-2">
@@ -318,7 +318,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 </div>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Family Info */}
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-0 md:mb-4">
+<div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4  mb-0 md:mb-4">
 <h2 className="text-xl font-bold mb-2">Family Information</h2>
 {familyData.map((item) => (
 <div key={item.user_id} className="mb-2">
@@ -336,7 +336,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 ))}
 </div>
 {/* Disclosure Info */}
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-4">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-0 md:mb-4">
 <h2 className="text-xl font-bold mb-2">Disclosure Information</h2>
 {disclosureData.map((item) => (
 <div key={item.user_id} className="mb-2">
@@ -350,7 +350,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 ))}
 </div>
 </div>
-<div className="bg-white p-4 shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] rounded mb-4">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-0 md:mb-4">
 <h2 className="text-xl font-bold mb-2">Uploaded Documents</h2>
 {documentData.map((item) => (
 <div key={item.user_id} className="mb-2">
