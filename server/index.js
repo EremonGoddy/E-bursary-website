@@ -18,6 +18,7 @@ const multer = require("multer");
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.json());
 
 // ✅ JWT Secret from .env or fallback
@@ -1434,6 +1435,7 @@ app.get('/api/user-report/:id', (req, res) => {
 });
 
 // GET profile-committee
+// GET profile-committee
 app.get('/api/profile-committee', (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token is required');
@@ -1443,7 +1445,7 @@ app.get('/api/profile-committee', (req, res) => {
 
     const sqlGet = `
       SELECT fullname, email, phone_no, national_id, subcounty, 
-             ward, position, 
+             ward, position, digital_signature,
              CASE 
                WHEN fullname IS NULL OR phone_no IS NULL OR national_id IS NULL THEN 0
                ELSE 1
@@ -1462,10 +1464,19 @@ app.get('/api/profile-committee', (req, res) => {
         return res.status(404).send('Profile not found');
       }
 
-      res.json(result.rows[0]);
+      let profile = result.rows[0];
+
+      // If signature exists, return a URL instead of just filename
+      if (profile.digital_signature) {
+        profile.digital_signature_url = `https://e-bursary-backend.onrender.com/uploads/${profile.digital_signature}`;
+      }
+
+      res.json(profile);
     });
   });
 });
+
+
 
 // POST profile-form with gender + digital_signature
 app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => {

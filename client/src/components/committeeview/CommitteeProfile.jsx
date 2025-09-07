@@ -306,6 +306,17 @@ const CommitteeProfile = () => {
                           : '—'}
                       </span>
                     </div>
+
+          {committeeDetails.digital_signature_url && (
+          <div className="flex flex-col gap-2">
+            <span className="font-semibold">Digital Signature:</span>
+            <img
+              src={committeeDetails.digital_signature_url}
+              alt="Digital Signature"
+              className="w-40 h-20 object-contain border rounded"
+            />
+          </div>
+        )}
                   </div>
                 </div>
               ) : (

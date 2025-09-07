@@ -314,7 +314,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </div>
         {/* Main Content Area */}
         <div className={`flex-1 ml-8 md:ml-30 p-4 transition-all duration-300`}>
-          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]  max-w-[340px] md:max-w-[800px] shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] mx-auto -mt-4 md:mt-50 mb-4 md:mb-6 p-1 md:p-8">
+          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]  max-w-[340px] md:max-w-[800px] mx-auto -mt-4 md:mt-50 mb-4 md:mb-6 p-1 md:p-8">
             <h1 className="text-1xl md:text-2xl font-bold mb-2 text-center">Bursary Report</h1>
             {/* Responsive Report Info: vertical on mobile, table on md+ */}
             <div>
