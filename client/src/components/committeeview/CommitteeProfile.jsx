@@ -1,3 +1,4 @@
+// src/components/CommitteeProfile.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,6 +21,8 @@ const CommitteeProfile = () => {
   const [committeeDetails, setCommitteeDetails] = useState({});
   const [userName, setUserName] = useState('');
   const [isEditFormVisible, setEditFormVisible] = useState(false);
+
+  // ⬇️ include digital_signature in state
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
@@ -29,7 +32,9 @@ const CommitteeProfile = () => {
     subcounty: '',
     ward: '',
     position: '',
+    digital_signature: null, // <-- important
   });
+
   const [isProfileFetched, setIsProfileFetched] = useState(false);
   const [profileExists, setProfileExists] = useState(false);
 
@@ -48,7 +53,7 @@ const CommitteeProfile = () => {
     if (!token) {
       navigate('/signin');
     } else {
-      setUserName(name);
+      setUserName(name || '');
       axios
         .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
           headers: { Authorization: `Bearer ${token}` },
@@ -57,7 +62,12 @@ const CommitteeProfile = () => {
           setIsProfileFetched(true);
           const data = response.data;
           if (data) {
-            setFormData(data);
+            // Populate fields. Keep digital_signature null so we don't try to re-upload a string.
+            setFormData(prev => ({
+              ...prev,
+              ...data,
+              digital_signature: null,
+            }));
             setProfileExists(true);
           }
         })
@@ -73,12 +83,38 @@ const CommitteeProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ⬇️ capture the selected file
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+    setFormData({ ...formData, digital_signature: file });
+  };
+
+  // ⬇️ submit as multipart/form-data
   const handleSubmit = (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('authToken');
+
+    const data = new FormData();
+    data.append('fullname', formData.fullname);
+    data.append('email', formData.email);
+    data.append('phone_no', formData.phone_no);
+    data.append('national_id', formData.national_id);
+    data.append('gender', formData.gender);
+    data.append('subcounty', formData.subcounty);
+    data.append('ward', formData.ward);
+    data.append('position', formData.position);
+
+    // Only append the file if it's actually a File (avoid sending a string from fetched data)
+    if (formData.digital_signature instanceof File) {
+      data.append('digital_signature', formData.digital_signature);
+    }
+
     axios
-      .post('https://e-bursary-backend.onrender.com/api/profile-form', formData, {
-        headers: { Authorization: `Bearer ${token}` },
+      .post('https://e-bursary-backend.onrender.com/api/profile-form', data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
       })
       .then(() => {
         alert('Profile created/updated successfully');
@@ -91,6 +127,7 @@ const CommitteeProfile = () => {
       });
   };
 
+  // Fetch again for header avatar etc.
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
@@ -101,7 +138,7 @@ const CommitteeProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          setCommitteeDetails(response.data);
+          setCommitteeDetails(response.data || {});
         })
         .catch((error) => {
           console.error('Error fetching profile data:', error);
@@ -155,81 +192,81 @@ const CommitteeProfile = () => {
 
       <div className="flex flex-col md:flex-row pt-20 min-h-screen">
         {/* Sidebar */}
-        {/* ... (unchanged sidebar code) ... */}
-<div
-className={`
-fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
-transition-all duration-100 ease-in-out
-overflow-visible
-${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
-`}
->
-<div className="hidden md:flex justify-end mb-4">
-<FontAwesomeIcon
-icon={faBars}
-className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
-onClick={toggleSidebar}
-/>
-</div>
-<ul className="flex flex-col h-full mt-6 space-y-10">
-{navItems.map((item, index) => (
-<li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
-{item.isLogout ? (
-<a
-href="#"
-onClick={(e) => {
-e.preventDefault();
-const token = sessionStorage.getItem('authToken');
-axios
-.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-headers: { Authorization: `Bearer ${token}` }
-})
-.catch(() => {})
-.finally(() => {
-sessionStorage.clear();
-navigate('/');
-});
-}}
-className={`flex items-center space-x-2 transition-all duration-200 ${
-sidebarActive ? 'justify-start' : 'justify-center'
-}`}
->
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-<span
-className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-}`}
->
-{item.label}
-</span>
-</a>
-) : (
-<Link
-to={item.to}
-className={`flex items-center space-x-2 transition-all duration-200 ${
-sidebarActive ? 'justify-start' : 'justify-center'
-}`}
->
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-<span
-className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-}`}
->
-{item.label}
-</span>
-</Link>
-)}
-{!sidebarActive && (
-<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
-{item.label}
-</span>
-)}
-</li>
-))}
-</ul>
-</div>
+        <div
+          className={`
+            fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
+            transition-all duration-100 ease-in-out
+            overflow-visible
+            ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
+            ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
+          `}
+        >
+          <div className="hidden md:flex justify-end mb-4">
+            <FontAwesomeIcon
+              icon={faBars}
+              className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+              onClick={toggleSidebar}
+            />
+          </div>
+          <ul className="flex flex-col h-full mt-6 space-y-10">
+            {navItems.map((item, index) => (
+              <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
+                {item.isLogout ? (
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const token = sessionStorage.getItem('authToken');
+                      axios
+                        .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+                          headers: { Authorization: `Bearer ${token}` }
+                        })
+                        .catch(() => {})
+                        .finally(() => {
+                          sessionStorage.clear();
+                          navigate('/');
+                        });
+                    }}
+                    className={`flex items-center space-x-2 transition-all duration-200 ${
+                      sidebarActive ? 'justify-start' : 'justify-center'
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+                    <span
+                      className={`${
+                        sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </a>
+                ) : (
+                  <Link
+                    to={item.to}
+                    className={`flex items-center space-x-2 transition-all duration-200 ${
+                      sidebarActive ? 'justify-start' : 'justify-center'
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+                    <span
+                      className={`${
+                        sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                )}
+                {!sidebarActive && (
+                  <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+                    {item.label}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Main Content */}
         <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-10 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[40px] md:ml-[30px]'}`}>
           <div className="w-[98%] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto pt-1 pr-6 pl-6 pb-4">
@@ -246,13 +283,29 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                     <FontAwesomeIcon icon={faEdit} className="mr-1" /> Edit Profile
                   </button>
                   <hr className="my-4" />
+
+                  {/* Avoid rendering File objects directly */}
                   <div className="space-y-5 text-[#14213d]">
-                    {Object.entries(formData).map(([key, value]) => (
-                      <div className="flex gap-10" key={key}>
-                        <span className="font-semibold capitalize">{key.replace('_', ' ')}:</span>
-                        <span>{value}</span>
-                      </div>
-                    ))}
+                    {Object.entries(formData)
+                      .filter(([key]) => key !== 'digital_signature')
+                      .map(([key, value]) => (
+                        <div className="flex gap-10" key={key}>
+                          <span className="font-semibold capitalize">{key.replace('_', ' ')}:</span>
+                          <span>{String(value ?? '')}</span>
+                        </div>
+                      ))}
+
+                    {/* Show signature name/status safely */}
+                    <div className="flex gap-10">
+                      <span className="font-semibold">Digital signature:</span>
+                      <span>
+                        {formData.digital_signature
+                          ? formData.digital_signature instanceof File
+                            ? formData.digital_signature.name
+                            : String(formData.digital_signature)
+                          : '—'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -261,18 +314,16 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 
                   {/* Fullname */}
                   <div className="flex items-center gap-3 mb-5">
-  <label className="text-[#14213d] font-semibold w-[110px]">
-    Fullname:
-  </label>
-  <input
-    type="text"
-    name="fullname"
-    value={formData.fullname}
-    onChange={handleChange}
-    className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
-    required
-  />
-</div>
+                    <label className="text-[#14213d] font-semibold w-[110px]">Fullname:</label>
+                    <input
+                      type="text"
+                      name="fullname"
+                      value={formData.fullname}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
+                      required
+                    />
+                  </div>
 
                   {/* Email */}
                   <div className="flex items-center gap-3 mb-5">
@@ -301,8 +352,8 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                   </div>
 
                   {/* National ID */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">National ID:</label>
+                  <div className="flex items-center mb-5">
+                    <label className="text-[#14213d] font-semibold w-[130px]">National ID:</label>
                     <input
                       type="text"
                       name="national_id"
@@ -335,7 +386,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                           value="Female"
                           checked={formData.gender === 'Female'}
                           onChange={handleChange}
-                          className="accent-[#14213d] "
+                          className="accent-[#14213d]"
                         />
                         Female
                       </label>
@@ -377,36 +428,35 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                   </div>
 
                   {/* Position */}
-              {/* Position */}
-<div className="flex items-center gap-3 mb-5">
-  <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
-  <select
-    name="position"
-    value={formData.position}
-    onChange={handleChange}
-    className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-    required
-  >
-    <option value="">Select Position</option>
-    {positions.map((p, i) => (
-      <option key={i} value={p}>{p}</option>
-    ))}
-  </select>
-</div>
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
+                    <select
+                      name="position"
+                      value={formData.position}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    >
+                      <option value="">Select Position</option>
+                      {positions.map((p, i) => (
+                        <option key={i} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
 
-{/* Upload digital signature if Chairman */}
-{formData.position === "Chairperson" && (
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Signature:</label>
-<input
-type="file"
-name="digital_signature"
-      accept=".png,.jpg,.jpeg,.pdf"
-      onChange={(e) => setFormData({ ...formData, digital_signature: e.target.files[0] })}
-      className="flex-1 border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-    />
-  </div>
-)}
+                  {/* Upload digital signature if Chairperson */}
+                  {formData.position === "Chairperson" && (
+                    <div className="flex items-center gap-3 mb-5">
+                      <label className="text-[#14213d] font-semibold w-[110px]">Signature:</label>
+                      <input
+                        type="file"
+                        name="digital_signature"
+                        accept="image/*,.pdf"
+                        onChange={handleFileChange}
+                        className="flex-1 border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      />
+                    </div>
+                  )}
 
                   <button
                     type="submit"
@@ -561,6 +611,20 @@ name="digital_signature"
                   ))}
                 </select>
               </div>
+
+              {/* Signature in edit too (if Chairperson) */}
+              {formData.position === "Chairperson" && (
+                <div className="flex items-center gap-3">
+                  <label className="w-[110px] font-medium">Signature:</label>
+                  <input
+                    type="file"
+                    name="digital_signature"
+                    accept="image/*,.pdf"
+                    onChange={handleFileChange}
+                    className="flex-1 border rounded px-3 py-2"
+                  />
+                </div>
+              )}
 
               <button
                 type="submit"

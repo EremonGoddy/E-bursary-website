@@ -731,7 +731,9 @@ app.get('/api/upload/status/:userId', async (req, res) => {
 });
 
 // Use /tmp/uploads for cloud environments like Render
-const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+const UPLOAD_DIR = process.env.NODE_ENV === 'production' 
+  ? '/tmp/uploads' 
+  : path.join(__dirname, 'uploads');
 
 // Ensure upload directory exists
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -747,9 +749,28 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+// Restrict to PDF and image files
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/gif'
+  ];
 
-// ...existing imports and setup...
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only PDF and image files are allowed!'), false);
+  }
+};
+
+const upload = multer({ 
+  storage, 
+  fileFilter 
+});
+
 
 app.post('/api/upload', upload.single('document'), async (req, res) => {
   const { documentName, userId } = req.body;
@@ -1446,7 +1467,6 @@ app.get('/api/profile-committee', (req, res) => {
   });
 });
 
-// POST profile-form
 // POST profile-form with gender + digital_signature
 app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -1456,16 +1476,18 @@ app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => 
     if (err) return res.status(401).send('Unauthorized access');
 
     const { fullname, phone_no, national_id, subcounty, ward, position, gender } = req.body;
+
+    // ✅ Enforce Chairperson must upload signature
+    if (position === "Chairperson" && !req.file) {
+      return res.status(400).json({ error: "Digital signature is required for Chairperson." });
+    }
+
     if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position || !gender) {
       return res.status(400).send('All profile fields are required');
     }
 
     const email = decoded.email;
-    const digital_signature = req.file ? req.file.filename : null; // save filename
-
-    console.log('Insert data:', {
-      fullname, email, phone_no, national_id, subcounty, ward, position, gender, digital_signature
-    });
+    const digital_signature = req.file ? req.file.filename : null;
 
     const sqlInsert = `
       INSERT INTO bursary.profile_committee 
