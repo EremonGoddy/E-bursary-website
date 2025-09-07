@@ -276,42 +276,42 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 {/* Header Info */}
 {personalData.length > 0 && (
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] mb-4  p-4 text-center">
-<h1 className="text-2xl font-bold">{personalData[0].fullname}</h1>
-<p className="font-semibold text-[1.2rem]">Admission Number: {personalData[0].admission}</p>
-<p className="font-semibold text-[1.2rem]">Institution: {personalData[0].institution}</p>
+<h1 className="text-2xl font-bold text-[#14213d]">{personalData[0].fullname}</h1>
+<p className="font-semibold text-[1.2rem] text-[#14213d]">Admission Number: {personalData[0].admission}</p>
+<p className="font-semibold text-[1.2rem] text-[#14213d]">Institution: {personalData[0].institution}</p>
 </div>
 )}
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Personal Info */}
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4  mb-0 md:mb-4">
-<h2 className="text-xl font-bold mb-2">Personal Information</h2>
+<h2 className="text-xl font-bold mb-2 text-[#14213d]">Personal Information</h2>
 {personalData.map((item) => (
-<div key={item.user_id} className="mb-2">
-<div><span className="font-semibold">Email:</span> {item.email}</div>
-<div><span className="font-semibold">Sub County:</span> {item.subcounty}</div>
-<div><span className="font-semibold">Ward:</span> {item.ward}</div>
-<div><span className="font-semibold">Village:</span> {item.village}</div>
-<div><span className="font-semibold">Date of Birth:</span> {item.birth}</div>
-<div><span className="font-semibold">Gender:</span> {item.gender}</div>
-<div><span className="font-semibold">Institution:</span> {item.institution}</div>
-<div><span className="font-semibold">Year/Form:</span> {item.year}</div>
-<div><span className="font-semibold">Admission:</span> {item.admission}</div>
+<div key={item.user_id} className="mb-2 space-y-2 text-[#14213d]">
+<div><span className="font-bold">Email:</span> {item.email}</div>
+<div><span className="font-bold">Sub County:</span> {item.subcounty}</div>
+<div><span className="font-bold">Ward:</span> {item.ward}</div>
+<div><span className="font-bold">Village:</span> {item.village}</div>
+<div><span className="font-bold">Date of Birth:</span> {item.birth}</div>
+<div><span className="font-bold">Gender:</span> {item.gender}</div>
+<div><span className="font-bold">Institution:</span> {item.institution}</div>
+<div><span className="font-bold">Year/Form:</span> {item.year}</div>
+<div><span className="font-bold">Admission:</span> {item.admission}</div>
 </div>
 ))}
 </div>
 {/* Amount Info */}
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-4">
-<h2 className="text-xl font-bold mb-2">Amount Information</h2>
+<h2 className="text-xl font-bold mb-2 text-[#14213d]">Amount Information</h2>
 {amountData.map((item) => (
-<div key={item.user_id} className="mb-2">
-<div><span className="font-semibold">Payable Amount (Words):</span> {item.payable_words}</div>
-<div><span className="font-semibold">Payable Amount (Figures):</span> {item.payable_figures}</div>
-<div><span className="font-semibold">Outstanding Amount (Words):</span> {item.outstanding_words}</div>
-<div><span className="font-semibold">Outstanding Amount (Figures):</span> {item.outstanding_figures}</div>
-<div><span className="font-semibold">School Account Name:</span> {item.school_accountname}</div>
-<div><span className="font-semibold">School Account Number:</span> {item.school_accountnumber}</div>
-<div><span className="font-semibold">School Branch:</span> {item.school_branch}</div>
+<div key={item.user_id} className="mb-2 space-y-3 text-[#14213d]">
+<div><span className="font-bold">Payable Amount (Words):</span> {item.payable_words}</div>
+<div><span className="font-bold">Payable Amount (Figures):</span> {item.payable_figures}</div>
+<div><span className="font-bold">Outstanding Amount (Words):</span> {item.outstanding_words}</div>
+<div><span className="font-bold">Outstanding Amount (Figures):</span> {item.outstanding_figures}</div>
+<div><span className="font-bold">School Account Name:</span> {item.school_accountname}</div>
+<div><span className="font-bold">School Account Number:</span> {item.school_accountnumber}</div>
+<div><span className="font-bold">School Branch:</span> {item.school_branch}</div>
 </div>
 ))}
 </div>
@@ -319,43 +319,43 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Family Info */}
 <div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4  mb-0 md:mb-4">
-<h2 className="text-xl font-bold mb-2">Family Information</h2>
+<h2 className="text-xl font-bold mb-2 text-[#14213d]">Family Information</h2>
 {familyData.map((item) => (
-<div key={item.user_id} className="mb-2">
-<div><span className="font-semibold">Family Status:</span> {item.family_status}</div>
-<div><span className="font-semibold">Disability Issue:</span> {item.disability}</div>
-<div><span className="font-semibold">Parent/Guardian Name:</span> {item.parent_guardian_name}</div>
-<div><span className="font-semibold">Relationship:</span> {item.relationship}</div>
-<div><span className="font-semibold">Contact Information:</span> {item.contact_info}</div>
-<div><span className="font-semibold">Occupation:</span> {item.occupation}</div>
-<div><span className="font-semibold">Guardian Children:</span> {item.guardian_children}</div>
-<div><span className="font-semibold">Working Siblings:</span> {item.working_siblings}</div>
-<div><span className="font-semibold">Studying Siblings:</span> {item.studying_siblings}</div>
-<div><span className="font-semibold">Monthly Income:</span> {item.monthly_income}</div>
+<div key={item.user_id} className="mb-2 space-y-2 text-[#14213d]">
+<div><span className="font-bold">Family Status:</span> {item.family_status}</div>
+<div><span className="font-bold">Disability Issue:</span> {item.disability}</div>
+<div><span className="font-bold">Parent/Guardian Name:</span> {item.parent_guardian_name}</div>
+<div><span className="font-bold">Relationship:</span> {item.relationship}</div>
+<div><span className="font-bold">Contact Information:</span> {item.contact_info}</div>
+<div><span className="font-bold">Occupation:</span> {item.occupation}</div>
+<div><span className="font-bold">Guardian Children:</span> {item.guardian_children}</div>
+<div><span className="font-bold">Working Siblings:</span> {item.working_siblings}</div>
+<div><span className="font-bold">Studying Siblings:</span> {item.studying_siblings}</div>
+<div><span className="font-bold">Monthly Income:</span> {item.monthly_income}</div>
 </div>
 ))}
 </div>
 {/* Disclosure Info */}
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-0 md:mb-4">
-<h2 className="text-xl font-bold mb-2">Disclosure Information</h2>
+<h2 className="text-xl font-bold mb-2 text-[#14213d] ">Disclosure Information</h2>
 {disclosureData.map((item) => (
-<div key={item.user_id} className="mb-2">
-<div><span className="font-semibold">Bursary Received:</span> {item.receiving_bursary}</div>
-<div><span className="font-semibold">Bursary Source:</span> {item.bursary_source}</div>
-<div><span className="font-semibold">Bursary Amount:</span> {item.bursary_amount}</div>
-<div><span className="font-semibold">Applied HELB:</span> {item.applied_helb}</div>
-<div><span className="font-semibold">HELB Outcome:</span> {item.helb_outcome}</div>
-<div><span className="font-semibold">Reason for Not Applying HELB:</span> {item.helb_noreason}</div>
+<div key={item.user_id} className="mb-2 text-[#14213d] space-y-3">
+<div><span className="font-bold">Bursary Received:</span> {item.receiving_bursary}</div>
+<div><span className="font-bold">Bursary Source:</span> {item.bursary_source}</div>
+<div><span className="font-bold">Bursary Amount:</span> {item.bursary_amount}</div>
+<div><span className="font-bold">Applied HELB:</span> {item.applied_helb}</div>
+<div><span className="font-bold">HELB Outcome:</span> {item.helb_outcome}</div>
+<div><span className="font-bold">Reason for Not Applying HELB:</span> {item.helb_noreason}</div>
 </div>
 ))}
 </div>
 </div>
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-0 md:mb-4">
-<h2 className="text-xl font-bold mb-2">Uploaded Documents</h2>
+<h2 className="text-xl text-[#14213d] font-bold mb-2">Uploaded Documents</h2>
 {documentData.map((item) => (
-<div key={item.user_id} className="mb-2">
-<div><span className="font-semibold">Document Name:</span> {item.document_name}</div>
-<div><span className="font-semibold">File Path:</span> {item.file_path}</div>
+<div key={item.user_id} className="mb-2 text-[#14213d] space-y-3">
+<div><span className="font-bold">Document Name:</span> {item.document_name}</div>
+<div><span className="font-bold">File Path:</span> {item.file_path}</div>
 <div>
 <a
 className="text-blue-500 underline"

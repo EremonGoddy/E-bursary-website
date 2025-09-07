@@ -1443,11 +1443,7 @@ app.get('/api/profile-committee', (req, res) => {
 
     const sqlGet = `
       SELECT fullname, email, phone_no, national_id, subcounty, 
-             ward, position, gender,
-             CASE 
-               WHEN fullname IS NULL OR phone_no IS NULL OR national_id IS NULL THEN 0
-               ELSE 1
-             END AS is_complete
+             ward, position, gender
       FROM bursary.profile_committee 
       WHERE email = $1
     `;

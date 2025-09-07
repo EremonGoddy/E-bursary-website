@@ -240,7 +240,7 @@ const CommitteeProfile = () => {
         </div>
 
         {/* Main Content */}
-        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-10 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[40px] md:ml-[30px]'}`}>
+        <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-4 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[40px] md:ml-[30px]'}`}>
           <div className="w-[98%] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto pt-1 pr-6 pl-6 pb-4">
             {isProfileFetched ? (
               profileExists ? (
@@ -249,20 +249,23 @@ const CommitteeProfile = () => {
                   <h2 className="text-xl font-bold ml-7 -mt-7 text-[#14213d]">Committee Profile</h2>
                   <button
                     onClick={() => setEditFormVisible(true)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 ml-auto flex items-center"
+                    className="bg-blue-500 cursor-pointer text-white px-3 font-bold py-1 -mt-8 rounded hover:bg-blue-600 ml-auto flex items-center"
                   >
-                    <FontAwesomeIcon icon={faEdit} className="mr-1" /> Edit Profile
+                    <FontAwesomeIcon icon={faEdit} className="mr-1 font-bold" /> Edit Profile
                   </button>
                   <hr className="my-4" />
 
-                  <div className="space-y-5 text-[#14213d]">
-                    {Object.entries(formData).map(([key, value]) => (
-                      <div className="flex gap-10" key={key}>
-                        <span className="font-semibold capitalize">{key.replace('_', ' ')}:</span>
-                        <span>{String(value ?? '')}</span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="space-y-5 text-[#14213d]">
+  {Object.entries(formData).map(([key, value]) => (
+    <div className="flex gap-5" key={key}>
+      <span className="w-40 font-bold capitalize">
+        {key.replace('_', ' ')}:
+      </span>
+      <span>{String(value ?? '')}</span>
+    </div>
+  ))}
+</div>
+
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
@@ -340,76 +343,143 @@ const CommitteeProfile = () => {
 
       {/* Overlay Edit Form */}
       {isEditFormVisible && (
-        <div className="shadow-overlay fade-in flex justify-center items-center">
-          <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[500px] relative">
-            <button
-              onClick={() => setEditFormVisible(false)}
-              className="absolute top-1 right-1 w-8 h-8 flex items-center justify-center 
-                         text-[#14213d] font-bold hover:bg-gray-200 
-                         rounded-full text-xl cursor-pointer transition active:scale-90"
-            >
-              ✕
-            </button>
-            <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              {Object.keys(formData).map((field) => (
-                <div className="flex items-center gap-3" key={field}>
-                  <label className="w-[110px] font-medium">{field.replace('_',' ').toUpperCase()}:</label>
-                  {field === 'gender' ? (
-                    <div className="flex gap-6">
-                      {['Male','Female'].map((g) => (
-                        <label className="flex items-center gap-2" key={g}>
-                          <input
-                            type="radio"
-                            name="gender"
-                            value={g}
-                            checked={formData.gender === g}
-                            onChange={handleChange}
-                            className="accent-[#14213d]"
-                          />
-                          {g}
-                        </label>
-                      ))}
-                    </div>
-                  ) : field==='subcounty' || field==='ward' || field==='position' ? null : (
-                    <input
-                      type={field==='email'?'email':'text'}
-                      name={field}
-                      value={formData[field]}
-                      onChange={handleChange}
-                      className="flex-1 border rounded px-3 py-2"
-                    />
-                  )}
-                </div>
-              ))}
-              {/* Subcounty, Ward, Position in edit */}
-              {[
-                {name:'subcounty', options:subcounties},
-                {name:'ward', options:wards},
-                {name:'position', options:positions}
-              ].map(({name,options}) => (
-                <div className="flex items-center gap-3" key={name}>
-                  <label className="w-[110px] font-medium">{name.charAt(0).toUpperCase() + name.slice(1)}:</label>
-                  <select
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="flex-1 border rounded px-3 py-2"
-                  >
-                    <option value="">Select {name.charAt(0).toUpperCase() + name.slice(1)}</option>
-                    {options.map((opt,i) => <option key={i} value={opt}>{opt}</option>)}
-                  </select>
-                </div>
-              ))}
-              <button
-                type="submit"
-                className="px-4 py-2 bg-[#14213d] text-white rounded hover:bg-gray-800"
-              >
-                Update Profile
-              </button>
-            </form>
+  <div className="shadow-overlay fade-in flex justify-center items-center">
+    <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[500px] relative">
+      <button
+        onClick={() => setEditFormVisible(false)}
+        className="absolute top-1 right-1 w-8 h-8 flex items-center justify-center 
+                   text-[#14213d] font-bold hover:bg-gray-200 
+                   rounded-full text-xl cursor-pointer transition active:scale-90"
+      >
+        ✕
+      </button>
+      <h2 className="text-2xl font-bold mb-4 text-[#14213d]">Edit Profile</h2>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        
+        {/* Fullname */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Full Name:</label>
+          <input
+            type="text"
+            name="fullname"
+            value={formData.fullname}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          />
+        </div>
+
+        {/* Email */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          />
+        </div>
+
+        {/* Phone */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Phone No:</label>
+          <input
+            type="text"
+            name="phone_no"
+            value={formData.phone_no}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          />
+        </div>
+
+        {/* National ID */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">National ID:</label>
+          <input
+            type="text"
+            name="national_id"
+            value={formData.national_id}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          />
+        </div>
+
+        {/* Gender */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Gender:</label>
+          <div className="flex gap-6">
+            {['Male', 'Female'].map((g) => (
+              <label className="flex items-center gap-2" key={g}>
+                <input
+                  type="radio"
+                  name="gender"
+                  value={g}
+                  checked={formData.gender === g}
+                  onChange={handleChange}
+                  className="accent-[#14213d]"
+                />
+                {g}
+              </label>
+            ))}
           </div>
         </div>
+
+        {/* Subcounty */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Subcounty:</label>
+          <select
+            name="subcounty"
+            value={formData.subcounty}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          >
+            <option value="">Select Subcounty</option>
+            {subcounties.map((opt, i) => (
+              <option key={i} value={opt}>{opt}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Ward */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Ward:</label>
+          <select
+            name="ward"
+            value={formData.ward}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          >
+            <option value="">Select Ward</option>
+            {wards.map((opt, i) => (
+              <option key={i} value={opt}>{opt}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Position */}
+        <div className="flex items-center gap-3">
+          <label className="w-[110px] font-medium">Position:</label>
+          <select
+            name="position"
+            value={formData.position}
+            onChange={handleChange}
+            className="flex-1 w-full text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+          >
+            <option value="">Select Position</option>
+            {positions.map((opt, i) => (
+              <option key={i} value={opt}>{opt}</option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-[#14213d] cursor-pointer text-white rounded hover:bg-gray-600"
+        >
+          Update Profile
+        </button>
+      </form>
+    </div>
+  </div>
       )}
     </div>
   );

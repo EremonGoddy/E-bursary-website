@@ -240,15 +240,15 @@ ${sidebarActive ? 'ml-[0px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Bursary Fund Details</h2>
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-4">
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Funds Available</p>
 <strong className="text-blue-700 text-2xl">{bursaryAmount}</strong>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-green-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-green-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-green-700 font-semibold mb-0 md:mb-1">Allocated to Students</p>
 <strong className="text-green-700 text-2xl">{allocatedAmount}</strong>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-400 rounded-xl p-0 md:p-3  shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-500 rounded-xl p-0 md:p-3  shadow-sm">
 <p className="text-yellow-700 font-semibold mb-0 md:mb-1">Remaining Funds</p>
 <strong className="text-yellow-700 text-2xl">{remainingAmount}</strong>
 </div>
@@ -260,23 +260,23 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Quick Statistics</h2>
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-2">
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-yellow-700 font-semibold mb-0 md:mb-1">Pending</p>
 <strong className="text-yellow-700 text-2xl">{pendingApplications}</strong>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-gray-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-gray-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-gray-700 font-semibold mb-0 md:mb-1">Incomplete</p>
 <strong className="text-gray-600 text-2xl">{incompleteApplications}</strong>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Student</p>
 <strong className="text-blue-700 text-2xl">{totalApplications}</strong>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-green-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4 border-green-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-green-700 font-semibold mb-0 md:mb-1">Approved</p>
 <strong className="text-green-700 text-2xl">{approvedApplications}</strong>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4  border-red-400 rounded-xl p-0 md:p-3 shadow-sm">
+<div className="flex-1 text-center bg-white border-3 md:border-4  border-red-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-red-700 font-semibold mb-0 md:mb-1">Rejected</p>
 <strong className="text-red-700 text-2xl">{rejectedApplications}</strong>
 </div>
@@ -310,7 +310,7 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 text-center whitespace-nowrap">
 {(item.approved_by_committee && item.approved_by_committee !== userName) ? (
 <span className="text-gray-500 text-[0.85rem] italic">
-Approved by {item.approved_by_committee}
+Reviewed by {item.approved_by_committee}
 </span>
 ) : (
 <Link

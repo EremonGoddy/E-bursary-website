@@ -18,6 +18,7 @@ const BursaryAllocation = () => {
   const { id } = useParams(); // Get the user ID from the URL
   const [data, setData] = useState([]);
   const [committeeDetails, setCommitteeDetails] = useState({});
+  const [userName, setUserName] = useState('');
   const [selectedAmount, setSelectedAmount] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -95,9 +96,12 @@ const BursaryAllocation = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
+      const name = sessionStorage.getItem('userName');
+  
     if (!token) {
       navigate('/signin');
     } else {
+       setUserName(name || '');
       axios
         .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
           headers: { Authorization: `Bearer ${token}` },
@@ -235,36 +239,44 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
  
               <div className={`flex-1 ml-0 md:ml-64 p-4 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10 ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}`}>
 
-          <div className="max-w-4xl mx-auto shadow-[0_0_10px_3px_rgba(0,0,0,0.25)] bg-white rounded-lg p-6">
-            <h2 className="text-center text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
-            <div className="flex justify-around mb-6">
-              <div className="text-center text-[0.8rem] md:text-[1rem] font-semibold">
-                <p>Total Funds Available:</p>
-                <strong>{bursaryAmount.toLocaleString()} Ksh</strong>
-              </div>
-              <div className="text-center text-[0.8rem] md:text-[1rem] font-semibold">
-                <p>Amount Allocated to Students:</p>
-                <strong>{allocatedAmount.toLocaleString()} Ksh</strong>
-              </div>
-              <div className="text-center text-[0.8rem] md:text-[1rem] font-semibold">
-                <p>Remaining Funds:</p>
-                <strong>{remainingAmount.toLocaleString()} Ksh</strong>
-              </div>
-            </div>
+          <div className="max-w-4xl backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] mx-auto p-6">
+            <h2 className="text-center text-[#14213d] text-1xl md:text-2xl font-bold mb-4">Bursary Fund Details</h2>
+           
+           <div className="flex justify-around mb-6">
+  <div className="text-center text-[#14213d] text-[0.8rem] md:text-[1rem] font-bold">
+    <p>Total Funds Available:</p>
+    <strong>
+      {bursaryAmount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Ksh
+    </strong>
+  </div>
+  <div className="text-center text-[#14213d]  text-[0.8rem] md:text-[1rem] font-bold">
+    <p>Amount Allocated to Students:</p>
+    <strong>
+      {allocatedAmount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Ksh
+    </strong>
+  </div>
+  <div className="text-center text-[0.8rem] text-[#14213d]  md:text-[1rem] font-bold">
+    <p>Remaining Funds:</p>
+    <strong>
+      {remainingAmount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Ksh
+    </strong>
+  </div>
+</div>
 
-            <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Bursary Allocation</h1>
+
+            <h1 className="text-2xl font-bold mb-6 mt-6 text-[#14213d]  text-center">Bursary Allocation</h1>
             {data.map((item) => (
               <div key={item.user_id} className="mb-3">
-                <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
-                  <span className="text-gray-500">Full Name:</span> {item.fullname}
+                <p className=" text-gray-800 text-[1.1rem] md:text-[1.2rem]">
+                  <span className="text-[#14213d] font-bold">Full Name:</span> {item.fullname}
                 </p>
-                <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem]">
-                  <span className="text-gray-500">Admission Number:</span> {item.admission}
+                <p className=" text-gray-800 text-[1.1rem] md:text-[1.2rem]">
+                  <span className="text-[#14213d] font-bold">Admission Number:</span> {item.admission}
                 </p>
-                <p className="font-semibold text-gray-800 text-[1.1rem] md:text-[1.2rem] mb-8">
-                  <span className="text-gray-500">Institution:</span> {item.institution}
+                <p className=" text-gray-800 text-[1.1rem] md:text-[1.2rem] mb-8">
+                  <span className="text-[#14213d] font-bold">Institution:</span> {item.institution}
                 </p>
-                <div className="flex flex-wrap gap-4 mt-2 mb-2">
+                <div className="flex flex-wrap gap-4 mt-2 mb-2 text-[#14213d] font-bold">
                   {[10000, 20000, 30000, 40000, 50000].map((amount) => (
                     <label key={amount} className="flex items-center gap-2 cursor-pointer text-[1.6rem]">
                       <input
@@ -273,7 +285,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                         value={amount}
                         checked={selectedAmount[item.user_id] === amount}
                         onChange={() => setSelectedAmount((prev) => ({ ...prev, [item.user_id]: amount }))}
-                        className="accent-blue-600 scale-125"
+                        className="accent-[#14213d] scale-125 cursor-pointer"
                       />
                       <span className="text-[1.1rem]">{amount.toLocaleString()} Ksh</span>
                     </label>

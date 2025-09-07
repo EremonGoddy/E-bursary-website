@@ -314,15 +314,15 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </div>
         {/* Main Content Area */}
         <div className={`flex-1 ml-8 md:ml-30 p-4 transition-all duration-300`}>
-          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]  max-w-[340px] md:max-w-[800px] mx-auto -mt-4 md:mt-50 mb-4 md:mb-6 p-1 md:p-8">
-            <h1 className="text-1xl md:text-2xl font-bold mb-2 text-center">Bursary Report</h1>
+          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]  max-w-[340px] md:max-w-[800px] mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-1 md:p-8">
+            <h1 className="text-1xl md:text-2xl text-[#14213d] font-bold mb-2 text-center">Bursary Report</h1>
             {/* Responsive Report Info: vertical on mobile, table on md+ */}
             <div>
               {/* Mobile vertical layout */}
               <div className="block md:hidden">
                 {reportRows.map((row) => (
                   <div key={row.label} className="flex items-center py-2 border-b last:border-b-0">
-                    <span className="font-semibold w-1/2 text-[1rem] bg-blue-500 text-white px-2 py-1 rounded-1">
+                    <span className="font-semibold w-1/2 text-[1rem] bg-[#14213d] text-white px-2 py-1 rounded-1">
                       {row.label}
                     </span>
                     <span className="w-1/2 text-[1rem] bg-white-100 px-2 py-1 rounded-r">
@@ -335,14 +335,14 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
               <div className="hidden md:block w-full overflow-x-auto">
                 <table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
                   <thead>
-                    <tr className="bg-blue-500 text-white text-[1.1rem]">
+                    <tr className="bg-[#14213d] text-white text-[1.1rem]">
                       <th className="p-2 text-left">Reference Number</th>
                       <th className="p-2 text-left">Application Title</th>
                       <th className="p-2 text-left">Download Application</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b text-[1.1rem]">
+                    <tr className="border-b text-[1rem]">
                       <td className="p-2">{studentDetails.reference_number || 'N/A'}</td>
                       <td className="p-2">Committee Report</td>
                       <td className="p-2">
@@ -354,7 +354,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                         >
                           <FontAwesomeIcon
                             icon={faDownload}
-                            className="text-blue-500"
+                            className="text-[#14213d] text-[1.3rem]"
                           />
                         </button>
                       </td>
