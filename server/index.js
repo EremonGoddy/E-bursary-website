@@ -18,7 +18,7 @@ const multer = require("multer");
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(UPLOAD_DIR));
 app.use(bodyParser.json());
 
 // ✅ JWT Secret from .env or fallback
@@ -1435,7 +1435,6 @@ app.get('/api/user-report/:id', (req, res) => {
 });
 
 // GET profile-committee
-// GET profile-committee
 app.get('/api/profile-committee', (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token is required');
@@ -1466,15 +1465,16 @@ app.get('/api/profile-committee', (req, res) => {
 
       let profile = result.rows[0];
 
-      // If signature exists, return a URL instead of just filename
+      // ✅ If signature exists, return a dynamic URL
       if (profile.digital_signature) {
-        profile.digital_signature_url = `https://e-bursary-backend.onrender.com/uploads/${profile.digital_signature}`;
+        profile.digital_signature_url = `${req.protocol}://${req.get("host")}/uploads/${profile.digital_signature}`;
       }
 
       res.json(profile);
     });
   });
 });
+
 
 
 
