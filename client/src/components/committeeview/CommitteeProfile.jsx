@@ -22,7 +22,6 @@ const CommitteeProfile = () => {
   const [userName, setUserName] = useState('');
   const [isEditFormVisible, setEditFormVisible] = useState(false);
 
-  // ⬇️ include digital_signature in state
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
@@ -32,7 +31,6 @@ const CommitteeProfile = () => {
     subcounty: '',
     ward: '',
     position: '',
-    digital_signature: null, // <-- important
   });
 
   const [isProfileFetched, setIsProfileFetched] = useState(false);
@@ -62,11 +60,9 @@ const CommitteeProfile = () => {
           setIsProfileFetched(true);
           const data = response.data;
           if (data) {
-            // Populate fields. Keep digital_signature null so we don't try to re-upload a string.
             setFormData(prev => ({
               ...prev,
-              ...data,
-              digital_signature: null,
+              ...data
             }));
             setProfileExists(true);
           }
@@ -83,37 +79,14 @@ const CommitteeProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ⬇️ capture the selected file
-  const handleFileChange = (e) => {
-    const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
-    setFormData({ ...formData, digital_signature: file });
-  };
-
-  // ⬇️ submit as multipart/form-data
   const handleSubmit = (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('authToken');
 
-    const data = new FormData();
-    data.append('fullname', formData.fullname);
-    data.append('email', formData.email);
-    data.append('phone_no', formData.phone_no);
-    data.append('national_id', formData.national_id);
-    data.append('gender', formData.gender);
-    data.append('subcounty', formData.subcounty);
-    data.append('ward', formData.ward);
-    data.append('position', formData.position);
-
-    // Only append the file if it's actually a File (avoid sending a string from fetched data)
-    if (formData.digital_signature instanceof File) {
-      data.append('digital_signature', formData.digital_signature);
-    }
-
     axios
-      .post('https://e-bursary-backend.onrender.com/api/profile-form', data, {
+      .post('https://e-bursary-backend.onrender.com/api/profile-form', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
         },
       })
       .then(() => {
@@ -127,7 +100,6 @@ const CommitteeProfile = () => {
       });
   };
 
-  // Fetch again for header avatar etc.
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
@@ -273,7 +245,6 @@ const CommitteeProfile = () => {
             {isProfileFetched ? (
               profileExists ? (
                 <div>
-                  {/* Profile display */}
                   <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl mt-4 md:text-2xl mr-2" />
                   <h2 className="text-xl font-bold ml-7 -mt-7 text-[#14213d]">Committee Profile</h2>
                   <button
@@ -284,190 +255,73 @@ const CommitteeProfile = () => {
                   </button>
                   <hr className="my-4" />
 
-                  {/* Avoid rendering File objects directly */}
                   <div className="space-y-5 text-[#14213d]">
-                    {Object.entries(formData)
-                      .filter(([key]) => key !== 'digital_signature')
-                      .map(([key, value]) => (
-                        <div className="flex gap-10" key={key}>
-                          <span className="font-semibold capitalize">{key.replace('_', ' ')}:</span>
-                          <span>{String(value ?? '')}</span>
-                        </div>
-                      ))}
-
-                    {/* Show signature name/status safely */}
-                    <div className="flex gap-10">
-                      <span className="font-semibold">Digital signature:</span>
-                      <span>
-                        {formData.digital_signature
-                          ? formData.digital_signature instanceof File
-                            ? formData.digital_signature.name
-                            : String(formData.digital_signature)
-                          : '—'}
-                      </span>
-                    </div>
-
-          {committeeDetails.digital_signature_url && (
-          <div className="flex flex-col gap-2">
-            <span className="font-semibold">Digital Signature:</span>
-            <img
-              src={committeeDetails.digital_signature_url}
-              alt="Digital Signature"
-              className="w-40 h-20 object-contain border rounded"
-            />
-          </div>
-        )}
+                    {Object.entries(formData).map(([key, value]) => (
+                      <div className="flex gap-10" key={key}>
+                        <span className="font-semibold capitalize">{key.replace('_', ' ')}:</span>
+                        <span>{String(value ?? '')}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
                   <h2 className="text-[#14213d] text-2xl font-bold text-center mb-5">Create Profile</h2>
 
-                  {/* Fullname */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">Fullname:</label>
-                    <input
-                      type="text"
-                      name="fullname"
-                      value={formData.fullname}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
-                      required
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">Email:</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-                      required
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">Phone No:</label>
-                    <input
-                      type="text"
-                      name="phone_no"
-                      value={formData.phone_no}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
-                      required
-                    />
-                  </div>
-
-                  {/* National ID */}
-                  <div className="flex items-center mb-5">
-                    <label className="text-[#14213d] font-semibold w-[130px]">National ID:</label>
-                    <input
-                      type="text"
-                      name="national_id"
-                      value={formData.national_id}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-                      required
-                    />
-                  </div>
+                  {['fullname','email','phone_no','national_id'].map((field) => (
+                    <div className="flex items-center gap-3 mb-5" key={field}>
+                      <label className="text-[#14213d] font-semibold w-[110px]">{field.replace('_',' ').toUpperCase()}:</label>
+                      <input
+                        type={field === 'email' ? 'email' : 'text'}
+                        name={field}
+                        value={formData[field]}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
+                        required
+                      />
+                    </div>
+                  ))}
 
                   {/* Gender */}
                   <div className="flex items-center mb-5">
                     <label className="text-[#14213d] font-semibold w-[110px]">Gender:</label>
                     <div className="flex gap-6">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="Male"
-                          checked={formData.gender === 'Male'}
-                          onChange={handleChange}
-                          className="accent-[#14213d]"
-                        />
-                        Male
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="Female"
-                          checked={formData.gender === 'Female'}
-                          onChange={handleChange}
-                          className="accent-[#14213d]"
-                        />
-                        Female
-                      </label>
+                      {['Male','Female'].map((g) => (
+                        <label className="flex items-center gap-2" key={g}>
+                          <input
+                            type="radio"
+                            name="gender"
+                            value={g}
+                            checked={formData.gender === g}
+                            onChange={handleChange}
+                            className="accent-[#14213d]"
+                          />
+                          {g}
+                        </label>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Subcounty */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">Subcounty:</label>
-                    <select
-                      name="subcounty"
-                      value={formData.subcounty}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-                      required
-                    >
-                      <option value="">Select Subcounty:</option>
-                      {subcounties.map((s, i) => (
-                        <option key={i} value={s}>{s}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Ward */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">Ward:</label>
-                    <select
-                      name="ward"
-                      value={formData.ward}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2  focus:ring-[#14213d]"
-                      required
-                    >
-                      <option value="">Select Ward</option>
-                      {wards.map((w, i) => (
-                        <option key={i} value={w}>{w}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Position */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
-                    <select
-                      name="position"
-                      value={formData.position}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-                      required
-                    >
-                      <option value="">Select Position</option>
-                      {positions.map((p, i) => (
-                        <option key={i} value={p}>{p}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Upload digital signature if Chairperson */}
-                  {formData.position === "Chairperson" && (
-                    <div className="flex items-center gap-3 mb-5">
-                      <label className="text-[#14213d] font-semibold w-[110px]">Signature:</label>
-                      <input
-                        type="file"
-                        name="digital_signature"
-                        accept="image/*,.pdf"
-                        onChange={handleFileChange}
-                        className="flex-1 border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-                      />
+                  {/* Subcounty, Ward, Position */}
+                  {[
+                    {name:'subcounty', options:subcounties},
+                    {name:'ward', options:wards},
+                    {name:'position', options:positions}
+                  ].map(({name,options}) => (
+                    <div className="flex items-center gap-3 mb-5" key={name}>
+                      <label className="text-[#14213d] font-semibold w-[110px]">{name.charAt(0).toUpperCase() + name.slice(1)}:</label>
+                      <select
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                        required
+                      >
+                        <option value="">Select {name.charAt(0).toUpperCase() + name.slice(1)}</option>
+                        {options.map((opt,i) => <option key={i} value={opt}>{opt}</option>)}
+                      </select>
                     </div>
-                  )}
+                  ))}
 
                   <button
                     type="submit"
@@ -498,145 +352,55 @@ const CommitteeProfile = () => {
             </button>
             <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* Fullname */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Fullname:</label>
-                <input
-                  type="text"
-                  name="fullname"
-                  value={formData.fullname}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Email:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              {/* Phone */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Phone:</label>
-                <input
-                  type="text"
-                  name="phone_no"
-                  value={formData.phone_no}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              {/* National ID */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">National ID:</label>
-                <input
-                  type="text"
-                  name="national_id"
-                  value={formData.national_id}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              {/* Gender */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Gender:</label>
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2">
+              {Object.keys(formData).map((field) => (
+                <div className="flex items-center gap-3" key={field}>
+                  <label className="w-[110px] font-medium">{field.replace('_',' ').toUpperCase()}:</label>
+                  {field === 'gender' ? (
+                    <div className="flex gap-6">
+                      {['Male','Female'].map((g) => (
+                        <label className="flex items-center gap-2" key={g}>
+                          <input
+                            type="radio"
+                            name="gender"
+                            value={g}
+                            checked={formData.gender === g}
+                            onChange={handleChange}
+                            className="accent-[#14213d]"
+                          />
+                          {g}
+                        </label>
+                      ))}
+                    </div>
+                  ) : field==='subcounty' || field==='ward' || field==='position' ? null : (
                     <input
-                      type="radio"
-                      name="gender"
-                      value="Male"
-                      checked={formData.gender === 'Male'}
+                      type={field==='email'?'email':'text'}
+                      name={field}
+                      value={formData[field]}
                       onChange={handleChange}
-                      className="accent-[#14213d]"
+                      className="flex-1 border rounded px-3 py-2"
                     />
-                    Male
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Female"
-                      checked={formData.gender === 'Female'}
-                      onChange={handleChange}
-                      className="accent-[#14213d]"
-                    />
-                    Female
-                  </label>
+                  )}
                 </div>
-              </div>
-
-              {/* Subcounty */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Subcounty:</label>
-                <select
-                  name="subcounty"
-                  value={formData.subcounty}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                >
-                  <option value="">Select Subcounty</option>
-                  {subcounties.map((s, i) => (
-                    <option key={i} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Ward */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Ward:</label>
-                <select
-                  name="ward"
-                  value={formData.ward}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                >
-                  <option value="">Select Ward</option>
-                  {wards.map((w, i) => (
-                    <option key={i} value={w}>{w}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Position */}
-              <div className="flex items-center gap-3">
-                <label className="w-[110px] font-medium">Position:</label>
-                <select
-                  name="position"
-                  value={formData.position}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-3 py-2"
-                >
-                  <option value="">Select Position</option>
-                  {positions.map((p, i) => (
-                    <option key={i} value={p}>{p}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Signature in edit too (if Chairperson) */}
-              {formData.position === "Chairperson" && (
-                <div className="flex items-center gap-3">
-                  <label className="w-[110px] font-medium">Signature:</label>
-                  <input
-                    type="file"
-                    name="digital_signature"
-                    accept="image/*,.pdf"
-                    onChange={handleFileChange}
+              ))}
+              {/* Subcounty, Ward, Position in edit */}
+              {[
+                {name:'subcounty', options:subcounties},
+                {name:'ward', options:wards},
+                {name:'position', options:positions}
+              ].map(({name,options}) => (
+                <div className="flex items-center gap-3" key={name}>
+                  <label className="w-[110px] font-medium">{name.charAt(0).toUpperCase() + name.slice(1)}:</label>
+                  <select
+                    name={name}
+                    value={formData[name]}
+                    onChange={handleChange}
                     className="flex-1 border rounded px-3 py-2"
-                  />
+                  >
+                    <option value="">Select {name.charAt(0).toUpperCase() + name.slice(1)}</option>
+                    {options.map((opt,i) => <option key={i} value={opt}>{opt}</option>)}
+                  </select>
                 </div>
-              )}
-
+              ))}
               <button
                 type="submit"
                 className="px-4 py-2 bg-[#14213d] text-white rounded hover:bg-gray-800"

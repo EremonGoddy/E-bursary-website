@@ -18,7 +18,6 @@ const multer = require("multer");
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/uploads', express.static(UPLOAD_DIR));
 app.use(bodyParser.json());
 
 // ✅ JWT Secret from .env or fallback
@@ -1444,7 +1443,7 @@ app.get('/api/profile-committee', (req, res) => {
 
     const sqlGet = `
       SELECT fullname, email, phone_no, national_id, subcounty, 
-             ward, position, digital_signature,
+             ward, position, gender,
              CASE 
                WHEN fullname IS NULL OR phone_no IS NULL OR national_id IS NULL THEN 0
                ELSE 1
@@ -1463,23 +1462,15 @@ app.get('/api/profile-committee', (req, res) => {
         return res.status(404).send('Profile not found');
       }
 
-      let profile = result.rows[0];
-
-      // ✅ If signature exists, return a dynamic URL
-      if (profile.digital_signature) {
-        profile.digital_signature_url = `${req.protocol}://${req.get("host")}/uploads/${profile.digital_signature}`;
-      }
-
+      const profile = result.rows[0];
       res.json(profile);
     });
   });
 });
 
 
-
-
-// POST profile-form with gender + digital_signature
-app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => {
+// POST profile-form without digital_signature
+app.post('/api/profile-form', (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token is required');
 
@@ -1488,22 +1479,16 @@ app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => 
 
     const { fullname, phone_no, national_id, subcounty, ward, position, gender } = req.body;
 
-    // ✅ Enforce Chairperson must upload signature
-    if (position === "Chairperson" && !req.file) {
-      return res.status(400).json({ error: "Digital signature is required for Chairperson." });
-    }
-
     if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position || !gender) {
       return res.status(400).send('All profile fields are required');
     }
 
     const email = decoded.email;
-    const digital_signature = req.file ? req.file.filename : null;
 
     const sqlInsert = `
       INSERT INTO bursary.profile_committee 
-      (fullname, email, phone_no, national_id, subcounty, ward, position, gender, digital_signature) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      (fullname, email, phone_no, national_id, subcounty, ward, position, gender) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `;
 
     pool.query(sqlInsert, [
@@ -1514,8 +1499,7 @@ app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => 
       subcounty,
       ward,
       position,
-      gender,
-      digital_signature
+      gender
     ], (err, result) => {
       if (err) {
         console.error('Error inserting committee data:', err);
@@ -1535,13 +1519,13 @@ app.post('/api/profile-form', upload.single('digital_signature'), (req, res) => 
           subcounty,
           ward,
           position,
-          gender,
-          digital_signature
+          gender
         }
       });
     });
   });
 });
+
 
 // GET committee report with generated REFNO
 app.get('/api/comreport', (req, res) => {
