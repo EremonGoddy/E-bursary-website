@@ -23,9 +23,7 @@ const StatusMessagePage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const toggleSidebar = () => {
-    setSidebarActive(!sidebarActive);
-  };
+  const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
   // ✅ Fetch student info & document upload status
   useEffect(() => {
@@ -41,82 +39,70 @@ const StatusMessagePage = () => {
     setUserName(name);
     setLoading(true);
 
+    // Fetch student details
     axios.get('https://e-bursary-backend.onrender.com/api/student', {
       headers: { Authorization: token }
     })
-    .then((response) => {
-      setStudentDetails(response.data);
+    .then(res => {
+      setStudentDetails(res.data);
       setLoading(false);
     })
     .catch(() => setLoading(false));
 
+    // Check document upload status
     if (userId) {
       axios.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
         headers: { Authorization: token }
       })
-      .then((res) => {
-        const isUploaded = res.data && res.data.uploaded === true;
-        setDocumentUploaded(isUploaded);
-      })
+      .then(res => setDocumentUploaded(res.data?.uploaded || false))
       .catch(() => setDocumentUploaded(false));
     }
   }, [navigate]);
 
- useEffect(() => {
-  const token = sessionStorage.getItem('authToken');
-  const userId = sessionStorage.getItem('userId');
+  // ✅ Fetch status message & "is_new" flag
+  useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    const userId = sessionStorage.getItem('userId');
 
-  if (!token) {
-    navigate('/signin');
-    return;
-  }
+    if (!token) return;
 
-  if (userId) {
-    axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
-      headers: { Authorization: token }
-    })
-    .then(response => {
-      const { status_message, is_new } = response.data;
-
-      setStatusMessage(status_message);
-
-      if (is_new) {
-        setHasNewMessage(true);
-        sessionStorage.setItem("hasNewMessage", "true");
-      } else {
+    if (userId) {
+      axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
+        headers: { Authorization: token }
+      })
+      .then(response => {
+        const { status_message, is_new } = response.data;
+        setStatusMessage(status_message);
+        setHasNewMessage(is_new);
+        sessionStorage.setItem("hasNewMessage", is_new ? "true" : "false");
+        setLoading(false);
+      })
+      .catch(() => {
+        setStatusMessage('No status message available.');
         setHasNewMessage(false);
+        setLoading(false);
+      });
+    }
+  }, [navigate]);
+
+  // ✅ Mark message as read when page loads
+  useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    const userId = sessionStorage.getItem('userId');
+
+    if (userId && token) {
+      axios.put(
+        `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
+        {},
+        { headers: { Authorization: token } }
+      )
+      .then(() => {
+        setHasNewMessage(false); // hide red dot
         sessionStorage.setItem("hasNewMessage", "false");
-      }
-
-      setLoading(false);
-    })
-    .catch(() => {
-      setStatusMessage('No status message available.');
-      setHasNewMessage(false);
-      setLoading(false);
-    });
-  }
-}, [navigate]);
-
-
-useEffect(() => {
-  const token = sessionStorage.getItem('authToken');
-  const userId = sessionStorage.getItem('userId');
-
-  if (userId && token) {
-    axios.put(
-      `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
-      {},
-      { headers: { Authorization: token } }
-    )
-    .then(() => {
-      setHasNewMessage(false);
-      sessionStorage.setItem("hasNewMessage", "false");
-    })
-    .catch(err => console.error('Error marking message as read:', err));
-  }
-}, []);
-
+      })
+      .catch(err => console.error('Error marking message as read:', err));
+    }
+  }, []);
 
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
