@@ -72,7 +72,7 @@ const StudentDashboard = () => {
   };
 
 
-  useEffect(() => {
+useEffect(() => {
   const token = sessionStorage.getItem('authToken');
   const userId = sessionStorage.getItem('userId');
 
@@ -87,7 +87,9 @@ const StudentDashboard = () => {
     })
     .then(response => {
       const message = response.data.status_message;
-      if (message && message.toLowerCase().includes("new")) {
+
+      // ✅ Mark as new if there is any status update at all
+      if (message && message.trim() !== "") {
         setHasNewMessage(true);
       } else {
         setHasNewMessage(false);
@@ -97,7 +99,8 @@ const StudentDashboard = () => {
       console.error('Error checking status message:', err);
     });
   }
-}, []);
+}, [navigate]);
+
 
   // Toggle sidebar
   const toggleSidebar = () => {
