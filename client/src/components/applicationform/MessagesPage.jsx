@@ -86,23 +86,24 @@ const StatusMessagePage = () => {
   }, [navigate]);
 
   // ✅ Mark message as read when page loads
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const userId = sessionStorage.getItem('userId');
+ useEffect(() => {
+  const token = sessionStorage.getItem('authToken');
+  const userId = sessionStorage.getItem('userId');
 
-    if (userId && token) {
-      axios.put(
-        `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
-        {},
-        { headers: { Authorization: token } }
-      )
-      .then(() => {
-        setHasNewMessage(false); // hide red dot
-        sessionStorage.setItem("hasNewMessage", "false");
-      })
-      .catch(err => console.error('Error marking message as read:', err));
-    }
-  }, []);
+  if (!token || !userId) return;
+
+  // Mark the message as read
+  axios.put(
+    `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
+    {},
+    { headers: { Authorization: token } }
+  )
+  .then(() => {
+    sessionStorage.setItem("hasNewMessage", "false"); // ✅ Persist across pages
+  })
+  .catch(err => console.error('Error marking message as read:', err));
+}, []);
+
 
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">

@@ -28,10 +28,12 @@ const StudentDashboard = () => {
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
-  const [hasNewMessage, setHasNewMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const navigate = useNavigate();
+  const [hasNewMessage, setHasNewMessage] = useState(
+  sessionStorage.getItem("hasNewMessage") === "true"
+);
 
 
     const getStatusIcon = (status) => {
@@ -71,46 +73,44 @@ const StudentDashboard = () => {
     }
   };
 
-useEffect(() => {
-  const token = sessionStorage.getItem('authToken');
-  const userId = sessionStorage.getItem('userId');
-
-  if (!token || !userId) return;
-
-  axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
-    headers: { Authorization: token }
-  })
-  .then(res => {
-    const { is_new } = res.data;
-    setHasNewMessage(is_new);
-    sessionStorage.setItem("hasNewMessage", is_new ? "true" : "false");
-  })
-  .catch(err => console.error(err));
-}, []);
 
 useEffect(() => {
   const token = sessionStorage.getItem('authToken');
   const userId = sessionStorage.getItem('userId');
 
-  if (!token || !userId) return;
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
 
-  // Mark message as read
-  axios.put(
-    `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
-    {},
-    { headers: { Authorization: token } }
-  )
-  .then(() => {
-    setHasNewMessage(false);
-    sessionStorage.setItem("hasNewMessage", "false");
-  })
-  .catch(err => console.error('Error marking message as read:', err));
-}, []);
+  if (userId) {
+    axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
+      headers: { Authorization: token }
+    })
+    .then(response => {
+      const message = response.data.status_message;
+      const isRead = response.data.is_read; // ✅ backend should send this flag
+
+      if (message && message.trim() !== "" && !isRead) {
+        setHasNewMessage(true);
+        sessionStorage.setItem("hasNewMessage", "true");
+      } else {
+        setHasNewMessage(false);
+        sessionStorage.setItem("hasNewMessage", "false");
+      }
+    })
+    .catch(err => {
+      console.error('Error checking status message:', err);
+    });
+  }
+}, [navigate]);
+
 
   // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
+
 
   // Fetch student info and document upload status
   useEffect(() => {
@@ -375,12 +375,12 @@ useEffect(() => {
             sidebarActive ? 'justify-start' : 'justify-center'
           }`}
         >
-         <div className="relative">
-  <FontAwesomeIcon icon={faBell} className="text-[1.2rem] md:text-[1.4rem]" />
-  {hasNewMessage && (
-    <span className="absolute -top-2 -right-1 w-3.5 h-3.5 bg-red-600 rounded-full"></span>
-  )}
-</div>
+          <div className="relative">
+            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+            {item.label === 'Notification' && hasNewMessage && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+            )}
+          </div>
           <span
             className={`${
               sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
