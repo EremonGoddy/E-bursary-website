@@ -319,10 +319,11 @@ app.post("/api/approve-student", async (req, res) => {
 });
 
 
+// ✅ Fetch status message and "is_new" flag
 app.get('/api/status-message/user/:userId', async (req, res) => {
   const userId = req.params.userId;
   const sql = `
-    SELECT status_message 
+    SELECT status_message, is_new
     FROM bursary.personal_details 
     WHERE user_id = $1
   `;
@@ -330,12 +331,37 @@ app.get('/api/status-message/user/:userId', async (req, res) => {
     const result = await pool.query(sql, [userId]);
 
     if (result.rows.length > 0) {
-      res.json({ status_message: result.rows[0].status_message });
+      res.json({
+        status_message: result.rows[0].status_message,
+        is_new: result.rows[0].is_new
+      });
     } else {
       res.status(404).json({ message: 'Not found' });
     }
   } catch (error) {
     console.error('Error fetching status message:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// ✅ Mark message as "read" when viewed
+app.put('/api/status-message/user/:userId/read', async (req, res) => {
+  const userId = req.params.userId;
+  const sql = `
+    UPDATE bursary.personal_details
+    SET is_new = false
+    WHERE user_id = $1
+    RETURNING status_message, is_new
+  `;
+  try {
+    const result = await pool.query(sql, [userId]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: 'Not found' });
+    }
+  } catch (error) {
+    console.error('Error marking message as read:', error);
     res.status(500).send('Server error');
   }
 });
