@@ -71,25 +71,15 @@ const StudentDashboard = () => {
     }
   };
 
-
 useEffect(() => {
   const token = sessionStorage.getItem('authToken');
   const userId = sessionStorage.getItem('userId');
-  const storedMessageFlag = sessionStorage.getItem("hasNewMessage");
 
   if (!token) {
     navigate('/signin');
     return;
   }
 
-  // ✅ Step 1: Apply stored flag immediately (instant UI update)
-  if (storedMessageFlag === "false") {
-    setHasNewMessage(false);
-  } else if (storedMessageFlag === "true") {
-    setHasNewMessage(true);
-  }
-
-  // ✅ Step 2: Always confirm with backend
   if (userId) {
     axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
       headers: { Authorization: token }
@@ -111,13 +101,10 @@ useEffect(() => {
   }
 }, [navigate]);
 
-
-
   // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarActive(!sidebarActive);
   };
-
 
   // Fetch student info and document upload status
   useEffect(() => {

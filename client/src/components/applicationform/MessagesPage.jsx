@@ -62,50 +62,61 @@ const StatusMessagePage = () => {
     }
   }, [navigate]);
 
-  // ✅ Fetch status message
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const userId = sessionStorage.getItem('userId');
+ useEffect(() => {
+  const token = sessionStorage.getItem('authToken');
+  const userId = sessionStorage.getItem('userId');
 
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
 
-    if (userId) {
-      axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
-        headers: { Authorization: token }
-      })
-      .then(response => {
-        setStatusMessage(response.data.status_message);
-        setHasNewMessage(true); // assume new message exists
-        setLoading(false);
-      })
-      .catch(() => {
-        setStatusMessage('No status message available.');
-        setLoading(false);
-      });
-    }
-  }, [navigate]);
+  if (userId) {
+    axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
+      headers: { Authorization: token }
+    })
+    .then(response => {
+      const { status_message, is_new } = response.data;
 
-  // ✅ Mark message as read when page is opened
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const userId = sessionStorage.getItem('userId');
+      setStatusMessage(status_message);
 
-    if (userId && token) {
-      axios.put(
-        `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
-        {},
-        { headers: { Authorization: token } }
-      )
-      .then(() => {
-        setHasNewMessage(false); // hide red dot
-        sessionStorage.setItem("hasNewMessage", "false"); // store for dashboard
-      })
-      .catch(err => console.error('Error marking message as read:', err));
-    }
-  }, []);
+      if (is_new) {
+        setHasNewMessage(true);
+        sessionStorage.setItem("hasNewMessage", "true");
+      } else {
+        setHasNewMessage(false);
+        sessionStorage.setItem("hasNewMessage", "false");
+      }
+
+      setLoading(false);
+    })
+    .catch(() => {
+      setStatusMessage('No status message available.');
+      setHasNewMessage(false);
+      setLoading(false);
+    });
+  }
+}, [navigate]);
+
+
+useEffect(() => {
+  const token = sessionStorage.getItem('authToken');
+  const userId = sessionStorage.getItem('userId');
+
+  if (userId && token) {
+    axios.put(
+      `https://e-bursary-backend.onrender.com/api/status-message/user/${userId}/read`,
+      {},
+      { headers: { Authorization: token } }
+    )
+    .then(() => {
+      setHasNewMessage(false);
+      sessionStorage.setItem("hasNewMessage", "false");
+    })
+    .catch(err => console.error('Error marking message as read:', err));
+  }
+}, []);
+
 
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
