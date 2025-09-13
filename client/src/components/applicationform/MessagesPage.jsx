@@ -62,7 +62,7 @@ const StatusMessagePage = () => {
     }
   }, [navigate]);
 
-  // ✅ Check if there's a new status message
+  // ✅ Fetch status message
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const userId = sessionStorage.getItem('userId');
@@ -78,7 +78,7 @@ const StatusMessagePage = () => {
       })
       .then(response => {
         setStatusMessage(response.data.status_message);
-        setHasNewMessage(response.data.is_new); // 👈 use backend is_new
+        setHasNewMessage(true); // assume new message exists
         setLoading(false);
       })
       .catch(() => {
@@ -99,7 +99,10 @@ const StatusMessagePage = () => {
         {},
         { headers: { Authorization: token } }
       )
-      .then(() => setHasNewMessage(false)) // clear red dot
+      .then(() => {
+        setHasNewMessage(false); // hide red dot
+        sessionStorage.setItem("hasNewMessage", "false"); // store for dashboard
+      })
       .catch(err => console.error('Error marking message as read:', err));
     }
   }, []);
@@ -197,7 +200,7 @@ const StatusMessagePage = () => {
                     <div className="relative">
                       <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
                       {item.label === 'Notification' && hasNewMessage && (
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
                       )}
                     </div>
                     {sidebarActive && <span className="ml-2 font-semibold">{item.label}</span>}

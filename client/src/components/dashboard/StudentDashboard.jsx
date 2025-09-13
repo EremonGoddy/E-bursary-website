@@ -75,10 +75,16 @@ const StudentDashboard = () => {
 useEffect(() => {
   const token = sessionStorage.getItem('authToken');
   const userId = sessionStorage.getItem('userId');
+  const storedMessageFlag = sessionStorage.getItem('hasNewMessage');
 
   if (!token) {
     navigate('/signin');
     return;
+  }
+
+  if (storedMessageFlag === "false") {
+    setHasNewMessage(false);
+    return; // ✅ already marked as read
   }
 
   if (userId) {
@@ -88,9 +94,9 @@ useEffect(() => {
     .then(response => {
       const message = response.data.status_message;
 
-      // ✅ Mark as new if there is any status update at all
       if (message && message.trim() !== "") {
         setHasNewMessage(true);
+        sessionStorage.setItem("hasNewMessage", "true");
       } else {
         setHasNewMessage(false);
       }
@@ -100,6 +106,7 @@ useEffect(() => {
     });
   }
 }, [navigate]);
+
 
 
   // Toggle sidebar
@@ -374,7 +381,7 @@ useEffect(() => {
           <div className="relative">
             <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
             {item.label === 'Notification' && hasNewMessage && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+              <span className="absolute -top-2 -right-1 w-3.5 h-3.5 bg-red-600 rounded-full "></span>
             )}
           </div>
           <span
