@@ -24,7 +24,7 @@ const RegisterPage = () => {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
-    role: 'Committee',
+    role: 'Admin',
   });
   const [errors, setErrors] = useState({});
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);

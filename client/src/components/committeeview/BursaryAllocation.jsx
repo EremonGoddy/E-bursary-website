@@ -20,6 +20,7 @@ const BursaryAllocation = () => {
   const [committeeDetails, setCommitteeDetails] = useState({});
   const [userName, setUserName] = useState('');
   const [selectedAmount, setSelectedAmount] = useState({});
+  const [amountData, setAmountData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -54,6 +55,15 @@ const BursaryAllocation = () => {
       console.error('Error fetching bursary data:', error);
     }
   };
+
+  const loadAmountData = useCallback(async () => {
+try {
+const response = await axios.get(`https://e-bursary-backend.onrender.com/api/amountInformation/${id}`);
+setAmountData(response.data);
+} catch (error) {
+console.error('Error fetching amount information:', error);
+}
+}, [id]);
 
   useEffect(() => {
     loadData();
@@ -124,6 +134,11 @@ const BursaryAllocation = () => {
   { icon: faCog, label: 'Settings', to: '/committeesetting' },
   { icon: faSignOutAlt, label: 'Logout', isLogout: true }
   ];
+
+  useEffect(() => {
+  loadAmountData();
+  }, [ loadAmountData]);
+  
 
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
@@ -261,6 +276,17 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
       {remainingAmount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Ksh
     </strong>
   </div>
+  {amountData.map((item) => (
+    <div key={item.user_id} className="text-center text-[0.8rem] text-[#14213d]  md:text-[1rem] font-bold">
+    <p>Requested Amount:</p>
+    <strong>
+ {Number(item.payable_figures).toLocaleString("en-KE", { 
+  minimumFractionDigits: 2, 
+  maximumFractionDigits: 2 
+})} Ksh
+    </strong>
+  </div>
+  ))}
 </div>
 
 

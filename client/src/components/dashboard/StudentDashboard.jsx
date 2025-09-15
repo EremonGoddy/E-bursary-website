@@ -28,12 +28,10 @@ const StudentDashboard = () => {
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({});
   const [userName, setUserName] = useState('');
+  const [hasNewMessage, setHasNewMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const navigate = useNavigate();
-  const [hasNewMessage, setHasNewMessage] = useState(
-  sessionStorage.getItem("hasNewMessage") === "true"
-);
 
 
     const getStatusIcon = (status) => {
@@ -89,14 +87,12 @@ useEffect(() => {
     })
     .then(response => {
       const message = response.data.status_message;
-      const isRead = response.data.is_read; // ✅ backend should send this flag
 
-      if (message && message.trim() !== "" && !isRead) {
+      // ✅ Mark as new if there is any status update at all
+      if (message && message.trim() !== "") {
         setHasNewMessage(true);
-        sessionStorage.setItem("hasNewMessage", "true");
       } else {
         setHasNewMessage(false);
-        sessionStorage.setItem("hasNewMessage", "false");
       }
     })
     .catch(err => {

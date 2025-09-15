@@ -370,9 +370,9 @@ View Document
 ))}
 </div>
 {/* Approval and Rejection Buttons */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <button
-            className={`px-4 py-3 rounded font-bold text-white ${isAllDataAvailable ? 'bg-green-500 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'}`}
+            className={`px-4 py-3 cursor-pointer rounded-xl font-bold text-white ${isAllDataAvailable ? 'bg-green-500 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'}`}
             onClick={() => updateStatus(id, 'Approved')}
             disabled={!isAllDataAvailable}
           >
@@ -380,14 +380,14 @@ View Document
           </button>
 
           <button
-            className="bg-red-500 hover:bg-red-700 text-white px-4 py-3 rounded font-bold"
+            className="bg-red-500 cursor-pointer hover:bg-red-700 text-white px-4 py-3 rounded-xl font-bold"
             onClick={() => updateStatus(id, 'Rejected')}
           >
             Reject Application
           </button>
 
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-3 rounded font-bold"
+            className="bg-blue-500 cursor-pointer hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-bold"
             onClick={() => updateStatus(id, 'Incomplete')}
           >
             Incomplete Application
