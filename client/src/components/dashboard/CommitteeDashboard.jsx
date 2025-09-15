@@ -238,7 +238,7 @@ ${sidebarActive ? 'ml-[0px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 {/* Bursary Fund Details */}
 <div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
 transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
-<h2 className="text-center text-base md:text-2xl font-bold mb-2 md:mb-4">Bursary Fund Details</h2>
+<h2 className="text-xl font-bold text-center">Bursary Fund Details</h2>
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-4">
 <div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Funds Available</p>

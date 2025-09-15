@@ -1063,7 +1063,7 @@ app.get('/api/committee-count', async (req, res) => {
 app.get('/api/quick-statistics', async (req, res) => {
   const queryTotal = 'SELECT COUNT(*) AS total FROM bursary.personal_details';
   const queryApproved = "SELECT COUNT(*) AS approved FROM bursary.personal_details WHERE status = 'Approved'";
-  const queryRejected = "SELECT COUNT(*) AS rejected FROM bursary.personal_details WHERE status = 'rejected'";
+  const queryRejected = "SELECT COUNT(*) AS rejected FROM bursary.personal_details WHERE status = 'Rejected'";
   const queryPending = "SELECT COUNT(*) AS pending FROM bursary.personal_details WHERE status = 'pending'";
   const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM bursary.personal_details WHERE status = 'Incomplete'";
 
