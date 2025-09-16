@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Pie, Bar } from 'react-chartjs-2';
@@ -102,29 +102,65 @@ const rejectedPercentage = totalApplications > 0 ? (rejectedApplications / total
 const pendingPercentage = totalApplications > 0 ? (pendingApplications / totalApplications) * 100 : 0;
 const incompletePercentage = totalApplications > 0 ? (incompleteApplications / totalApplications) * 100 : 0;
 
-const chartData = {
-labels: ['Approved', 'Rejected', 'Pending', 'Incomplete'],
-datasets: [
-{
-data: [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage],
-backgroundColor: ['#4CAF50', '#FF5252', '#FFC107', '#2196F3'],
-hoverBackgroundColor: ['#388E3C', '#D32F2F', '#FFA000', '#1976D2'],
-},
-],
-};
 
-const chartOptions = {
-plugins: {
-datalabels: {
-color: '#fff',
-formatter: (value) => `${value.toFixed(2)}%`,
-font: {
-weight: 'bold',
-size: 15,
-},
-},
-},
-};
+// inside component
+const chartData = useMemo(() => ({
+  labels: ["Approved", "Rejected", "Pending", "Incomplete"],
+  datasets: [
+    {
+      data: [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage],
+      backgroundColor: ["#4CAF50", "#FF5252", "#FFC107", "#2196F3"],
+      hoverBackgroundColor: ["#388E3C", "#D32F2F", "#FFA000", "#1976D2"],
+    },
+  ],
+}), [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage]);
+
+const chartOptions = useMemo(() => ({
+  plugins: {
+    datalabels: {
+      color: "#fff",
+      formatter: (value) => `${value.toFixed(2)}%`,
+      font: { weight: "bold", size: 15 },
+    },
+  },
+}), []);
+
+// Bar chart
+const barData = useMemo(() => ({
+  labels: ["Approved", "Rejected", "Pending", "Incomplete"],
+  datasets: [
+    {
+      label: "Applications",
+      data: [
+        approvedApplications,
+        rejectedApplications,
+        pendingApplications,
+        incompleteApplications,
+      ],
+      backgroundColor: ["#4CAF50", "#FF5252", "#FFC107", "#2196F3"],
+    },
+  ],
+}), [approvedApplications, rejectedApplications, pendingApplications, incompleteApplications]);
+
+const barOptions = useMemo(() => ({
+  responsive: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: "#14213d",
+      titleColor: "#fff",
+      bodyColor: "#fff",
+      padding: 10,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: { precision: 0 },
+    },
+  },
+}), []);
+
 
 const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/admindashboard' },
@@ -389,103 +425,46 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 
 </div>
 
-{/* Approval Status Chart */}
+{/* Approval Status Chart (Pie) */}
 <div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
 transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
   <h2 className="text-xl md:text-2xl font-bold text-center text-[#14213d] mb-4">
-    Approval Status
+    Approval Status (Pie)
   </h2>
   <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
-    {/* Pie Chart */}
-    <div className="w-full md:w-1/2">
-      <Pie
-        key={`pie-${approvedApplications}-${rejectedApplications}-${pendingApplications}-${incompleteApplications}`}
-        data={chartData}
-        options={{
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              color: '#fff',
-              formatter: (value) => `${value.toFixed(1)}%`,
-              font: { weight: 'bold', size: 14 },
-            },
-            tooltip: {
-              backgroundColor: '#14213d',
-              titleColor: '#fff',
-              bodyColor: '#fff',
-              padding: 10,
-              borderWidth: 1,
-              borderColor: '#ccc',
-              callbacks: {
-                label: (tooltipItem) =>
-                  `${tooltipItem.label}: ${tooltipItem.formattedValue}%`,
-              },
-            },
-          },
-          animation: { animateScale: true, animateRotate: true },
-        }}
-      />
+    <div className="w-full md:w-2/3 lg:w-1/2">
+<Pie data={chartData} options={chartOptions} />
+ {/* ✅ added redraw */}
     </div>
 
-    {/* Bar Chart */}
-    <div className="w-full md:w-1/2">
-      <Bar
-        key={`bar-${approvedApplications}-${rejectedApplications}-${pendingApplications}-${incompleteApplications}`}
-        data={{
-          labels: ['Approved', 'Rejected', 'Pending', 'Incomplete'],
-          datasets: [
-            {
-              label: 'Applications',
-              data: [
-                approvedApplications,
-                rejectedApplications,
-                pendingApplications,
-                incompleteApplications,
-              ],
-              backgroundColor: ['#4CAF50', '#FF5252', '#FFC107', '#2196F3'],
-              borderRadius: 6,
-            },
-          ],
-        }}
-        options={{
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#14213d',
-              titleColor: '#fff',
-              bodyColor: '#fff',
-              padding: 10,
-              borderWidth: 1,
-              borderColor: '#ccc',
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { stepSize: 1 },
-            },
-          },
-        }}
-      />
+    {/* Custom Legend */}
+    <div className="flex flex-col space-y-3 text-sm md:text-base">
+      {[
+        { label: 'Approved', color: '#4CAF50' },
+        { label: 'Rejected', color: '#FF5252' },
+        { label: 'Pending', color: '#FFC107' },
+        { label: 'Incomplete', color: '#2196F3' },
+      ].map((item, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          <span
+            className="inline-block w-4 h-4 rounded-full shadow-md"
+            style={{ backgroundColor: item.color }}
+          ></span>
+          <span className="font-medium text-gray-700">{item.label}</span>
+        </div>
+      ))}
     </div>
   </div>
+</div>
 
-  {/* Custom Legend */}
-  <div className="flex flex-wrap justify-center gap-4 mt-4 text-sm md:text-base">
-    {[
-      { label: 'Approved', color: '#4CAF50' },
-      { label: 'Rejected', color: '#FF5252' },
-      { label: 'Pending', color: '#FFC107' },
-      { label: 'Incomplete', color: '#2196F3' },
-    ].map((item, index) => (
-      <div key={index} className="flex items-center space-x-2">
-        <span
-          className="inline-block w-4 h-4 rounded-full shadow-md"
-          style={{ backgroundColor: item.color }}
-        ></span>
-        <span className="font-medium text-gray-700">{item.label}</span>
-      </div>
-    ))}
+{/* Application Status Chart (Bar) */}
+<div className="w-full mb-6 md:mb-8 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+  <h2 className="text-xl md:text-2xl font-bold text-center text-[#14213d] mb-4">
+    Application Status (Bar)
+  </h2>
+  <div className="w-full">
+<Bar data={barData} options={barOptions} /> {/* ✅ uses barData + barOptions */}
   </div>
 </div>
 
