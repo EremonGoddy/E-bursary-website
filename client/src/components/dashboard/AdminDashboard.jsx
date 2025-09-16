@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Pie, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend,CategoryScale,LinearScale,BarElement,
+ } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -18,7 +19,16 @@ faSignOutAlt,
 faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
-ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ChartDataLabels
+);
+
 
 const AdminDashboard = () => {
 const [sidebarActive, setSidebarActive] = useState(false);
@@ -102,64 +112,121 @@ const rejectedPercentage = totalApplications > 0 ? (rejectedApplications / total
 const pendingPercentage = totalApplications > 0 ? (pendingApplications / totalApplications) * 100 : 0;
 const incompletePercentage = totalApplications > 0 ? (incompleteApplications / totalApplications) * 100 : 0;
 
+const chartData = {
+    labels: ['Approved', 'Rejected', 'Pending', 'Incomplete'],
+    datasets: [
+      {
+        data: [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage],
+        backgroundColor: [
+  "#A5D6A7", // soft modern green
+  "#EF9A9A", // soft modern red
+  "#FFF59D", // soft modern yellow
+  "#90CAF9"  // soft modern blue
+],
+borderColor: [
+  "#2E7D32", // deep green
+  "#C62828", // deep red
+  "#F9A825", // deep yellow
+  "#1565C0"  // deep blue
+],
+borderWidth: 2,
+hoverBackgroundColor: [
+  "#66BB6A", // brighter green hover
+  "#E57373", // brighter red hover
+  "#FFD54F", // brighter yellow hover
+  "#64B5F6"  // brighter blue hover
+],
+hoverBorderColor: [
+  "#1B5E20", // strongest green
+  "#B71C1C", // strongest red
+  "#F57F17", // strongest yellow
+  "#0D47A1"  // strongest blue
+],
+      },
+    ],
+  };
 
-// inside component
-const chartData = useMemo(() => ({
-  labels: ["Approved", "Rejected", "Pending", "Incomplete"],
-  datasets: [
-    {
-      data: [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage],
-      backgroundColor: ["#4CAF50", "#FF5252", "#FFC107", "#2196F3"],
-      hoverBackgroundColor: ["#388E3C", "#D32F2F", "#FFA000", "#1976D2"],
-    },
-  ],
-}), [approvedPercentage, rejectedPercentage, pendingPercentage, incompletePercentage]);
-
-const chartOptions = useMemo(() => ({
+ const chartOptions = {
   plugins: {
+    legend: { display: false },  // ✅ hides the Pie chart legend
     datalabels: {
-      color: "#fff",
+      color: '#fff',
       formatter: (value) => `${value.toFixed(2)}%`,
-      font: { weight: "bold", size: 15 },
+      font: {
+        weight: 'bold',
+        size: 15,
+      },
     },
   },
-}), []);
+};
 
-// Bar chart
-const barData = useMemo(() => ({
-  labels: ["Approved", "Rejected", "Pending", "Incomplete"],
-  datasets: [
-    {
-      label: "Applications",
-      data: [
-        approvedApplications,
-        rejectedApplications,
-        pendingApplications,
-        incompleteApplications,
-      ],
-      backgroundColor: ["#4CAF50", "#FF5252", "#FFC107", "#2196F3"],
-    },
-  ],
-}), [approvedApplications, rejectedApplications, pendingApplications, incompleteApplications]);
 
-const barOptions = useMemo(() => ({
+  // Bar chart config
+  const barData = {
+    labels: ['Approved', 'Rejected', 'Pending', 'Incomplete'],
+    datasets: [
+      {
+        label: 'Applications',
+        data: [approvedApplications, rejectedApplications, pendingApplications, incompleteApplications],
+       backgroundColor: [
+  "#A5D6A7", // soft modern green
+  "#EF9A9A", // soft modern red
+  "#FFF59D", // soft modern yellow
+  "#90CAF9"  // soft modern blue
+],
+borderColor: [
+  "#2E7D32", // deep green
+  "#C62828", // deep red
+  "#F9A825", // deep yellow
+  "#1565C0"  // deep blue
+],
+borderWidth: 2,
+      },
+    ],
+  };
+
+ const barOptions = {
   responsive: true,
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: "#14213d",
-      titleColor: "#fff",
-      bodyColor: "#fff",
+      backgroundColor: '#14213d',
+      titleColor: '#fff',
+      bodyColor: '#fff',
       padding: 10,
+    },
+    datalabels: {
+      color: '#fff',   // ✅ black numbers
+      font: {
+        weight: 'bold',
+        size: 14,      // adjust size if needed
+      },
     },
   },
   scales: {
     y: {
       beginAtZero: true,
-      ticks: { precision: 0 },
+      ticks: {
+        stepSize: 1,
+        precision: 0,
+        color: '#14213d',
+        font: {
+          size: 12,
+          weight: 'bold',
+        },
+      },
+    },
+    x: {
+      ticks: {
+        color: '#14213d',
+        font: {
+          size: 12,
+          weight: 'bold',
+        },
+      },
     },
   },
-}), []);
+};
 
 
 const navItems = [
@@ -302,50 +369,80 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 {/* Bursary Fund Details */}
 <div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
-<h2 className="text-xl font-bold text-[#14213d] text-center">Bursary Fund Details</h2>
-<div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-4">
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Funds Available</p>
-<strong className="text-blue-700 text-2xl">{bursaryAmount}</strong>
+  transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+  <h2 className="text-xl font-bold text-[#14213d] text-center mb-4">
+    Bursary Fund Details
+  </h2>
+
+  <div className="flex flex-col gap-4 md:flex-row md:justify-around md:gap-6">
+    {/* Total Funds Available */}
+    <div className="flex-1 text-center bg-blue-100 border-4 border-[#1565C0] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#1565C0] font-semibold mb-1">Total Funds Available</p>
+      <strong className="text-[#1565C0] text-2xl">{bursaryAmount}</strong>
+    </div>
+
+    {/* Allocated to Students */}
+    <div className="flex-1 text-center bg-green-100 border-4 border-[#2E7D32] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#2E7D32] font-semibold mb-1">Allocated to Students</p>
+      <strong className="text-[#2E7D32] text-2xl">{allocatedAmount}</strong>
+    </div>
+
+    {/* Remaining Funds */}
+    <div className="flex-1 text-center bg-yellow-100 border-4 border-[#F9A825] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#F9A825] font-semibold mb-1">Remaining Funds</p>
+      <strong className="text-[#F9A825] text-2xl">{remainingAmount}</strong>
+    </div>
+  </div>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-green-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-green-700 font-semibold mb-0 md:mb-1">Allocated to Students</p>
-<strong className="text-green-700 text-2xl">{allocatedAmount}</strong>
-</div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-500 rounded-xl p-0 md:p-3  shadow-sm">
-<p className="text-yellow-700 font-semibold mb-0 md:mb-1">Remaining Funds</p>
-<strong className="text-yellow-700 text-2xl">{remainingAmount}</strong>
-</div>
-</div>
-</div>
+
 {/* Quick Statistics */}
 <div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
-<h2 className="text-xl font-bold text-[#14213d] text-center">Quick Statistics</h2>
-<div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-2">
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-yellow-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-yellow-700 font-semibold mb-0 md:mb-1">Pending</p>
-<strong className="text-yellow-700 text-2xl">{pendingApplications}</strong>
+  transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+  <h2 className="text-xl font-bold text-[#14213d] text-center mb-4">
+    Quick Statistics
+  </h2>
+
+  <div className="flex flex-col gap-4 md:flex-row md:justify-around md:gap-6">
+    {/* Pending */}
+    <div className="flex-1 text-center bg-yellow-100 border-4 border-[#F9A825] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#F9A825] font-semibold mb-1">Pending</p>
+      <strong className="text-[#F9A825] text-2xl">{pendingApplications}</strong>
+    </div>
+
+    {/* Incomplete */}
+    <div className="flex-1 text-center bg-gray-100 border-4 border-[#616161] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#424242] font-semibold mb-1">Incomplete</p>
+      <strong className="text-[#424242] text-2xl">{incompleteApplications}</strong>
+    </div>
+
+    {/* Total Student */}
+    <div className="flex-1 text-center bg-blue-100 border-4 border-[#1565C0] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#1565C0] font-semibold mb-1">Total Student</p>
+      <strong className="text-[#1565C0] text-2xl">{totalApplications}</strong>
+    </div>
+
+    {/* Approved */}
+    <div className="flex-1 text-center bg-green-100 border-4 border-[#2E7D32] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#2E7D32] font-semibold mb-1">Approved</p>
+      <strong className="text-[#2E7D32] text-2xl">{approvedApplications}</strong>
+    </div>
+
+    {/* Rejected */}
+    <div className="flex-1 text-center bg-red-100 border-4 border-[#C62828] rounded-xl p-3 shadow-md 
+      transition-transform hover:scale-105">
+      <p className="text-[#C62828] font-semibold mb-1">Rejected</p>
+      <strong className="text-[#C62828] text-2xl">{rejectedApplications}</strong>
+    </div>
+  </div>
 </div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-gray-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-gray-700 font-semibold mb-0 md:mb-1">Incomplete</p>
-<strong className="text-gray-600 text-2xl">{incompleteApplications}</strong>
-</div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Student</p>
-<strong className="text-blue-700 text-2xl">{totalApplications}</strong>
-</div>
-<div className="flex-1 text-center bg-white border-3 md:border-4 border-green-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-green-700 font-semibold mb-0 md:mb-1">Approved</p>
-<strong className="text-green-700 text-2xl">{approvedApplications}</strong>
-</div>
-<div className="flex-1 text-center bg-white border-3 md:border-4  border-red-500 rounded-xl p-0 md:p-3 shadow-sm">
-<p className="text-red-700 font-semibold mb-0 md:mb-1">Rejected</p>
-<strong className="text-red-700 text-2xl">{rejectedApplications}</strong>
-</div>
-</div>
-</div>
+
 </div>
 
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
@@ -425,47 +522,115 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 
 </div>
 
-{/* Approval Status Chart (Pie) */}
-<div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+{/* Approval Status Chart */}
+   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  {/* Pie Chart Container */}
+{/* Pie Chart Container */}
+<div className="w-full max-h-[500px] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+    transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
   <h2 className="text-xl md:text-2xl font-bold text-center text-[#14213d] mb-4">
     Approval Status (Pie)
   </h2>
+
   <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
-    <div className="w-full md:w-2/3 lg:w-1/2">
-<Pie data={chartData} options={chartOptions} />
- {/* ✅ added redraw */}
+    {/* Pie Chart */}
+    <div className="w-full lg:w-2/3 flex justify-center">
+      <div className="w-[300px] h-[300px]">
+        <Pie data={chartData} options={chartOptions} />
+      </div>
     </div>
 
-    {/* Custom Legend */}
-    <div className="flex flex-col space-y-3 text-sm md:text-base">
-      {[
-        { label: 'Approved', color: '#4CAF50' },
-        { label: 'Rejected', color: '#FF5252' },
-        { label: 'Pending', color: '#FFC107' },
-        { label: 'Incomplete', color: '#2196F3' },
-      ].map((item, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          <span
-            className="inline-block w-4 h-4 rounded-full shadow-md"
-            style={{ backgroundColor: item.color }}
-          ></span>
-          <span className="font-medium text-gray-700">{item.label}</span>
-        </div>
-      ))}
+    {/* Vertical Stat Circles */}
+    <div className="flex flex-col items-start gap-4">
+      {/* Approved */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-green-100 border-4 border-green-500 shadow-md"></div>
+        <p className="text-green-700 font-bold text-sm">
+          Approved: <span className="text-lg">{approvedApplications}</span>
+        </p>
+      </div>
+
+      {/* Rejected */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-red-100 border-4 border-red-500 shadow-md"></div>
+        <p className="text-red-700 font-bold text-sm">
+          Rejected: <span className="text-lg">{rejectedApplications}</span>
+        </p>
+      </div>
+
+      {/* Pending */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-yellow-100 border-4 border-yellow-500 shadow-md"></div>
+        <p className="text-yellow-700 font-bold text-sm">
+          Pending: <span className="text-lg">{pendingApplications}</span>
+        </p>
+      </div>
+
+      {/* Incomplete */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-blue-100 border-4 border-blue-500 shadow-md"></div>
+        <p className="text-blue-700 font-bold text-sm">
+          Incomplete: <span className="text-lg">{incompleteApplications}</span>
+        </p>
+      </div>
     </div>
   </div>
 </div>
 
-{/* Application Status Chart (Bar) */}
-<div className="w-full mb-6 md:mb-8 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+
+  {/* Bar Chart Container */}
+  {/* Bar Chart Container */}
+<div className="w-full max-h-[500px] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+    transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
   <h2 className="text-xl md:text-2xl font-bold text-center text-[#14213d] mb-4">
-    Application Status (Bar)
+    Approval Status (Bar)
   </h2>
-  <div className="w-full">
-<Bar data={barData} options={barOptions} /> {/* ✅ uses barData + barOptions */}
+
+  {/* Container for Bar Chart + Stats */}
+<div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+  {/* Bar Chart */}
+  <div className="w-full lg:w-2/3">
+    <Bar data={barData} options={barOptions} />
   </div>
+
+  {/* Vertical Stat Circles */}
+  <div className="flex flex-col items-start gap-4">
+    {/* Approved */}
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-green-100 border-4 border-green-500 shadow-md"></div>
+      <p className="text-green-700 font-bold text-sm">
+        Approved: <span className="text-lg">{approvedApplications}</span>
+      </p>
+    </div>
+
+    {/* Rejected */}
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-red-100 border-4 border-red-500 shadow-md"></div>
+      <p className="text-red-700 font-bold text-sm">
+        Rejected: <span className="text-lg">{rejectedApplications}</span>
+      </p>
+    </div>
+
+    {/* Pending */}
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-yellow-100 border-4 border-yellow-500 shadow-md"></div>
+      <p className="text-yellow-700 font-bold text-sm">
+        Pending: <span className="text-lg">{pendingApplications}</span>
+      </p>
+    </div>
+
+    {/* Incomplete */}
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-blue-100 border-4 border-blue-500 shadow-md"></div>
+      <p className="text-blue-700 font-bold text-sm">
+        Incomplete: <span className="text-lg">{incompleteApplications}</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
 </div>
 
 
