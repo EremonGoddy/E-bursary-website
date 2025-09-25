@@ -109,7 +109,7 @@ className="w-full object-cover h-[40vh] md:h-[60vh]"
 
 {/* About Section */}
 <div className="py-8 px-4 sm:px-8 mt-[2px]  sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-1 md:gap-8 -mt-3 md:mt-0">
 {/* Student Registration */}
 <div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
   <div className="flex justify-center mb-2">
@@ -162,8 +162,8 @@ This effort plays a vital role in shaping a brighter, more inclusive future for 
 
 {/* Footer */}
 <footer className="bg-[#14213d] text-white text-center py-4 text-[1rem] md:text-[1.35rem] flex items-center justify-center gap-2">
-  <FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
-  <span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
+<FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
+<span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
 </footer>
 </div>
 );

@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse,
-  faFileAlt,
+faHouse,
+faFileAlt,
   faDownload,
   faComments,
   faCog,
@@ -219,7 +219,7 @@ useEffect(() => {
 
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
           <div className="flex items-center space-x-1">
-            <h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+            <h2 className="mr-1 md:mr-5  font-bold text-[#14213d]">
               Welcome: {userName}
             </h2>
             <div className="flex items-center space-x-2">
@@ -243,7 +243,7 @@ useEffect(() => {
 <div className="block md:hidden">
   <FontAwesomeIcon
     icon={faBars}
-    className="text-[1.7rem] cursor-pointer text-[#14213d]"
+    className="text-2xl cursor-pointer text-[#14213d]"
     onClick={toggleSidebar}
   />
 </div>
@@ -269,7 +269,7 @@ useEffect(() => {
 <div className="hidden md:flex justify-end mb-4">
   <FontAwesomeIcon
     icon={sidebarActive ? faTimes : faBars}
-    className={`text-white cursor-pointer text-[1.5rem] ${
+    className={`text-white cursor-pointer text-2xl ${
       sidebarActive ? 'ml-auto' : 'mr-2'
     }`}
     onClick={toggleSidebar}
@@ -337,10 +337,10 @@ useEffect(() => {
             sidebarActive ? 'justify-start' : 'justify-center'
           }`}
         >
-          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+          <FontAwesomeIcon icon={item.icon} className="text-2xl" />
           <span
             className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+              sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
             }`}
           >
             {item.label}
@@ -355,10 +355,10 @@ useEffect(() => {
           } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
           aria-disabled={item.disabled ? 'true' : 'false'}
         >
-          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+          <FontAwesomeIcon icon={item.icon} className="text-2xl" />
           <span
             className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+              sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
             }`}
           >
             {item.label}
@@ -372,14 +372,14 @@ useEffect(() => {
           }`}
         >
           <div className="relative">
-            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+            <FontAwesomeIcon icon={item.icon} className="text-2xl" />
             {item.label === 'Notification' && hasNewMessage && (
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
             )}
           </div>
           <span
             className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+              sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
             }`}
           >
             {item.label}
@@ -388,7 +388,7 @@ useEffect(() => {
       )}
 
       {!sidebarActive && (
-        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
           {item.label}
         </span>
       )}
@@ -399,7 +399,7 @@ useEffect(() => {
 
         {/* Main Content */}
         <div
-  className={`flex-1 transition-all duration-300 -mt-6 md:mt-0 pt-4  
+  className={`flex-1 transition-all duration-300 -mt-6 md:-mt-6 pt-4  
     ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
   `}
 >
@@ -413,8 +413,8 @@ useEffect(() => {
                 {/* Bursary Funds & Status */}
                 <div className="flex flex-col gap-1 md:gap-4">
                   <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-                    <h2 className="text-[1.2rem] md:text-[1.2rem] font-bold mb-1 text-[#14213d]">Bursary funds allocated:</h2>
-                    <p className="mb-2 text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold">
+                    <h2 className=" font-bold mb-1 text-[#14213d]">Bursary funds allocated:</h2>
+                    <p className="mb-2 text-[#14213d]  font-semibold">
                       {studentDetails.bursary
                           ? `${Number(studentDetails.bursary).toLocaleString()} Ksh`
                         : "0.00 Ksh"}
@@ -422,8 +422,8 @@ useEffect(() => {
                  <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-500 text-4xl" />
                   </div>
                   <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-                    <h2 className="text-[1.2rem] md:text-[1.2rem]  font-bold mb-1">Status of the application:</h2>
-                    <p className="mb-2 text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold">{studentDetails.status}</p>
+                    <h2 className="text-[#14213d]  font-bold mb-1">Status of the application:</h2>
+                    <p className="mb-2 text-[#14213d] font-semibold">{studentDetails.status}</p>
                    <FontAwesomeIcon
     icon={getStatusIcon(studentDetails.status).icon}
     className={`${getStatusIcon(studentDetails.status).color} text-4xl`}
@@ -432,7 +432,7 @@ useEffect(() => {
                 </div>
                 {/* User Profile */}
                 <div className=" p-6 flex -mt-2 md:mt-0 flex-col items-center  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-                  <h2 className="text-xl font-bold mb-2 text-[1.2rem] md:text-[1.35rem] text-[#14213d]">User Profile</h2>
+                  <h2 className="text-xl font-bold mb-2  text-[#14213d]">User Profile</h2>
                   <hr className="my-4 w-full " />
                   <div className="text-center leading-8">
 
@@ -448,34 +448,34 @@ useEffect(() => {
   className="rounded-full w-24 h-24 mx-auto"
 />
                     
-                    <h5 className="font-bold mt-4 text-[1rem] text-[#14213d] md:text-[1.1rem]">
+                    <h5 className="font-bold mt-4  text-[#14213d]">
                       {studentDetails.fullname}
                     </h5>
                     <p className="font-semibold text-[1rem] md:text-[1.1rem] text-[#14213d]">Student</p>
                   </div>
                   <hr className="my-4 w-full " />
-                  <p className='leading-8 text-[1rem] text-[#14213d] md:text-[1.1rem]'>
+                  <p className='leading-8 text-[#14213d]'>
                     <strong>Student No:</strong> {studentDetails.admission}
                   </p>
-                  <p className='leading-8 text-[1rem] md:text-[1.1rem] text-[#14213d]'>
+                  <p className='leading-8 text-[#14213d]'>
                     <strong>School:</strong> {studentDetails.institution}
                   </p>
                 </div>
                 {/* Personal Information */}
                 <div className=" p-6  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                   <div className="flex items-center mb-4">
-                    <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl md:text-2xl mr-2" />
+                    <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-xl mr-2" />
                     <h2 className="text-xl font-bold mr-4  text-[1.2rem] md:text-[1.3rem] text-[#14213d]">Personal Information</h2>
                     <button
-                      className="bg-blue-500 text-white px-3 cursor-pointer md:px-2 md:py-1 text-[1rem] md:text-[1.1rem] font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
+                      className="bg-blue-500 text-white px-3 cursor-pointer md:px-2 md:py-1 font-bold rounded hover:bg-blue-600 ml-auto flex items-center"
                       onClick={handleEditClick}
                     >
-                      <FontAwesomeIcon icon={faEdit} className="text-[1rem] md:text-[1.2rem]" /> Update Profile
+                      <FontAwesomeIcon icon={faEdit}/> Update Profile
                     </button>
                   </div>
                   <hr className="my-4" />
                   <table className="table-auto w-full text-left">
-                    <tbody className="leading-8 text-[1rem] md:text-[1.1rem] text-[#14213d]">
+                    <tbody className="leading-8 text-[#14213d]">
                       <tr>
                         <th className="pr-4">Full name:</th>
                         <td>{studentDetails.fullname}</td>
@@ -565,7 +565,7 @@ useEffect(() => {
   <div className="mb-7 md:mt-6 ">
   <FontAwesomeIcon
     icon={faTimes}
-    className="absolute w-8 h-8 top-1  -right-1 md:right-2 text-[#14213d] hover:text-[#14213d] hover:bg-gray-200 p-1 rounded-full text-[1.6rem] md:text-[2rem] cursor-pointer transition duration-200 ease-in-out active:scale-90"
+    className="absolute w-8 h-8 top-1  -right-1 md:right-2 text-[#14213d] hover:text-[#14213d] hover:bg-gray-200 p-1 rounded-full text-3xl cursor-pointer transition duration-200 ease-in-out active:scale-90"
     onClick={handleCloseForm}
   />
 </div>
@@ -586,7 +586,7 @@ useEffect(() => {
       <div key={id} className="mb-3 flex items-center  text-[#14213d]">
   <label
     htmlFor={id}
-    className="block font-medium text-[1rem] md:text-[1.05rem] w-[110px]" // Fixed width
+    className="block font-bold  w-[110px]" // Fixed width
   >
     {label}:
   </label>
@@ -596,7 +596,7 @@ useEffect(() => {
     name={id}
     value={formData[id] || ''}
     onChange={handleInputChange}
-    className="flex-1 max-w-[320px] text-[1rem] md:text-[1.05rem] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+    className="flex-1 max-w-[320px] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm  focus:ring-1 focus:ring-[#14213d] focus:border-transparent transition duration-200"
   />
 </div>
 
@@ -605,7 +605,7 @@ useEffect(() => {
     <div className="flex justify-end items-center mt-6">
       <button
         type="submit"
-        className="px-3 py-1 md:px-4 md:py-2 bg-[#14213d] text-white font-medium rounded-md hover:bg-gray-800 transition"
+        className="px-3 py-1 md:px-4 md:py-2 bg-[#14213d] cursor-pointer text-white font-bold rounded-md hover:bg-gray-600 transition"
       >
         Save Changes
       </button>

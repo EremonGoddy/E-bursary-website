@@ -120,7 +120,7 @@ src={image}
 className="w-full object-cover h-[40vh] md:h-[65vh]"
 alt="Bursary program"/>
 <div className="empowering absolute bottom-0 left-0 w-full h-[60px] sm:h-[120px] md:h-[60px]  flex justify-center items-center">
-<h2 className="text-[1.2rem] md:text-4xl text-white mt-[0px] font-bold text-center">
+<h2 className="text-[1.1rem] md:text-4xl text-white mt-[0px] font-bold text-center">
 Empowering Education in Turkana Through Bursaries: Your Path to Success
 </h2>
 </div>
@@ -141,16 +141,16 @@ Empowering Education in Turkana Through Bursaries: Your Path to Success
 
 {/* Content Section */}
 <div className=" py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-<div className="grid md:grid-cols-3 gap-1 md:gap-8">
+<div className="grid md:grid-cols-3 gap-1 md:gap-8 -mt-3 md:mt-0">
 {/* Program Overview */}
 <div className=" mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
 <div className="flex justify-center mb-2">
   <FontAwesomeIcon icon={faBookOpen} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
 </div>
-<h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]  text-center">
+<h2 className="text-[1.3rem] font-heading md:text-[1.35rem] font-bold text-[#14213d]  text-center">
 Overview of the Bursary Program
 </h2>
-<p className="text-[#14213d] mt-4 text-[1rem] md:text-[1.1rem]">
+<p className="text-[#14213d] mt-4 font-sans text-[1rem] md:text-[1.1rem]">
 The Turkana County Bursary Program is designed to support deserving students from Turkana County in their pursuit of higher education. The program aims to alleviate financial barriers and empower talented individuals to achieve their academic goals. Eligible candidates will receive financial assistance to cover tuition fees, textbooks, and other educational expenses.
 </p>
 </div>
@@ -172,7 +172,7 @@ The Turkana County Bursary Program is designed to support deserving students fro
 {/* Important Announcement */}
 <div className=" mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl  transition-all duration-300 transform hover:scale-[1.01]">
  <div className="flex justify-center mb-2">
-  <FontAwesomeIcon icon={faBullhorn}  className="text-[#14213d] text-[2rem] md:text-[2rem]" />
+<FontAwesomeIcon icon={faBullhorn}  className="text-[#14213d] text-[2rem] md:text-[2rem]" />
 </div>
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]  text-center ">
 Important Announcement
@@ -186,8 +186,8 @@ We are pleased to announce that the application period for the Turkana County Bu
 
 {/* Footer */}
 <footer className="bg-[#14213d] text-white text-center py-4 text-[1rem] md:text-[1.35rem] flex items-center justify-center gap-2">
-  <FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
-  <span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
+<FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
+<span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
 </footer>
 </div>
 );

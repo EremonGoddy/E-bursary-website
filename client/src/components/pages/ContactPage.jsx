@@ -114,7 +114,7 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 
 {/* Services Section */}
 <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6 mb-3 md:mb-8">
+<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-1 md:gap-8 mb-3 md:mb-8 -mt-3 md:mt-0">
 {/* Location */}
 <div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
 <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
@@ -146,59 +146,59 @@ Nawoitorong, Turkana County Headquarters<br />P.O Box 141-30500, Lodwar
 </div>
 </div>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-  {/* Contact Details */}
-  <div className="mb-3 p-4 bg-transparent rounded-lg flex flex-col justify-center">
-    <h3 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]">Contact Us</h3>
-    <p className="text-[#14213d] mt-4 text-[1rem] md:text-[1.1rem]">
-      Have questions or need assistance? We're here to help! Whether you’re seeking information,
-      need support, or have feedback, feel free to reach out. Fill out the form below with your
-      details and message, and our team will respond promptly.
-      We look forward to connecting with you and addressing your needs effectively!
-    </p>
-  </div>
+{/* Contact Details */}
+<div className="mb-3 p-4 bg-transparent rounded-lg flex flex-col justify-center">
+<h3 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d]">Contact Us</h3>
+<p className="text-[#14213d] mt-4 text-[1rem] md:text-[1.1rem]">
+Have questions or need assistance? We're here to help! Whether you’re seeking information,
+need support, or have feedback, feel free to reach out. Fill out the form below with your
+details and message, and our team will respond promptly.
+We look forward to connecting with you and addressing your needs effectively!
+</p>
+</div>
 
-  {/* Message Form */}
-  <div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] ml-auto w-full max-w-lg">
-    <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Send us a Message</h2>
-    <form className="p-4 space-y-4">
-      <div>
-        <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Name</label>
-        <input
-          type="text"
-          className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-          placeholder="John Doe"
-        />
-      </div>
-      <div>
-        <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Email</label>
-        <input
-          type="email"
-          className="w-full px-4 py-2 text-[1rem] md:text-[1.1rem] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-          placeholder="example@email.com"
-        />
-      </div>
-      <div>
-        <label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Message</label>
-        <textarea
-          className="w-full px-4 py-2 h-24 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
-          placeholder="Write your message here..."
-        />
-      </div>
-      <button
-        type="submit"
-        className="bg-gray-700 hover:bg-gray-900 text-white cursor-pointer font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
-      >
-        Send Message
-      </button>
-    </form>
-  </div>
+{/* Message Form */}
+<div className="mb-3 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] ml-auto w-full max-w-lg">
+<h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Send us a Message</h2>
+<form className="p-4 space-y-4">
+<div>
+<label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Name</label>
+<input
+type="text"
+className="w-full px-4 py-2 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+placeholder="John Doe"
+/>
+</div>
+<div>
+<label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Email</label>
+<input
+type="email"
+className="w-full px-4 py-2 text-[1rem] md:text-[1.1rem] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+placeholder="example@email.com"
+/>
+</div>
+<div>
+<label className="block text-[#14213d] text-[1rem] md:text-[1.1rem] font-semibold mb-1">Message</label>
+<textarea
+className="w-full px-4 py-2 h-24 border text-[1rem] md:text-[1.1rem] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
+placeholder="Write your message here..."
+/>
+</div>
+<button
+type="submit"
+className="bg-gray-700 hover:bg-gray-900 text-white cursor-pointer font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
+>
+Send Message
+</button>
+</form>
+</div>
 </div>
 </div>
 
 {/* Footer */}
 <footer className="bg-[#14213d] text-white text-center py-4 text-[1rem] md:text-[1.35rem] flex items-center justify-center gap-2">
-  <FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
-  <span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
+<FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
+<span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
 </footer>
 </div>
 );

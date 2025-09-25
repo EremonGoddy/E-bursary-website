@@ -105,7 +105,7 @@ className="w-full object-cover h-[40vh] md:h-[65vh]"
 
 {/* Services Section */}
 <div className="py-8 px-4 sm:px-8 mt-[2px] sm:mt-[2px] md:mt-[2px] lg:mt-[2px] xl:mt-[2px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 md:gap-8 -mt-3 md:mt-0">
 {/* Student Registration */}
 <div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
 <div className="flex justify-center mb-2">
@@ -122,9 +122,9 @@ allowing students to focus on their education without hassle.
 
 {/* Application Tracking */}
 <div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-    <div className="flex justify-center mb-2">
-    <FontAwesomeIcon icon={faListCheck} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
-      </div>
+<div className="flex justify-center mb-2">
+<FontAwesomeIcon icon={faListCheck} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
+</div>
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Application Tracking</h2>
 <p className="text-[#14213d] mt-4 text-[1rem] md:text-[1.1rem]">
 Track your bursary application in real time with our transparent system. 
@@ -135,9 +135,9 @@ updates. No need to follow up manually — our platform keeps you in the loop.
 
 {/* Document Upload */}
 <div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-    <div className="flex justify-center mb-2">
-    <FontAwesomeIcon icon={faFileUpload} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
-      </div>
+<div className="flex justify-center mb-2">
+<FontAwesomeIcon icon={faFileUpload} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
+</div>
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Document Upload</h2>
 <p className="text-[#14213d] mt-4 text-[1rem] md:text-[1.1rem]">
 Upload required documents securely and with ease. Our system supports multiple 
@@ -148,9 +148,9 @@ your application digitally, reducing the need for physical paperwork.
 
 {/* Allocation Notifications */}
 <div className="mb-4 p-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
-    <div className="flex justify-center mb-2">
-    <FontAwesomeIcon icon={faBell} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
-      </div>
+<div className="flex justify-center mb-2">
+<FontAwesomeIcon icon={faBell} className="text-[#14213d] text-[2rem] md:text-[2rem]" />
+</div>
 <h2 className="text-[1.3rem] md:text-[1.35rem] font-bold text-[#14213d] text-center">Allocation Notifications</h2>
 <p className="text-[#14213d] mt-4 text-[1rem] md:text-[1.1rem]">
 Get notified about bursary allocation and disbursement status. Our alerts 
@@ -163,8 +163,8 @@ ahead with confidence. Notifications are sent directly to ensure transparency.
 
 {/* Footer */}
 <footer className="bg-[#14213d] text-white text-center py-4 text-[1rem] md:text-[1.35rem] flex items-center justify-center gap-2">
-  <FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
-  <span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
+<FontAwesomeIcon icon={faGraduationCap} className="text-white text-lg md:text-xl" />
+<span>&copy; {new Date().getFullYear()} E-Bursary | Empowering Education</span>
 </footer>
 </div>
 );

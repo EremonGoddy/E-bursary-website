@@ -79,15 +79,26 @@ const logsResponse = await axios.get('https://e-bursary-backend.onrender.com/api
 setActivityLogs(logsResponse.data);
 };
 
+const navItems = [
+{ icon: faHouse, label: 'Dashboard', to: '/admindashboard' },
+{ icon: faUserGear, label: 'User Management', to: '/usermanagement' },
+{ icon: faBank, label: 'Bursary Management', to: '/bursarymanagement' },
+{ icon: faFileAlt, label: 'Application Monitoring', to: '/monitoring' },
+{ icon: faChartBar, label: 'Analysis', to: '/adminreport' },
+{ icon: faFileLines, label: 'Audit Logs', to: '/auditlogs' },
+{ icon: faCog, label: 'Settings', to: '/adminsetting' },
+{ icon: faSignOutAlt, label: 'Logout', isLogout: true }
+];
+
   return (
-<div className="w-full min-h-screen relative bg-gray-100">
+<div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-2">
 {/* Top Bar */}
-<div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
+<div className="bg-white fixed top-0 left-0 w-full shadow-lg p-1 md:p-2.5 z-50 md:pl-20 md:pr-20">
 <div className="flex justify-between items-center">
-<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#1F2937]">EBursary</h1>
-<div className="flex items-center space-x-6">
-<h2 className="mr-2 md:mr-5 text-[1.1rem] md:text-[1.20rem] font-semibold">
-Welcome, {adminDetails.name}
+<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
+<div className="flex items-center space-x-1">
+<h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+Welcome: {adminDetails.name || 'Admin'}
 </h2>
 <div className="flex items-center space-x-2">
 <img
@@ -96,6 +107,15 @@ alt="Admin"
 className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 />
 <FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
+</div>  
+{/* Sidebar toggle only visible on small screens */}
+{/* Toggle Button for opening sidebar on mobile */}
+<div className="block md:hidden">
+<FontAwesomeIcon
+icon={faBars}
+className="text-[1.7rem] cursor-pointer text-[#14213d]"
+onClick={toggleSidebar}
+/>
 </div>
 </div>
 </div>
@@ -105,320 +125,237 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 {/* Sidebar */}
 <div
 className={`
-fixed top-0 left-0 z-30 bg-[#1F2937] 
-h-screen 
-${sidebarActive ? 'w-[180px] md:w-[210px]' : 'w-[40px] md:w-[50px]'} 
-mt-10
-text-white p-4 
-flex flex-col
-transition-all duration-300
-min-h-screen
-md:min-h-screen
+fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
+transition-all duration-100 ease-in-out
+overflow-visible
+${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
+${sidebarActive ? 'md:w-[260px] md:p-4' : 'md:w-[45px] md:p-2'}
 `}
 >
+<div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`
-text-white 
-${sidebarActive ? 'transform translate-x-[130px] md:translate-x-[150px]' : ''}
-text-[1.4rem] md:text-[1.7rem] -ml-2 md:-ml-1.5 mt-4 transition-all duration-300 cursor-pointer self-start
-`}
+className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
 onClick={toggleSidebar}
 />
-<ul className="space-y-10 md:space-y-12 mt-1 md:mt-4 pl-0">
-{/* Dashboard */}
-<li className="list-none mt-[30px] text-center relative group">
-<div className="flex items-center">
-<Link to="/admindashboard" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start md:pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faHouse} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Dashboard</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[40px] h-[40px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-Dashboard
-</span>
 </div>
-</li>
-{/* User Management */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/usermanagement" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faUserGear} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>User Management</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-User Management
-</span>
-</div>
-</li>
-{/* Bursary Management */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/bursarymanagement" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faBank} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Bursary Management</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-Bursary Management
-</span>
-</div>
-</li>
-{/* Application Monitoring */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/monitoring" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faFileAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Application Monitoring</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-Application Monitoring
-</span>
-</div>
-</li>
-{/* Analysis */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/adminreport" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faChartBar} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Analysis</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-Analysis
-</span>
-</div>
-</li>
-{/* Audit Logs */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/auditlogs" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faFileLines} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Audit Logs</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-Audit Logs
-</span>
-</div>
-</li>
-{/* Settings */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/adminsetting" className={`
-flex items-center w-full space-x-2 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faCog} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Settings</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[5px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'hidden' : 'block'}
-`}>
-Settings
-</span>
-</div>
-</li>
-{/* Logout */}
-<li className="relative group">
-<div className="flex items-center">
-<Link to="/" className={`
-flex items-center w-full space-x-2 mt-25 md:mt-20 text-white no-underline
-transition-all duration-200
-${sidebarActive ? 'justify-start pl-[10px]' : 'justify-center'}
-`}>
-<FontAwesomeIcon icon={faSignOutAlt} className="text-[1.2rem] md:text-[1.4rem]" />
-<span className={`transition-all duration-200 ${sidebarActive ? 'text-[1rem] md:text-[1.1rem] inline ml-[10px]' : 'hidden'}`}>Logout</span>
-</Link>
-<span className={`
-absolute left-[60px] top-1/2 mt-[0px] md:mt-[38px] -translate-y-1/2
-rounded-[5px] w-[122px] bg-[#1F2937] text-white font-semibold
-text-center shadow-lg transition-all duration-300 ease-in-out
-opacity-0 group-hover:opacity-100
-pointer-events-none group-hover:pointer-events-auto
-leading-[35px] h-[35px] block
-${sidebarActive ? 'text-[1rem] md:text-[1.1rem] hidden' : 'block'}
-`}>
-Logout
-</span>
-</div>
-</li>
+<ul className="flex flex-col h-full mt-6">
+  {/* Top nav items */}
+  <div className="flex flex-col space-y-10">
+    {navItems.filter((item) => !item.isLogout).map((item, index) => (
+      <li className="group relative" key={index}>
+        <Link
+          to={item.to}
+          className={`flex items-center space-x-2 transition-all duration-200 ${
+            sidebarActive ? 'justify-start' : 'justify-center'
+          }`}
+        >
+          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+          <span
+            className={`${
+              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+            }`}
+          >
+            {item.label}
+          </span>
+        </Link>
+
+        {!sidebarActive && (
+          <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[220px] flex items-center justify-center z-50">
+            {item.label}
+          </span>
+        )}
+      </li>
+    ))}
+  </div>
+
+  {/* Logout item pinned at bottom */}
+  {navItems.filter((item) => item.isLogout).map((item, index) => (
+    <li className="group relative mt-30" key={index}>
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          const token = sessionStorage.getItem('authToken');
+          axios
+            .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            .catch(() => {})
+            .finally(() => {
+              sessionStorage.clear();
+              navigate('/');
+            });
+        }}
+        className={`flex items-center space-x-2 transition-all duration-200 ${
+          sidebarActive ? 'justify-start' : 'justify-center'
+        }`}
+      >
+        <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+        <span
+          className={`${
+            sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+          }`}
+        >
+          {item.label}
+        </span>
+      </a>
+
+      {!sidebarActive && (
+        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+          {item.label}
+        </span>
+      )}
+    </li>
+  ))}
 </ul>
+
 </div>
 
 {/* Main Content */}
-<div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
-`}>
-<div className="max-w-5xl mx-auto bg-white p-8 shadow rounded-md mt-10">
-<h2 className="text-2xl font-bold mb-6 text-center">User Account Management</h2>
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-{/* Add User */}
-<div className="bg-gray-50 p-6 rounded shadow">
-<h3 className="text-xl font-bold mb-4">Add New User</h3>
-<input
-type="text"
-name="fullname"
-className="form-input mb-3 w-full px-3 py-2 border border-gray-300 rounded"
-placeholder="Full Name"
-value={newUser.fullname}
-onChange={handleInputChange}
-/>
-<input
-type="email"
-name="email"
-className="form-input mb-3 w-full px-3 py-2 border border-gray-300 rounded"
-placeholder="Email"
-value={newUser.email}
-onChange={handleInputChange}
-/>
-<select
-name="role"
-className="form-select mb-3 w-full px-3 py-2 border border-gray-300 rounded"
-value={newUser.role}
-onChange={handleInputChange}
+<div
+  className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-10 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
+  ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+  `}
 >
-<option value="Committee">Committee</option>
-<option value="Admin">Admin</option>
-</select>
-<button
-className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold w-full"
-onClick={handleAddUser}
->
-Add User
-</button>
+    <h2 className="text-2xl font-bold mb-6 text-center">User Account Management</h2>
+
+    {/* Add + Existing Users side by side */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+      {/* Add User */}
+<div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-8">
+  <h3 className="text-xl font-bold mb-4">Add New User</h3>
+
+  <div className="mb-3">
+    <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-1">
+      Full Name
+    </label>
+    <input
+      type="text"
+      id="fullname"
+      name="fullname"
+      className="form-input w-full px-3 py-2 border border-gray-300 rounded"
+      placeholder="Enter full name"
+      value={newUser.fullname}
+      onChange={handleInputChange}
+    />
+  </div>
+
+  <div className="mb-3">
+    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+      Email
+    </label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      className="form-input w-full px-3 py-2 border border-gray-300 rounded"
+      placeholder="Enter email"
+      value={newUser.email}
+      onChange={handleInputChange}
+    />
+  </div>
+
+  <div className="mb-3">
+    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+      Role
+    </label>
+    <select
+      id="role"
+      name="role"
+      className="form-select w-full px-3 py-2 border border-gray-300 rounded"
+      value={newUser.role}
+      onChange={handleInputChange}
+    >
+      <option value="Committee">Committee</option>
+      <option value="Admin">Admin</option>
+    </select>
+  </div>
+
+  <button
+    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold w-full"
+    onClick={handleAddUser}
+  >
+    Add User
+  </button>
 </div>
-{/* Existing Users */}
-<div className="bg-gray-50 p-6 rounded shadow">
-<h3 className="text-xl font-bold mb-4">Existing Users</h3>
-<div className="overflow-x-auto">
-<table className="min-w-full divide-y divide-gray-200">
-<thead className="bg-blue-200">
-<tr>
-<th className="px-3 py-2 text-center font-semibold">ID</th>
-<th className="px-3 py-2 text-center font-semibold">Full Name</th>
-<th className="px-3 py-2 text-center font-semibold">Email</th>
-<th className="px-3 py-2 text-center font-semibold">Role</th>
-<th className="px-3 py-2 text-center font-semibold">Actions</th>
-</tr>
-</thead>
-<tbody className="bg-white divide-y divide-gray-100">
-{users.map((user) => (
-<tr key={user.id}>
-<td className="px-3 py-2 text-center">{user.id}</td>
-<td className="px-3 py-2 text-center">{user.fullname}</td>
-<td className="px-3 py-2 text-center">{user.email}</td>
-<td className="px-3 py-2 text-center">{user.role}</td>
-<td className="px-3 py-2 text-center">
-<button
-className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded font-semibold"
-onClick={() => handleDeleteUser(user.id)}
->
-Delete
-</button>
-</td>
-</tr>
-))}
-</tbody>
-</table>
-{users.length === 0 && (
-<div className="py-4 text-center text-gray-400">No users found.</div>
-)}
+
+
+      {/* Existing Users */}
+     <div className="w-full mb-0 md:mb-4 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+
+  <h2 className="text-xl font-bold mb-3 text-[#14213d]">Existing Users</h2>
+
+  {/* Scrollable table wrapper with fixed height */}
+ <div className="overflow-y-auto max-h-[450px] w-full">
+  <table className="min-w-[600px] w-full border-collapse border border-gray-300">
+    <thead className="bg-[#14213d] text-white">
+      <tr>
+        <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2 whitespace-nowrap sticky top-0 bg-[#14213d] z-10">ID</th>
+        <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2 whitespace-nowrap sticky top-0 bg-[#14213d] z-10">Full Name</th>
+        <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2 whitespace-nowrap sticky top-0 bg-[#14213d] z-10">Email</th>
+        <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2 whitespace-nowrap sticky top-0 bg-[#14213d] z-10">Role</th>
+        <th className="border border-gray-300 px-2 py-1 md:px-4 md:py-2 whitespace-nowrap sticky top-0 bg-[#14213d] z-10">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {users.map((user) => (
+        <tr key={user.id} className="hover:bg-gray-100">
+          <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 whitespace-nowrap">{user.id}</td>
+          <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 whitespace-nowrap">{user.name}</td>
+          <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 whitespace-nowrap">{user.email}</td>
+          <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 whitespace-nowrap">{user.role}</td>
+          <td className="border border-gray-300 px-2 py-1 md:px-4 md:py-1 text-center whitespace-nowrap">
+            <span
+              onClick={() => handleDeleteUser(user.id)}
+              className="text-red-500 cursor-pointer hover:text-red-700 font-semibold transition"
+            >
+              Delete
+            </span>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  {/* Mobile hint */}
+  <div className="md:hidden text-center text-xs text-gray-500 mt-2">
+    Swipe left/right to see all columns
+  </div>
+</div>
+
+</div>
+    </div>
+
+    {/* Activity Logs */}
+<div className="max-w-[750px] mb-0 md:mb-4 backdrop-blur-xl bg-white/90 border border-gray-200 shadow-lg rounded-2xl 
+  transition-all duration-300 hover:shadow-xl hover:scale-[1.01] p-4">
+
+  <h2 className="text-lg md:text-xl font-bold text-[#14213d] mb-3 border-b pb-2">
+    Activity Logs
+  </h2>
+
+  {/* Scrollable list wrapper */}
+  <div className="overflow-y-auto max-h-[450px]  pr-2">
+    <ul className="space-y-2 text-sm md:text-base">
+      {activityLogs.map((log, index) => (
+        <li
+          key={index}
+          className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center"
+        >
+          <span className="text-gray-800">{log.log_message}</span>
+          <span className="text-gray-500 text-xs md:text-sm italic">
+            {log.log_time}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
 </div>
 </div>
-</div>
-{/* Activity Logs */}
-<div className="bg-gray-50 p-6 rounded shadow">
-<h3 className="text-xl font-bold mb-4">Activity Logs</h3>
-<ul className="divide-y divide-gray-200">
-{activityLogs.map((log, index) => (
-<li className="py-2" key={index}>
-<span className="text-gray-700">{log.log_message}</span>
-<span className="ml-2 text-gray-400 text-sm">at {log.log_time}</span>
-</li>
-))}
-{activityLogs.length === 0 && (
-<li className="py-4 text-center text-gray-400">No activity logs found.</li>
-)}
-</ul>
-</div>
-</div>
-</div>
+
 </div>
 </div>
 );
