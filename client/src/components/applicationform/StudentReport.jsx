@@ -5,473 +5,471 @@ import autoTable from "jspdf-autotable";
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHouse,
-  faFileAlt,
-  faPaperclip,
-  faDownload,
-  faComments,
-  faCog,
-  faTimes,
-  faSignOutAlt,
-  faBars,
-  faBell,
+faHouse,
+faFileAlt,
+faPaperclip,
+faDownload,
+faComments,
+faCog,
+faTimes,
+faSignOutAlt,
+faBars,
+faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 const StudentReport = () => {
-  const [sidebarActive, setSidebarActive] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [studentDetails, setStudentDetails] = useState({});
-  // Step 1: Add studentProfile state
-  const [studentProfile, setStudentProfile] = useState({});
-   const [documentUploaded, setDocumentUploaded] = useState(false);
-  const [hasNewMessage, setHasNewMessage] = useState(false);
-  const navigate = useNavigate();
+const [sidebarActive, setSidebarActive] = useState(false);
+const [userName, setUserName] = useState('');
+const [studentDetails, setStudentDetails] = useState({});
+// Step 1: Add studentProfile state
+const [studentProfile, setStudentProfile] = useState({});
+const [documentUploaded, setDocumentUploaded] = useState(false);
+const [hasNewMessage, setHasNewMessage] = useState(false);
+const navigate = useNavigate();
 
-  const toggleSidebar = () => {
-    setSidebarActive(!sidebarActive);
-  };
+const toggleSidebar = () => {
+setSidebarActive(!sidebarActive);
+};
 
-  // Step 2: Update useEffect to fetch both report and student profile
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const name = sessionStorage.getItem('userName');
-    if (!token) {
-      navigate('/signin');
-    } else {
-      setUserName(name);
-      // Fetch report data
-      axios
-        .get('https://e-bursary-backend.onrender.com/api/reports', {
-          headers: { Authorization: token },
-        })
-        .then((response) => {
-          setStudentDetails(response.data);
-        })
-        .catch((error) =>
-          console.error('Error fetching student report data:', error)
-        );
-      // Fetch student profile data for Apply button logic
-      axios
-        .get('https://e-bursary-backend.onrender.com/api/student', {
-          headers: { Authorization: token },
-        })
-        .then((response) => {
-          setStudentProfile(response.data);
-        })
-        .catch((error) => {
-          setStudentProfile({});
-        });
-    }
-  }, [navigate]);
+// Step 2: Update useEffect to fetch both report and student profile
+useEffect(() => {
+const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
+if (!token) {
+navigate('/signin');
+} else {
+setUserName(name);
+// Fetch report data
+axios
+.get('https://e-bursary-backend.onrender.com/api/reports', {
+headers: { Authorization: token },
+})
+.then((response) => {
+setStudentDetails(response.data);
+})
+.catch((error) =>
+console.error('Error fetching student report data:', error)
+);
+// Fetch student profile data for Apply button logic
+axios
+.get('https://e-bursary-backend.onrender.com/api/student', {
+headers: { Authorization: token },
+})
+.then((response) => {
+setStudentProfile(response.data);
+})
+.catch((error) => {
+setStudentProfile({});
+});
+}
+}, [navigate]);
 
-  useEffect(() => {
-  const token = sessionStorage.getItem('authToken');
-  const userId = sessionStorage.getItem('userId');
+useEffect(() => {
+const token = sessionStorage.getItem('authToken');
+const userId = sessionStorage.getItem('userId');
 
-  if (!token) {
-    navigate('/signin');
-    return;
-  }
+if (!token) {
+navigate('/signin');
+return;
+}
 
-  if (userId) {
-    axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
-      headers: { Authorization: token }
-    })
-    .then(response => {
-      const message = response.data.status_message;
-      if (message && message.toLowerCase().includes("new")) {
-        setHasNewMessage(true);
-      } else {
-        setHasNewMessage(false);
-      }
-    })
-    .catch(err => {
-      console.error('Error checking status message:', err);
-    });
-  }
+if (userId) {
+axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
+headers: { Authorization: token }
+})
+.then(response => {
+const message = response.data.status_message;
+if (message && message.toLowerCase().includes("new")) {
+setHasNewMessage(true);
+} else {
+setHasNewMessage(false);
+}
+})
+.catch(err => {
+console.error('Error checking status message:', err);
+});
+}
 
-  if (userId) {
-      axios
-        .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
-          headers: { Authorization: token }  // Optional but recommended for security
-        })
-        .then((res) => {
-          const isUploaded = res.data && res.data.uploaded === true;
-          setDocumentUploaded(isUploaded);
+if (userId) {
+axios
+.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
+headers: { Authorization: token }  // Optional but recommended for security
+})
+.then((res) => {
+const isUploaded = res.data && res.data.uploaded === true;
+setDocumentUploaded(isUploaded);
           
-        })
-        .catch(() => setDocumentUploaded(false));
-    }
+})
+.catch(() => setDocumentUploaded(false));
+}
 }, []);
 
-   // Ensures the proper step navigation on sidebar 'Apply' click
-  const handleApplyClick = async (e) => {
-    e.preventDefault();
-    const userId = sessionStorage.getItem('userId');
-    if (!userId) {
-      navigate('/personaldetails');
-      return;
-    }
-    try {
-      const res = await axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`);
-      if (res.data && res.data.user_id) {
-        // Details exist, go to Amountdetails
-        navigate('/Amountdetails');
-      } else {
-        // No details, force personal details page
-        navigate('/personaldetails');
-      }
-    } catch {
-      navigate('/personaldetails');
-    }
-  };
+// Ensures the proper step navigation on sidebar 'Apply' click
+const handleApplyClick = async (e) => {
+e.preventDefault();
+const userId = sessionStorage.getItem('userId');
+if (!userId) {
+navigate('/personaldetails');
+return;
+}
+try {
+const res = await axios.get(`https://e-bursary-backend.onrender.com/api/personal-details/user/${userId}`);
+if (res.data && res.data.user_id) {
+// Details exist, go to Amountdetails
+navigate('/Amountdetails');
+} else {
+// No details, force personal details page
+navigate('/personaldetails');
+}
+} catch {
+navigate('/personaldetails');
+}
+};
 
-  // Download PDF utility
-  const downloadReport = React.useCallback(() => {
-    const doc = new jsPDF();
-    doc.setFont('times', 'normal');
-    // Title Section
-    doc.setFontSize(25);
-    doc.text('Bursary Report', 105, 20, null, null, 'center');
-    doc.setFontSize(20);
-    doc.text('Generated by Bursary Management System', 105, 30, null, null, 'center');
-    doc.line(10, 35, 200, 35);
+// Download PDF utility
+const downloadReport = React.useCallback(() => {
+const doc = new jsPDF();
+doc.setFont('times', 'normal');
+// Title Section
+doc.setFontSize(25);
+doc.text('Bursary Report', 105, 20, null, null, 'center');
+doc.setFontSize(20);
+doc.text('Generated by Bursary Management System', 105, 30, null, null, 'center');
+doc.line(10, 35, 200, 35);
 
-    // Table Data
-    const personalInfo = [
-      ['Reference Number', studentDetails.reference_number || 'N/A'],
-      ['Full Name', studentDetails.fullname || 'N/A'],
-      ['Sub County', studentDetails.subcounty || 'N/A'],
-      ['Ward', studentDetails.ward || 'N/A'],
-      ['Institution', studentDetails.institution || 'N/A'],
-      ['Admission Number', studentDetails.admission || 'N/A'],
-      ['Date of Birth', studentDetails.birth || 'N/A'],
-      ['Gender', studentDetails.gender || 'N/A'],
-    ];
+// Table Data
+const personalInfo = [
+['Reference Number', studentDetails.reference_number || 'N/A'],
+['Full Name', studentDetails.fullname || 'N/A'],
+['Sub County', studentDetails.subcounty || 'N/A'],
+['Ward', studentDetails.ward || 'N/A'],
+['Institution', studentDetails.institution || 'N/A'],
+['Admission Number', studentDetails.admission || 'N/A'],
+['Date of Birth', studentDetails.birth || 'N/A'],
+['Gender', studentDetails.gender || 'N/A'],
+];
 
-    const bursaryInfo = [
-      ['Allocated Amount', studentDetails.bursary || 'N/A'],
-      ['Application Status', studentDetails.status || 'N/A'],
-    ];
+const bursaryInfo = [
+['Allocated Amount', studentDetails.bursary || 'N/A'],
+['Application Status', studentDetails.status || 'N/A'],
+];
 
-    // Render Personal Info Table
-    autoTable(doc, {
-      startY: 50,
-      head: [['Personal Information', 'Details']],
-      body: personalInfo,
-      theme: 'striped',
-      headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255], fontSize: 14 },
-      bodyStyles: { fontSize: 12 },
-      styles: { font: 'times' },
-    });
+// Render Personal Info Table
+autoTable(doc, {
+startY: 50,
+head: [['Personal Information', 'Details']],
+body: personalInfo,
+theme: 'striped',
+headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255], fontSize: 14 },
+bodyStyles: { fontSize: 12 },
+styles: { font: 'times' },
+});
 
-    // Render Bursary Info Table
-    autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 10,
-      head: [['Bursary Information', 'Details']],
-      body: bursaryInfo,
-      theme: 'grid',
-      headStyles: { fillColor: [39, 174, 96], textColor: [255, 255, 255], fontSize: 14 },
-      bodyStyles: { fontSize: 12 },
-      styles: { font: 'times' },
-    });
+// Render Bursary Info Table
+autoTable(doc, {
+startY: doc.lastAutoTable.finalY + 10,
+head: [['Bursary Information', 'Details']],
+body: bursaryInfo,
+theme: 'grid',
+headStyles: { fillColor: [39, 174, 96], textColor: [255, 255, 255], fontSize: 14 },
+bodyStyles: { fontSize: 12 },
+styles: { font: 'times' },
+});
 
-    // Declaration Table
-    const declarationInfo = [
-      ['Declaration', 'I hereby confirm the above details are accurate and complete.'],
-      ['Approved by', studentDetails.approved_by_committee || 'N/A'],
-    ['Signature', studentDetails.digital_signature || '________________________'], // Updated this line
-       ['Allocation date', studentDetails.allocation_date || 'N/A'],
+// Declaration Table
+const declarationInfo = [
+['Declaration', 'I hereby confirm the above details are accurate and complete.'],
+['Approved by', studentDetails.approved_by_committee || 'N/A'],
+['Signature', studentDetails.digital_signature || '________________________'], // Updated this line
+['Allocation date', studentDetails.allocation_date || 'N/A'],
      
-    ];
+];
 
-    autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 20,
-      head: [['Declaration', '']],
-      body: declarationInfo,
-      theme: 'grid',
-      headStyles: { fillColor: [192, 57, 43], textColor: [255, 255, 255], fontSize: 14 },
-      bodyStyles: { fontSize: 12, halign: 'left' },
-      styles: { font: 'times' },
-    });
+autoTable(doc, {
+startY: doc.lastAutoTable.finalY + 20,
+head: [['Declaration', '']],
+body: declarationInfo,
+theme: 'grid',
+headStyles: { fillColor: [192, 57, 43], textColor: [255, 255, 255], fontSize: 14 },
+bodyStyles: { fontSize: 12, halign: 'left' },
+styles: { font: 'times' },
+});
 
-    // Footer
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 10, 290);
-    doc.text('Bursary Management System', 105, 290, null, null, 'center');
+// Footer
+doc.setFontSize(10);
+doc.text(`Generated on: ${new Date().toLocaleString()}`, 10, 290);
+doc.text('Bursary Management System', 105, 290, null, null, 'center');
 
-    // Save must be LAST after all content is added!
-    doc.save('Bursary_Report.pdf');
-  }, [studentDetails]);
+// Save must be LAST after all content is added!
+doc.save('Bursary_Report.pdf');
+}, [studentDetails]);
+// Prepare report data (for mobile)
+const reportRows = [
+{ label: 'Reference Number', value: studentDetails.reference_number || 'N/A' },
+{ label: 'Application Title', value: 'Bursary Application' },
+{ label: 'Application Status', value: studentDetails.status || 'N/A' },
+{ label: 'Download Application', value: (
+<button
+type="button"
+onClick={downloadReport}
+aria-label="Download Application"
+className="bg-transparent border-0 p-0 m-0 cursor-pointer"
+>
+<FontAwesomeIcon icon={faDownload} className="text-[#14213d]"/>
+</button>
+)},
+];
 
-  // Prepare report data (for mobile)
-  const reportRows = [
-    { label: 'Reference Number', value: studentDetails.reference_number || 'N/A' },
-    { label: 'Application Title', value: 'Bursary Application' },
-    { label: 'Application Status', value: studentDetails.status || 'N/A' },
-    { label: 'Download Application', value: (
-      <button
-        type="button"
-        onClick={downloadReport}
-        aria-label="Download Application"
-        className="bg-transparent border-0 p-0 m-0 cursor-pointer"
-      >
-        <FontAwesomeIcon icon={faDownload} className="text-blue-500" />
-      </button>
-    )},
-  ];
-
-  return (
-    <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      {/* Top Bar */}
-     <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
-        <div className="flex justify-between items-center">
+return (
+<div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+{/* Top Bar */}
+<div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
+ <div className="flex justify-between items-center">
         
 
-          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
-          <div className="flex items-center space-x-1">
-            <h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
-              Welcome: {userName}
-            </h2>
-            <div className="flex items-center space-x-2">
- <img
-  src={
-    studentDetails.gender === 'Female'
-      ? '/images/woman.png'
-      : studentDetails.gender === 'Male'
-      ? '/images/patient.png'
-      : '/images/user.png'
-  }
-  alt="User"
-  className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
+<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
+<div className="flex items-center space-x-1">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
+Welcome: {userName}
+</h2>
+<div className="flex items-center space-x-2">
+<img
+src={
+studentDetails.gender === 'Female'
+? '/images/woman.png'
+: studentDetails.gender === 'Male'
+? '/images/patient.png'
+: '/images/user.png'
+}
+alt="User"
+className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
 />
 
 
 
- </div>
+</div>
 {/* Sidebar toggle only visible on small screens */}
 {/* Toggle Button for opening sidebar on mobile */}
 <div className="block md:hidden">
-  <FontAwesomeIcon
-    icon={faBars}
-    className="text-[1.7rem] cursor-pointer text-[#14213d]"
-    onClick={toggleSidebar}
-  />
+<FontAwesomeIcon
+icon={faBars}
+className="text-xl cursor-pointer text-[#14213d]"
+onClick={toggleSidebar}
+/>
 </div>
 
 </div>
 </div>
 </div>
-      <div className="flex pt-20 min-h-screen">
-        {/* Sidebar */}
+<div className="flex pt-20 min-h-screen">
+{/* Sidebar */}
 <div
-  className={`
-    fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
-    transition-all duration-100 ease-in-out
-    overflow-visible
-    ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-    ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
-  `}
+className={`
+fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
+transition-all duration-100 ease-in-out
+overflow-visible
+${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
+${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
+`}
 >
   
 
-  {/* Toggle Button for Desktop View */}
+{/* Toggle Button for Desktop View */}
 <div className="hidden md:flex justify-end mb-4">
-  <FontAwesomeIcon
-    icon={sidebarActive ? faTimes : faBars}
-    className={`text-white cursor-pointer text-[1.5rem] ${
-      sidebarActive ? 'ml-auto' : 'mr-2'
-    }`}
-    onClick={toggleSidebar}
-  />
+<FontAwesomeIcon
+icon={sidebarActive ? faTimes : faBars}
+className={`text-white cursor-pointer text-xl ${
+sidebarActive ? 'ml-auto' : 'mr-1'
+}`}
+onClick={toggleSidebar}
+/>
 </div>
 
 
 
-  {/* Navigation */}
+{/* Navigation */}
 <ul className="flex flex-col h-full mt-6 space-y-10">
-  {[
-    {
-      icon: faHouse,
-      label: 'Dashboard',
-      to: '/studentdashboard'
-    },
-    {
-      icon: faFileAlt,
-      label: 'Apply',
-      isButton: true,
-      onClick: handleApplyClick,
-      disabled: documentUploaded
-    },
-    {
-      icon: faDownload,
-      label: 'Report',
-      to: '/studentreport'
-    },
-    {
-      icon: faBell,
-      label: 'Notification',
-      to: '/messages'
-    },
-    {
-      icon: faCog,
-      label: 'Settings',
-      to: '/studentsetting'
-    },
-    {
-      icon: faSignOutAlt,
-      label: 'Logout',
-      isLogout: true
-    }
-  ].map((item, index) => (
-    <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`} key={index}>
+{[
+{
+icon: faHouse,
+label: 'Dashboard',
+to: '/studentdashboard'
+},
+{
+icon: faFileAlt,
+label: 'Apply',
+isButton: true,
+onClick: handleApplyClick,
+disabled: documentUploaded
+},
+{
+icon: faDownload,
+label: 'Report',
+to: '/studentreport'
+},
+{
+icon: faBell,
+label: 'Notification',
+to: '/messages'
+},
+{
+icon: faCog,
+label: 'Settings',
+to: '/studentsetting'
+},
+{
+icon: faSignOutAlt,
+label: 'Logout',
+isLogout: true
+}
+].map((item, index) => (
+<li className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`} key={index}>
       
-      {item.isLogout ? (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            const token = sessionStorage.getItem('authToken');
-            axios
-              .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-                headers: { Authorization: `Bearer ${token}` }
-              })
-              .catch(() => {})
-              .finally(() => {
-                sessionStorage.clear();
-                setDocumentUploaded(false);
-                navigate('/');
-              });
-          }}
-          className={`flex items-center space-x-2 transition-all duration-200 ${
-            sidebarActive ? 'justify-start' : 'justify-center'
-          }`}
-        >
-          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-          <span
-            className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-            }`}
-          >
-            {item.label}
-          </span>
-        </a>
-      ) : item.isButton ? (
-        <a
-          href="#"
-          onClick={item.disabled ? undefined : item.onClick}
-          className={`flex items-center space-x-2 transition-all duration-200 ${
-            sidebarActive ? 'justify-start' : 'justify-center'
-          } ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
-          aria-disabled={item.disabled ? 'true' : 'false'}
-        >
-          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-          <span
-            className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-            }`}
-          >
-            {item.label}
-          </span>
-        </a>
-      ) : (
-        <Link
-          to={item.to}
-          className={`flex items-center space-x-2 transition-all duration-200 ${
-            sidebarActive ? 'justify-start' : 'justify-center'
-          }`}
-        >
-          <div className="relative">
-            <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-            {item.label === 'Notification' && hasNewMessage && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
-            )}
-          </div>
-          <span
-            className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-            }`}
-          >
-            {item.label}
-          </span>
-        </Link>
-      )}
+{item.isLogout ? (
+<a
+href="#"
+onClick={(e) => {
+e.preventDefault();
+const token = sessionStorage.getItem('authToken');
+axios
+.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+headers: { Authorization: `Bearer ${token}` }
+})
+.catch(() => {})
+.finally(() => {
+sessionStorage.clear();
+setDocumentUploaded(false);
+navigate('/');
+});
+}}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</a>
+) : item.isButton ? (
+<a
+href="#"
+onClick={item.disabled ? undefined : item.onClick}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+} ${item.disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''}`}
+aria-disabled={item.disabled ? 'true' : 'false'}
+>
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</a>
+) : (
+<Link
+to={item.to}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<div className="relative">
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+{item.label === 'Notification' && hasNewMessage && (
+<span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+)}
+</div>
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 text-xl font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</Link>
+)}
 
-      {!sidebarActive && (
-        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
-          {item.label}
-        </span>
-      )}
-    </li>
-  ))}
+{!sidebarActive && (
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+{item.label}
+</span>
+)}
+</li>
+))}
 </ul>
 </div>
-        {/* Main Content Area */}
-        <div className={`
-          flex-1 md:ml-25 transition-all duration-300
-          ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
-          <div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[800px]  mx-auto -mt-4 md:mt-50 mb-4 md:mb-6 p-0 md:p-8">
-            <h1 className="text-[1.1rem] md:text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Report</h1>
-            {/* Responsive Report Info: vertical on mobile, table on md+ */}
-            <div>
-              {/* Mobile vertical layout */}
-              <div className="block md:hidden ">
-                {reportRows.map((row) => (
-                  <div key={row.label} className="flex items-center py-2 border-b last:border-b-0">
-                    <span className="font-semibold w-1/2 text-[1rem] bg-[#14213d] text-white px-2 py-1 rounded-1">
-                      {row.label}
-                    </span>
-                    <span className="w-1/2 text-[1rem] bg-white-100 px-2 py-1 rounded-r">
-                      {row.value}
-                    </span>
-                  </div>
-                ))}
-                
-              </div>
-              {/* Desktop table layout */}
-              <div className="hidden md:block w-full overflow-x-auto">
-                <table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
-                  <thead>
-                    <tr className="bg-[#14213d] text-white text-[1.1rem]">
-                      <th className="p-2 text-left">Reference Number</th>
-                      <th className="p-2 text-left">Application Title</th>
-                      <th className="p-2 text-left">Application Status</th>
-                      <th className="p-2 text-left">Download Application</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b text-[1.1rem] text-center">
-                      <td className="p-2">{studentDetails.reference_number || 'N/A'}</td>
-                      <td className="p-2">Bursary Application</td>
-                      <td className="p-2">{studentDetails.status || 'N/A'}</td>
-                      <td className="p-2">
-                        <button
-                          type="button"
-                          onClick={downloadReport}
-                          aria-label="Download Application"
-                          className="bg-transparent border-0  p-0 m-0 cursor-pointer"
-                        >
-                          <FontAwesomeIcon
-                            icon={faDownload}
-                            className="text-[#14213d] text-2xl "
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* End Responsive Table Wrapper */}
-          </div>
-          <div className="text-center mt-4 text-[1rem] md:text-[1.2rem] text-[#14213d] font-medium">
-  Digital Signature: <span className="text-[#e63946]">{studentDetails.digital_signature || 'Pending'}</span>
+{/* Main Content Area */}
+<div className={`
+flex-1 md:ml-25 transition-all duration-300
+${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
+<div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[800px]  mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-0 md:p-8">
+<h1 className="text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Report</h1>
+{/* Responsive Report Info: vertical on mobile, table on md+ */}
+<div>
+{/* Mobile vertical layout */}
+<div className="block md:hidden ">
+{reportRows.map((row) => (
+<div key={row.label} className="flex items-center py-2 border-b last:border-b-0">
+<span className="font-semibold w-1/2  bg-[#14213d] text-white px-2 py-1 rounded-1">
+{row.label}
+</span>
+<span className="w-1/2 bg-white-100 px-2 py-1 rounded-r">
+{row.value}
+</span>
 </div>
-
-        </div>
-      </div>
-    </div>
-  );
+))}
+                
+</div>
+{/* Desktop table layout */}
+<div className="hidden md:block w-full overflow-x-auto">
+<table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
+<thead>
+<tr className="bg-[#14213d] text-white ">
+<th className="p-2 text-left">Reference Number</th>
+<th className="p-2 text-left">Application Title</th>
+<th className="p-2 text-left">Application Status</th>
+<th className="p-2 text-left">Download Application</th>
+</tr>
+</thead>
+<tbody>
+<tr className="border-b text-[1.1rem] text-center">
+<td className="p-2">{studentDetails.reference_number || 'N/A'}</td>
+<td className="p-2">Bursary Application</td>
+<td className="p-2">{studentDetails.status || 'N/A'}</td>
+<td className="p-2">
+<button
+type="button"
+onClick={downloadReport}
+aria-label="Download Application"
+className="bg-transparent border-0  p-0 m-0 cursor-pointer"
+>
+<FontAwesomeIcon
+icon={faDownload}
+className="text-[#14213d] text-xl "
+/>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+{/* End Responsive Table Wrapper */}
+</div>
+<div className="text-center mt-4 text-[#14213d] font-medium">
+Digital Signature: <span className="text-[#e63946]">{studentDetails.digital_signature || 'Pending'}</span>
+</div>
+</div>
+</div>
+</div>
+);
 };
 
 export default StudentReport;
