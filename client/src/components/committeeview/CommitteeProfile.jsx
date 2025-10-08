@@ -240,32 +240,39 @@ sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 </div>
 
 {/* Main Content */}
-<div className={`flex-1 ml-0 md:ml-64 md:p-4 -mt-6 md:mt-4 ${sidebarActive ? 'ml-[28px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}`}>
-<div className="md:w-[98%] w-full backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto pt-1 pr-6 pl-6 pb-4">
+<div className={`flex-1 ml-0 md:ml-64 md:p-4 -mt-6 md:mt-4 ${sidebarActive ? 'ml-[2px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}`}>
+<div className="md:w-[98%] w-full backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto p-3 md:p-6">
 {isProfileFetched ? (
 profileExists ? (
-<div>
-<FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl mt-4 md:text-2xl mr-2" />
-<h2 className="text-xl font-bold ml-7 -mt-7 text-[#14213d]">Committee Profile</h2>
+<div className="relative py-2">
+<FontAwesomeIcon
+icon={faUser}
+className="text-[#14213d] text-2xl inline-block align-middle mr-2"
+/>
+<h2 className="text-xl font-bold inline-block align-middle text-[#14213d]">
+Profile
+</h2>
+
 <button
 onClick={() => setEditFormVisible(true)}
-className="bg-blue-500 cursor-pointer text-white px-3 font-bold py-1 -mt-8 rounded hover:bg-blue-600 ml-auto flex items-center"
+className="absolute right-0 top-2 bg-blue-500 cursor-pointer text-white px-1 py-1 md:px-3 md:py-1 font-bold  rounded hover:bg-blue-600 flex items-center"
 >
-<FontAwesomeIcon icon={faEdit} className="mr-1  font-bold" /> Edit Profile
+<FontAwesomeIcon icon={faEdit} className="mr-1 font-bold" /> Edit Profile
 </button>
+
 <hr className="my-4" />
 
 <div className="space-y-5 text-[#14213d]">
 {Object.entries(formData).map(([key, value]) => (
-<div className="flex gap-5" key={key}>
-<span className="w-40 font-bold capitalize">
+<div className="flex items-start gap-3 md:gap-24" key={key}>
+{/* Fixed width for label so values align */}
+<span className="w-32 font-bold capitalize">
 {key.replace('_', ' ')}:
 </span>
-<span>{String(value ?? '')}</span>
+<span className="flex-1">{String(value ?? '')}</span>
 </div>
 ))}
 </div>
-
 </div>
 ) : (
 <form onSubmit={handleSubmit}>
@@ -343,7 +350,7 @@ Create Profile
 
 {/* Overlay Edit Form */}
 {isEditFormVisible && (
-<div className="shadow-overlay fade-in flex justify-center items-center">
+<div className="shadow-overlay fade-in flex justify-center items-center p-3">
 <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[500px] relative">
 <button
 onClick={() => setEditFormVisible(false)}
@@ -471,12 +478,14 @@ className="flex-1 w-full border border-gray-300 rounded-md px-3 md:px-3 md:py-2 
 ))}
 </select>
 </div>
+<div className="flex justify-end">
 <button
 type="submit"
-className="px-4 py-2 bg-[#14213d] cursor-pointer text-white rounded hover:bg-gray-600"
+className="px-4 py-1 md:px-3 md:py-2 bg-[#14213d] font-bold cursor-pointer text-white rounded hover:bg-gray-600"
 >
 Update Profile
 </button>
+</div>
 </form>
 </div>
 </div>

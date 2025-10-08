@@ -1088,6 +1088,49 @@ app.get('/api/quick-statistics', async (req, res) => {
   }
 });
 
+app.get('/api/committee-statistics', async (req, res) => {
+  const committee = req.params.committee; // committee name or ID from the URL
+
+  const queryTotal = `
+    SELECT COUNT(*) AS total 
+    FROM bursary.personal_details 
+    WHERE approved_by_committee = $1
+  `;
+  const queryApproved = `
+    SELECT COUNT(*) AS approved 
+    FROM bursary.personal_details 
+    WHERE status = 'Approved' AND approved_by_committee = $1
+  `;
+  const queryRejected = `
+    SELECT COUNT(*) AS rejected 
+    FROM bursary.personal_details 
+    WHERE status = 'Rejected' AND approved_by_committee = $1
+  `;
+  const queryIncomplete = `
+    SELECT COUNT(*) AS incomplete 
+    FROM bursary.personal_details 
+    WHERE status = 'Incomplete' AND approved_by_committee = $1
+  `;
+
+  try {
+    const totalResult = await pool.query(queryTotal, [committee]);
+    const approvedResult = await pool.query(queryApproved, [committee]);
+    const rejectedResult = await pool.query(queryRejected, [committee]);
+    const incompleteResult = await pool.query(queryIncomplete, [committee]);
+
+    res.status(200).json({
+      total: totalResult.rows[0].total,
+      approved: approvedResult.rows[0].approved,
+      rejected: rejectedResult.rows[0].rejected,
+      incomplete: incompleteResult.rows[0].incomplete
+    });
+  } catch (err) {
+    console.error('Error fetching committee statistics:', err);
+    res.status(500).json({ error: 'Error fetching committee statistics' });
+  }
+});
+
+
 
 app.get("/api/personalInformation", async (req, res) => {
   try {
