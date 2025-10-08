@@ -55,16 +55,22 @@ remaining: response.data.remaining,
 })
 .catch((error) => console.error('Error fetching bursary info:', error));
 
-axios.get(`https://e-bursary-backend.onrender.com/api/committee-statistics`)
-  .then((response) => {
-    setApplicationInfo({
-      total: response.data.total,
-      incomplete: response.data.incomplete,
-      approved: response.data.approved,
-      rejected: response.data.rejected,
-    });
-  })
-.catch((error) => console.error('Error fetching application statistics:', error));
+axios.get("https://e-bursary-backend.onrender.com/api/committee-statistics", {
+  headers: {
+    Authorization: token, // ✅ send token for backend verification
+  },
+})
+.then((response) => {
+  setApplicationInfo({
+    total: response.data.total,
+    incomplete: response.data.incomplete,
+    approved: response.data.approved,
+    rejected: response.data.rejected,
+  });
+})
+.catch((error) => {
+  console.error("Error fetching committee statistics:", error);
+});
 }, [navigate]);
 
 useEffect(() => {

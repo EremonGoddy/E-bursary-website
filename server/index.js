@@ -1089,47 +1089,54 @@ app.get('/api/quick-statistics', async (req, res) => {
 });
 
 app.get('/api/committee-statistics', async (req, res) => {
-  const committee = req.params.committee; // committee name or ID from the URL
+  const token = req.headers['authorization']; // read token from request header
+  if (!token) return res.status(403).send('Token is required');
 
-  const queryTotal = `
-    SELECT COUNT(*) AS total 
-    FROM bursary.personal_details 
-    WHERE approved_by_committee = $1
-  `;
-  const queryApproved = `
-    SELECT COUNT(*) AS approved 
-    FROM bursary.personal_details 
-    WHERE status = 'Approved' AND approved_by_committee = $1
-  `;
-  const queryRejected = `
-    SELECT COUNT(*) AS rejected 
-    FROM bursary.personal_details 
-    WHERE status = 'Rejected' AND approved_by_committee = $1
-  `;
-  const queryIncomplete = `
-    SELECT COUNT(*) AS incomplete 
-    FROM bursary.personal_details 
-    WHERE status = 'Incomplete' AND approved_by_committee = $1
-  `;
+  jwt.verify(token, secret, async (err, decoded) => {
+    if (err) return res.status(401).send('Unauthorized access');
 
-  try {
-    const totalResult = await pool.query(queryTotal, [committee]);
-    const approvedResult = await pool.query(queryApproved, [committee]);
-    const rejectedResult = await pool.query(queryRejected, [committee]);
-    const incompleteResult = await pool.query(queryIncomplete, [committee]);
+    const committeeEmail = decoded.email; // extract committee email from token
 
-    res.status(200).json({
-      total: totalResult.rows[0].total,
-      approved: approvedResult.rows[0].approved,
-      rejected: rejectedResult.rows[0].rejected,
-      incomplete: incompleteResult.rows[0].incomplete
-    });
-  } catch (err) {
-    console.error('Error fetching committee statistics:', err);
-    res.status(500).json({ error: 'Error fetching committee statistics' });
-  }
+    // Fetch statistics based on email (approved_by_committee column should store email)
+    const queryTotal = `
+      SELECT COUNT(*) AS total 
+      FROM bursary.personal_details 
+      WHERE approved_by_committee = $1
+    `;
+    const queryApproved = `
+      SELECT COUNT(*) AS approved 
+      FROM bursary.personal_details 
+      WHERE status = 'Approved' AND approved_by_committee = $1
+    `;
+    const queryRejected = `
+      SELECT COUNT(*) AS rejected 
+      FROM bursary.personal_details 
+      WHERE status = 'Rejected' AND approved_by_committee = $1
+    `;
+    const queryIncomplete = `
+      SELECT COUNT(*) AS incomplete 
+      FROM bursary.personal_details 
+      WHERE status = 'Incomplete' AND approved_by_committee = $1
+    `;
+
+    try {
+      const totalResult = await pool.query(queryTotal, [committeeEmail]);
+      const approvedResult = await pool.query(queryApproved, [committeeEmail]);
+      const rejectedResult = await pool.query(queryRejected, [committeeEmail]);
+      const incompleteResult = await pool.query(queryIncomplete, [committeeEmail]);
+
+      res.status(200).json({
+        total: totalResult.rows[0].total,
+        approved: approvedResult.rows[0].approved,
+        rejected: rejectedResult.rows[0].rejected,
+        incomplete: incompleteResult.rows[0].incomplete
+      });
+    } catch (err) {
+      console.error('Error fetching committee statistics:', err);
+      res.status(500).json({ error: 'Error fetching committee statistics' });
+    }
+  });
 });
-
 
 
 app.get("/api/personalInformation", async (req, res) => {
