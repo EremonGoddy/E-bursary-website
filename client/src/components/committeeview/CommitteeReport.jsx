@@ -255,7 +255,7 @@ ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
 <div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`text-white cursor-pointer text-text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
+className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
 onClick={toggleSidebar}
 />
 </div>
@@ -350,7 +350,7 @@ sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[0px] md:ml-[10px]'
 </thead>
 <tbody>
 <tr className="border-b text-[1rem]">
-<td className="p-2">{studentDetails.reference_number || 'N/A'}</td>
+<td className="p-2">{committeeDetails.reference_number || 'N/A'}</td>
 <td className="p-2">Committee Report</td>
 <td className="p-2">
 <button

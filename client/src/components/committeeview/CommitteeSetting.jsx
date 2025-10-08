@@ -115,13 +115,13 @@ const navItems = [
 ];
 
 return (
-<div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+<div className="w-full min-h-screen -mt-10 md:-mt-4 relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-1 md:p-4">
 {/* Top Bar */}
 <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
 <div className="flex justify-between items-center">
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
 <div className="flex items-center space-x-1">
-<h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg  font-bold text-[#14213d]">
 Welcome: {committeeDetails.name || userName}
 </h2>
 <div className="flex items-center space-x-2">
@@ -140,7 +140,7 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
 <div className="block md:hidden">
 <FontAwesomeIcon
 icon={faBars}
-className="text-[1.7rem] cursor-pointer text-[#14213d]"
+className="text-xl cursor-pointer text-[#14213d]"
 onClick={toggleSidebar}
 />
 </div>
@@ -156,13 +156,13 @@ fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
 transition-all duration-100 ease-in-out
 overflow-visible
 ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
+${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
 `}
 >
 <div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
 onClick={toggleSidebar}
 />
 </div>
@@ -189,10 +189,10 @@ className={`flex items-center space-x-2 transition-all duration-200 ${
 sidebarActive ? 'justify-start' : 'justify-center'
 }`}
 >
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -205,10 +205,10 @@ className={`flex items-center space-x-2 transition-all duration-200 ${
 sidebarActive ? 'justify-start' : 'justify-center'
 }`}
 >
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -216,7 +216,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </Link>
 )}
 {!sidebarActive && (
-<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
 {item.label}
 </span>
 )}
@@ -227,10 +227,10 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 
 {/* Main Content Area */}
 <div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-12 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 `}>
-<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-lg mx-auto  p-8  mt-10">
-<h2 className="text-center text-2xl text-[#14213d] font-bold mb-6">Change Password</h2>
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-lg mx-auto p-4  md:p-8  mt-10">
+<h2 className="text-center text-xl md:text-2xl text-[#14213d] font-bold mb-6">Change Password</h2>
 <form onSubmit={handleChangePassword}>
 <div className="mb-5">
 <label htmlFor="currentPassword" className="block mb-1 font-medium text-[#14213d]">
@@ -303,7 +303,7 @@ Update Password
 </button>
 </form>
 {message && (
-<p className={`mt-4 text-center text-sm font-semibold ${isError ? 'text-red-600' : 'text-green-600'}`}>{message}</p>
+<p className={`mt-4 text-center font-semibold ${isError ? 'text-red-600' : 'text-green-600'}`}>{message}</p>
 )}
 </div>
 </div>
