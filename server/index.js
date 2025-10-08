@@ -1089,15 +1089,15 @@ app.get('/api/quick-statistics', async (req, res) => {
 });
 
 app.get('/api/committee-statistics', async (req, res) => {
-  const token = req.headers['authorization']; // read token from request header
+  const token = req.headers['authorization']; // Read token from header
   if (!token) return res.status(403).send('Token is required');
 
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
 
-    const committeeEmail = decoded.email; // extract committee email from token
+    const committeeName = decoded.name; // ✅ Extract committee name from token
 
-    // Fetch statistics based on email (approved_by_committee column should store email)
+    // Queries based on committee name
     const queryTotal = `
       SELECT COUNT(*) AS total 
       FROM bursary.personal_details 
@@ -1120,10 +1120,10 @@ app.get('/api/committee-statistics', async (req, res) => {
     `;
 
     try {
-      const totalResult = await pool.query(queryTotal, [committeeEmail]);
-      const approvedResult = await pool.query(queryApproved, [committeeEmail]);
-      const rejectedResult = await pool.query(queryRejected, [committeeEmail]);
-      const incompleteResult = await pool.query(queryIncomplete, [committeeEmail]);
+      const totalResult = await pool.query(queryTotal, [committeeName]);
+      const approvedResult = await pool.query(queryApproved, [committeeName]);
+      const rejectedResult = await pool.query(queryRejected, [committeeName]);
+      const incompleteResult = await pool.query(queryIncomplete, [committeeName]);
 
       res.status(200).json({
         total: totalResult.rows[0].total,
@@ -1137,6 +1137,7 @@ app.get('/api/committee-statistics', async (req, res) => {
     }
   });
 });
+
 
 
 app.get("/api/personalInformation", async (req, res) => {
