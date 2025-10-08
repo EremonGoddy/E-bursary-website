@@ -39,7 +39,7 @@ axios
 headers: { Authorization: token },
 })
 .then((response) => {
-setStudentDetails(response.data);
+setCommitteeDetails(response.data);
 })
 .catch((error) => console.error('Error fetching student data:', error));
 }
@@ -101,14 +101,14 @@ doc.line(10, 35, 200, 35);
 
 // Personal Information Table
 const personalInfo = [
-['Reference Number', studentDetails.reference_number || 'N/A'],
-['Full Name', studentDetails.fullname || 'N/A'],
-['Email', studentDetails.email || 'N/A'],
-['Phone No', studentDetails.phone_no || 'N/A'],
-['National ID', studentDetails.national_id || 'N/A'],
-['Sub County', studentDetails.subcounty || 'N/A'],
-['Ward', studentDetails.ward || 'N/A'],
-['Position', studentDetails.position || 'N/A'],
+['Reference Number', committeeDetails.reference_number || 'N/A'],
+['Full Name', committeeDetails.fullname || 'N/A'],
+['Email', committeeDetails.email || 'N/A'],
+['Phone No', committeeDetails.phone_no || 'N/A'],
+['National ID', committeeDetails.national_id || 'N/A'],
+['Sub County', committeeDetails.subcounty || 'N/A'],
+['Ward', committeeDetails.ward || 'N/A'],
+['Position', committeeDetails.position || 'N/A'],
 ];
 
 autoTable(doc, {
@@ -159,9 +159,9 @@ styles: { font: 'times' },
 // Declaration Table
 const declarationInfo = [
 ['Declaration', 'I hereby confirm the above details are accurate and complete.'],
-['Committee Member Name', '________________________'],
+['Committee Member Name', committeeDetails.fullname || 'N/A'],
 ['Signature', '________________________'],
-['Date', '________________________'],
+['Date & Time', new Date().toLocaleString()],
 ];
 
 autoTable(doc, {

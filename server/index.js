@@ -1600,12 +1600,19 @@ app.post('/api/profile-form', (req, res) => {
 
 
 // GET committee report with generated REFNO
+// ✅ GET committee report with generated REFNO
 app.get('/api/comreport', (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).send('Token is required');
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return res.status(403).send('Authorization token is required');
+
+  // ✅ Allow both "Bearer <token>" and raw token
+  const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
   jwt.verify(token, secret, (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
+
+    // ✅ Log to confirm what email the token contains
+    console.log('Decoded email:', decoded.email);
 
     const sqlGet = `
       SELECT 
@@ -1618,7 +1625,7 @@ app.get('/api/comreport', (req, res) => {
         ward, 
         position
       FROM bursary.profile_committee 
-      WHERE email = $1
+      WHERE TRIM(LOWER(email)) = TRIM(LOWER($1))
     `;
 
     pool.query(sqlGet, [decoded.email], (err, result) => {
@@ -1626,10 +1633,16 @@ app.get('/api/comreport', (req, res) => {
         console.error('Error fetching data:', err);
         return res.status(500).send('Error fetching data');
       }
+
+      if (result.rows.length === 0) {
+        return res.status(404).send('Committee profile not found for this email');
+      }
+
       res.json(result.rows[0]);
     });
   });
 });
+
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
