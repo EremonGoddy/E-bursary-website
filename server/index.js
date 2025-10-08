@@ -1089,54 +1089,53 @@ app.get('/api/quick-statistics', async (req, res) => {
 });
 
 app.get('/api/committee-statistics', async (req, res) => {
-  const token = req.headers['authorization']; // Read token from header
+  const token = req.headers['authorization'];
   if (!token) return res.status(403).send('Token is required');
 
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
 
-    const committeeName = decoded.name; // ✅ Extract committee name from token
-
-    // Queries based on committee name
-    const queryTotal = `
-      SELECT COUNT(*) AS total 
-      FROM bursary.personal_details 
-      WHERE approved_by_committee = $1
-    `;
-    const queryApproved = `
-      SELECT COUNT(*) AS approved 
-      FROM bursary.personal_details 
-      WHERE status = 'Approved' AND approved_by_committee = $1
-    `;
-    const queryRejected = `
-      SELECT COUNT(*) AS rejected 
-      FROM bursary.personal_details 
-      WHERE status = 'Rejected' AND approved_by_committee = $1
-    `;
-    const queryIncomplete = `
-      SELECT COUNT(*) AS incomplete 
-      FROM bursary.personal_details 
-      WHERE status = 'Incomplete' AND approved_by_committee = $1
-    `;
-
     try {
-      const totalResult = await pool.query(queryTotal, [committeeName]);
-      const approvedResult = await pool.query(queryApproved, [committeeName]);
-      const rejectedResult = await pool.query(queryRejected, [committeeName]);
-      const incompleteResult = await pool.query(queryIncomplete, [committeeName]);
+      // ✅ Step 1: Get committee name from profile_committee based on decoded email
+      const committeeQuery = `
+        SELECT fullname 
+        FROM bursary.profile_committee 
+        WHERE LOWER(email) = LOWER($1)
+      `;
+      const committeeResult = await pool.query(committeeQuery, [decoded.email]);
+
+      if (committeeResult.rows.length === 0) {
+        return res.status(404).json({ message: 'Committee not found' });
+      }
+
+      const committeeName = committeeResult.rows[0].fullname;
+
+      // ✅ Step 2: Compare names (case-insensitive) in personal_details
+      const query = `
+        SELECT 
+          COUNT(*) FILTER (WHERE LOWER(approved_by_committee) = LOWER($1)) AS total,
+          COUNT(*) FILTER (WHERE status = 'Approved' AND LOWER(approved_by_committee) = LOWER($1)) AS approved,
+          COUNT(*) FILTER (WHERE status = 'Rejected' AND LOWER(approved_by_committee) = LOWER($1)) AS rejected,
+          COUNT(*) FILTER (WHERE status = 'Incomplete' AND LOWER(approved_by_committee) = LOWER($1)) AS incomplete
+        FROM bursary.personal_details
+      `;
+
+      const result = await pool.query(query, [committeeName]);
 
       res.status(200).json({
-        total: totalResult.rows[0].total,
-        approved: approvedResult.rows[0].approved,
-        rejected: rejectedResult.rows[0].rejected,
-        incomplete: incompleteResult.rows[0].incomplete
+        total: result.rows[0].total,
+        approved: result.rows[0].approved,
+        rejected: result.rows[0].rejected,
+        incomplete: result.rows[0].incomplete,
       });
+
     } catch (err) {
       console.error('Error fetching committee statistics:', err);
       res.status(500).json({ error: 'Error fetching committee statistics' });
     }
   });
 });
+
 
 
 
