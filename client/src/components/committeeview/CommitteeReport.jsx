@@ -55,11 +55,11 @@ remaining: response.data.remaining,
 })
 .catch((error) => console.error('Error fetching bursary info:', error));
 
-axios.get(`https://e-bursary-backend.onrender.com/api/committee-statistics?committee=${loggedInCommitteeName}`)
+axios.get(`https://e-bursary-backend.onrender.com/api/committee-statistics`)
   .then((response) => {
     setApplicationInfo({
       total: response.data.total,
-      incomplete: response.data.total,
+      incomplete: response.data.incomplete,
       approved: response.data.approved,
       rejected: response.data.rejected,
     });
