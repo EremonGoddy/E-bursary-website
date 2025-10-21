@@ -9,6 +9,10 @@ faUserGear,
 faBank,
 faFileAlt,
 faChartBar,
+faChartLine,
+faDisplay,
+faClipboardList,
+faFileCircleCheck,
 faFileLines,
 faCog,
 faSignOutAlt,
@@ -49,9 +53,9 @@ const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/admindashboard' },
 { icon: faUserGear, label: 'User Management', to: '/usermanagement' },
 { icon: faBank, label: 'Bursary Management', to: '/bursarymanagement' },
-{ icon: faFileAlt, label: 'Application Monitoring', to: '/monitoring' },
-{ icon: faChartBar, label: 'Analysis', to: '/adminreport' },
-{ icon: faFileLines, label: 'Audit Logs', to: '/auditlogs' },
+{ icon: faDisplay, label: 'Application Monitoring', to: '/monitoring' },
+{ icon: faChartLine, label: 'Analysis', to: '/adminreport' },
+{ icon: faClipboardList, label: 'Audit Logs', to: '/auditlogs' },
 { icon: faCog, label: 'Settings', to: '/adminsetting' },
 { icon: faSignOutAlt, label: 'Logout', isLogout: true }
 ];
@@ -63,7 +67,7 @@ return (
 <div className="flex justify-between items-center">
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
 <div className="flex items-center space-x-1">
-<h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
 Welcome: {adminDetails.name || 'Admin'}
 </h2>
 <div className="flex items-center space-x-2">
@@ -72,14 +76,14 @@ src="/images/patient.png"
 alt="Admin"
 className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 />
-<FontAwesomeIcon icon={faBell} className="text-2xl md:text-2xl" />
+<FontAwesomeIcon icon={faBell} className="text-xl" />
 </div>  
 {/* Sidebar toggle only visible on small screens */}
 {/* Toggle Button for opening sidebar on mobile */}
 <div className="block md:hidden">
 <FontAwesomeIcon
 icon={faBars}
-className="text-[1.7rem] cursor-pointer text-[#14213d]"
+className="text-xl cursor-pointer text-[#14213d]"
 onClick={toggleSidebar}
 />
 </div>
@@ -95,123 +99,122 @@ fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
 transition-all duration-100 ease-in-out
 overflow-visible
 ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-${sidebarActive ? 'md:w-[260px] md:p-4' : 'md:w-[45px] md:p-2'}
+${sidebarActive ? 'md:w-[260px] md:p-4' : 'md:w-[36px] md:p-2'}
 `}
 >
 <div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
 onClick={toggleSidebar}
 />
 </div>
 <ul className="flex flex-col h-full mt-6">
-  {/* Top nav items */}
-  <div className="flex flex-col space-y-10">
-    {navItems.filter((item) => !item.isLogout).map((item, index) => (
-      <li className="group relative" key={index}>
-        <Link
-          to={item.to}
-          className={`flex items-center space-x-2 transition-all duration-200 ${
-            sidebarActive ? 'justify-start' : 'justify-center'
-          }`}
-        >
-          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-          <span
-            className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-            }`}
-          >
-            {item.label}
-          </span>
-        </Link>
+{/* Top nav items */}
+<div className="flex flex-col space-y-10">
+{navItems.filter((item) => !item.isLogout).map((item, index) => (
+<li className="group relative" key={index}>
+<Link
+to={item.to}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</Link>
 
-        {!sidebarActive && (
-          <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[220px] flex items-center justify-center z-50">
-            {item.label}
-          </span>
-        )}
-      </li>
-    ))}
-  </div>
+{!sidebarActive && (
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity  w-[220px] flex items-center justify-center z-50">
+{item.label}
+</span>
+)}
+</li>
+))}
+</div>
 
-  {/* Logout item pinned at bottom */}
-  {navItems.filter((item) => item.isLogout).map((item, index) => (
-    <li className="group relative mt-30" key={index}>
-      <a
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          const token = sessionStorage.getItem('authToken');
-          axios
-            .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-              headers: { Authorization: `Bearer ${token}` }
-            })
-            .catch(() => {})
-            .finally(() => {
-              sessionStorage.clear();
-              navigate('/');
-            });
-        }}
-        className={`flex items-center space-x-2 transition-all duration-200 ${
-          sidebarActive ? 'justify-start' : 'justify-center'
-        }`}
-      >
-        <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-        <span
-          className={`${
-            sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-          }`}
-        >
-          {item.label}
-        </span>
-      </a>
+{/* Logout item pinned at bottom */}
+{navItems.filter((item) => item.isLogout).map((item, index) => (
+<li className="group relative mt-30" key={index}>
+<a
+href="#"
+onClick={(e) => {
+e.preventDefault();
+const token = sessionStorage.getItem('authToken');
+axios
+.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+headers: { Authorization: `Bearer ${token}` }
+})
+.catch(() => {})
+.finally(() => {
+sessionStorage.clear();
+navigate('/');
+});
+}}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</a>
 
-      {!sidebarActive && (
-        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
-          {item.label}
-        </span>
-      )}
-    </li>
-  ))}
+{!sidebarActive && (
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
+{item.label}
+</span>
+)}
+</li>
+))}
 </ul>
 
 </div>
 {/* Main Content */}
 <div
-  className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:mt-2 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-  ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+className={`flex-1 ml-0 md:ml-64 p-4 -mt-22 md:-mt-14 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
+${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 `}
 >
-  <div className="max-w-[750px] mx-auto mb-0 md:mb-4 backdrop-blur-xl bg-white/90 border border-gray-200 shadow-lg rounded-2xl 
-    transition-all duration-300 hover:shadow-xl hover:scale-[1.01] p-4 mt-10">
+<div className="max-w-[850px] mx-auto mb-0 md:mb-4 backdrop-blur-xl bg-white/90 border border-gray-200 shadow-lg rounded-2xl 
+transition-all duration-300 hover:shadow-xl hover:scale-[1.01] p-4 mt-10">
+<h2 className="text-lg md:text-xl font-bold text-[#14213d] mb-3 border-b pb-2 text-center">
+Audit Logs
+</h2>
 
-    <h2 className="text-lg md:text-xl font-bold text-[#14213d] mb-3 border-b pb-2 text-center">
-      Audit Logs
-    </h2>
-
-    {/* Scrollable list wrapper */}
-    <div className="overflow-y-auto max-h-[450px] pr-2">
-      <ul className="space-y-2 text-sm md:text-base">
-        {logs.length === 0 && (
-          <li className="py-4 text-center text-gray-400">
-            No audit logs found.
-          </li>
-        )}
-        {logs.map((log, idx) => (
-          <li
-            key={idx}
-            className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center"
-          >
-            <span className="text-gray-800 font-medium">{log.log_message}</span>
-            <span className="text-gray-500 text-xs md:text-sm italic">
-              {log.log_time}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </div>
+{/* Scrollable list wrapper */}
+<div className="overflow-y-auto max-h-[500px] pr-2">
+<ul className="space-y-2 text-sm md:text-base">
+{logs.length === 0 && (
+<li className="py-4 text-center text-gray-400">
+No audit logs found.
+</li>
+)}
+{logs.map((log, idx) => (
+<li
+key={idx}
+className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center"
+>
+<span className="text-gray-800 font-medium">{log.log_message}</span>
+<span className="text-gray-500 text-xs md:text-sm italic">
+{log.log_time}
+</span>
+</li>
+))}
+</ul>
+</div>
+</div>
 </div>
 
 </div>

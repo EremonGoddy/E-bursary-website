@@ -40,8 +40,16 @@ const navigate = useNavigate();
 const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
 // Dropdown options
-const subcounties = ["Turkana Central", "Turkana South", "Turkana North", "Loima"];
-const wards = ["Kanamkemer", "Kerio Delta", "Kapua", "Letea"];
+const subcountyWards = {
+"Turkana Central": ["Kanamkemer", "Kerio Delta","Kang’atotha", "Kalokol", "Lodwar Township"],
+"Turkana East": ["Lokori/Kochodin", "Katilia", "Kapedo/Napeitom"],
+"Turkana South": ["Kaputir", "Katilu", "Lobokat", "Lokichar", "Kalapata"],
+"Loima": ["Lokiriama/Lorengipi", "Lobei/Kotaruk", "Loima", "Turkwel"],
+"Turkana North": ["Kaeris", "Kaaleng/Kaikor","Lake Zone","Kibish", "Nakalale", "Lapur"],
+"Turkana West": ["Letea", "Kalobeyei", "Kakuma", "Lopur", "Songot"],
+};
+
+const subcounties = Object.keys(subcountyWards);
 const positions = ["Chairperson", "Secretary", "Treasurer", "Member"];
 
 useEffect(() => {
@@ -312,26 +320,57 @@ className="accent-[#14213d]"
 </div>
 </div>
 
-{/* Subcounty, Ward, Position */}
-{[
-{name:'subcounty', options:subcounties},
-{name:'ward', options:wards},
-{name:'position', options:positions}
-].map(({name,options}) => (
-<div className="flex items-center gap-3 mb-5" key={name}>
-<label className="text-[#14213d] font-semibold w-[110px]">{name.charAt(0).toUpperCase() + name.slice(1)}:</label>
-<select
-name={name}
-value={formData[name]}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
->
-<option value="">Select {name.charAt(0).toUpperCase() + name.slice(1)}</option>
-{options.map((opt,i) => <option key={i} value={opt}>{opt}</option>)}
-</select>
-</div>
-))}
+{/* Subcounty Dropdown */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Subcounty:</label>
+                    <select
+                      name="subcounty"
+                      value={formData.subcounty}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    >
+                      <option value="">Select Subcounty</option>
+                      {subcounties.map((opt, i) => (
+                        <option key={i} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+
+{/* Ward Dropdown */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Ward:</label>
+                    <select
+                      name="ward"
+                      value={formData.ward}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    >
+                      <option value="">Select Ward</option>
+                      {(subcountyWards[formData.subcounty] || []).map((ward, i) => (
+                        <option key={i} value={ward}>{ward}</option>
+                      ))}
+                    </select>
+                  </div>
+
+  {/* Position Dropdown */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
+                    <select
+                      name="position"
+                      value={formData.position}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+                      required
+                    >
+                      <option value="">Select Position</option>
+                      {positions.map((opt, i) => (
+                        <option key={i} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+
 
 <button
 type="submit"

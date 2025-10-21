@@ -24,7 +24,7 @@ email: '',
 phoneNumber: '',
 password: '',
 confirmPassword: '',
-role: 'Student',
+role: 'Committee',
 });
 const [errors, setErrors] = useState({});
 const [isTermsAccepted, setIsTermsAccepted] = useState(false);

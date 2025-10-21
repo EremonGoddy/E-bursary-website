@@ -329,7 +329,7 @@ sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[0px] md:ml-[10px]'
 <div className="block md:hidden">
 {reportRows.map((row) => (
 <div key={row.label} className="flex items-center py-2 border-b last:border-b-0">
-<span className="font-semibold w-1/2 text-[1rem] bg-[#14213d] text-white px-2 py-1 rounded-1">
+<span className="font-semibold w-1/2 bg-[#14213d] text-white px-2 py-1 rounded-1">
 {row.label}
 </span>
 <span className="w-1/2 text-[1rem] bg-white-100 px-2 py-1 rounded-r">
@@ -342,14 +342,14 @@ sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[0px] md:ml-[10px]'
 <div className="hidden md:block w-full overflow-x-auto">
 <table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
 <thead>
-<tr className="bg-[#14213d] text-white text-[1.1rem]">
+<tr className="bg-[#14213d] text-white">
 <th className="p-2 text-left">Reference Number</th>
 <th className="p-2 text-left">Application Title</th>
 <th className="p-2 text-left">Download Application</th>
 </tr>
 </thead>
 <tbody>
-<tr className="border-b text-[1rem]">
+<tr className="border-b ">
 <td className="p-2">{committeeDetails.reference_number || 'N/A'}</td>
 <td className="p-2">Committee Report</td>
 <td className="p-2">
@@ -361,7 +361,7 @@ className="bg-transparent border-0 p-0 m-0 cursor-pointer"
 >
 <FontAwesomeIcon
 icon={faDownload}
-className="text-[#14213d] text-[1.3rem]"
+className="text-[#14213d] text-xl"
 />
 </button>
 </td>

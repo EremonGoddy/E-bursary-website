@@ -9,6 +9,10 @@ faUserGear,
 faBank,
 faFileAlt,
 faChartBar,
+faChartLine,
+faDisplay,
+faClipboardList,
+faFileCircleCheck,
 faFileLines,
 faCog,
 faSignOutAlt,
@@ -99,9 +103,9 @@ const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/admindashboard' },
 { icon: faUserGear, label: 'User Management', to: '/usermanagement' },
 { icon: faBank, label: 'Bursary Management', to: '/bursarymanagement' },
-{ icon: faFileAlt, label: 'Application Monitoring', to: '/monitoring' },
-{ icon: faChartBar, label: 'Analysis', to: '/adminreport' },
-{ icon: faFileLines, label: 'Audit Logs', to: '/auditlogs' },
+{ icon: faDisplay, label: 'Application Monitoring', to: '/monitoring' },
+{ icon: faChartLine, label: 'Analysis', to: '/adminreport' },
+{ icon: faClipboardList, label: 'Audit Logs', to: '/auditlogs' },
 { icon: faCog, label: 'Settings', to: '/adminsetting' },
 { icon: faSignOutAlt, label: 'Logout', isLogout: true }
 ];
@@ -113,7 +117,7 @@ return (
 <div className="flex justify-between items-center">
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
 <div className="flex items-center space-x-1">
-<h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
 Welcome: {adminDetails.name || 'Admin'}
 </h2>
 <div className="flex items-center space-x-2">
@@ -129,7 +133,7 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-2 md:mr-20"
 <div className="block md:hidden">
 <FontAwesomeIcon
 icon={faBars}
-className="text-[1.7rem] cursor-pointer text-[#14213d]"
+className="text-xl cursor-pointer text-[#14213d]"
 onClick={toggleSidebar}
 />
 </div>
@@ -145,109 +149,110 @@ fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
 transition-all duration-100 ease-in-out
 overflow-visible
 ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-${sidebarActive ? 'md:w-[260px] md:p-4' : 'md:w-[45px] md:p-2'}
+${sidebarActive ? 'md:w-[260px] md:p-4' : 'md:w-[36px] md:p-2'}
 `}
 >
 <div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
 onClick={toggleSidebar}
 />
 </div>
 <ul className="flex flex-col h-full mt-6">
-  {/* Top nav items */}
-  <div className="flex flex-col space-y-10">
-    {navItems.filter((item) => !item.isLogout).map((item, index) => (
-      <li className="group relative" key={index}>
-        <Link
-          to={item.to}
-          className={`flex items-center space-x-2 transition-all duration-200 ${
-            sidebarActive ? 'justify-start' : 'justify-center'
-          }`}
-        >
-          <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-          <span
-            className={`${
-              sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-            }`}
-          >
-            {item.label}
-          </span>
-        </Link>
+{/* Top nav items */}
+<div className="flex flex-col space-y-10">
+{navItems.filter((item) => !item.isLogout).map((item, index) => (
+<li className="group relative" key={index}>
+<Link
+to={item.to}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</Link>
 
-        {!sidebarActive && (
-          <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[220px] flex items-center justify-center z-50">
-            {item.label}
-          </span>
-        )}
-      </li>
-    ))}
-  </div>
+{!sidebarActive && (
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[220px] flex items-center justify-center z-50">
+{item.label}
+</span>
+)}
+</li>
+))}
+</div>
 
-  {/* Logout item pinned at bottom */}
-  {navItems.filter((item) => item.isLogout).map((item, index) => (
-    <li className="group relative mt-30" key={index}>
-      <a
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          const token = sessionStorage.getItem('authToken');
-          axios
-            .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-              headers: { Authorization: `Bearer ${token}` }
-            })
-            .catch(() => {})
-            .finally(() => {
-              sessionStorage.clear();
-              navigate('/');
-            });
-        }}
-        className={`flex items-center space-x-2 transition-all duration-200 ${
-          sidebarActive ? 'justify-start' : 'justify-center'
-        }`}
-      >
-        <FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
-        <span
-          className={`${
-            sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
-          }`}
-        >
-          {item.label}
-        </span>
-      </a>
+{/* Logout item pinned at bottom */}
+{navItems.filter((item) => item.isLogout).map((item, index) => (
+<li className="group relative mt-30" key={index}>
+<a
+href="#"
+onClick={(e) => {
+e.preventDefault();
+const token = sessionStorage.getItem('authToken');
+axios
+.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+headers: { Authorization: `Bearer ${token}` }
+})
+.catch(() => {})
+.finally(() => {
+sessionStorage.clear();
+navigate('/');
+});
+}}
+className={`flex items-center space-x-2 transition-all duration-200 ${
+sidebarActive ? 'justify-start' : 'justify-center'
+}`}
+>
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
+<span
+className={`${
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
+}`}
+>
+{item.label}
+</span>
+</a>
 
-      {!sidebarActive && (
-        <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
-          {item.label}
-        </span>
-      )}
-    </li>
-  ))}
+{!sidebarActive && (
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
+{item.label}
+</span>
+)}
+</li>
+))}
 </ul>
 </div>
 
 {/* Main Content */}
-<div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 md:-mt-10 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-  ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
-  `}>
+<div className={`flex-1 ml-0 md:ml-64 p-4 -mt-10 md:-mt-6 transition-all duration-100 pr-2 pl-2 md:pr-10 md:pl-10
+${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
+`}>
 <div className="max-w-xl mx-auto backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
-transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-8">
-<h2 className="text-2xl font-bold mb-6 text-center">Change Password</h2>
+transition-all duration-300 transform hover:scale-[1.01] p-5 md:p-8">
+<h2 className="text-2xl font-bold mb-6 text-center text-[#14213d]">Change Password</h2>
 <form onSubmit={handleChangePassword}>
 <div className="mb-5">
-<label className="block font-semibold mb-1">Current Password</label>
+<label className="block font-semibold mb-1 text-[#14213d]">Current Password</label>
 <div className="relative flex items-center">
 <input
 type={showCurrentPassword ? 'text' : 'password'}
-className="form-input px-4 py-2 w-full rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+placeholder="Enter your current password"
+className="form-input px-4 py-2 w-full rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14213d]"
 value={currentPassword}
 onChange={(e) => setCurrentPassword(e.target.value)}
 required
 />
 <button
 type="button"
-className="absolute right-2 p-1 text-gray-500"
+className="absolute text-xl text-[#14213d] right-2 p-1"
 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
 tabIndex={-1}
 >
@@ -257,18 +262,19 @@ tabIndex={-1}
 </div>
 
 <div className="mb-5">
-<label className="block font-semibold mb-1">New Password</label>
+<label className="block font-semibold mb-1 text-[#14213d]">New Password</label>
 <div className="relative flex items-center">
 <input
 type={showNewPassword ? 'text' : 'password'}
-className="form-input px-4 py-2 w-full rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+placeholder="Re-enter new password"
+className="form-input px-4 py-2 w-full rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14213d]"
 value={newPassword}
 onChange={(e) => setNewPassword(e.target.value)}
 required
 />
 <button
 type="button"
-className="absolute right-2 p-1 text-gray-500"
+className="absolute right-2 p-1 text-[#14213d] text-xl"
 onClick={() => setShowNewPassword(!showNewPassword)}
 tabIndex={-1}
 >
@@ -278,18 +284,19 @@ tabIndex={-1}
 </div>
 
 <div className="mb-5">
-<label className="block font-semibold mb-1">Confirm New Password</label>
+<label className="block font-semibold mb-1 text-[#14213d]">Confirm New Password</label>
 <div className="relative flex items-center">
 <input
 type={showConfirmPassword ? 'text' : 'password'}
-className="form-input px-4 py-2 w-full rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+placeholder="Enter a new password"
+className="form-input px-4 py-2 w-full rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14213d]"
 value={confirmPassword}
 onChange={(e) => setConfirmPassword(e.target.value)}
 required
 />
 <button
 type="button"
-className="absolute right-2 p-1 text-gray-500"
+className="absolute right-2 p-1 text-[#14213d] text-xl"
 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
 tabIndex={-1}
 >
@@ -297,7 +304,7 @@ tabIndex={-1}
 </button>
 </div>
 </div>
-<button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 mt-2 rounded w-full font-semibold">
+<button type="submit" className="bg-[#14213d] hover:bg-gray-600 cursor-pointer text-white px-6 py-2 mt-2 rounded w-full font-semibold">
 Update Password
 </button>
 </form>
