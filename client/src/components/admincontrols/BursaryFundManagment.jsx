@@ -46,46 +46,47 @@ email: response.data.email,
 }, [navigate]);
 
 // ✅ Submit funds for a specific ward
-  const handleSubmit = async () => {
-    if (!amount || !ward) {
-      alert('Please select a ward and enter an amount.');
-      return;
-    }
+ const handleSubmit = async () => {
+  if (!amount || !ward) {
+    alert('Please select a ward and enter an amount.');
+    return;
+  }
 
-    try {
-      await axios.post('https://e-bursary-backend.onrender.com/api/bursary-funds', {
-        ward,
-        ward_amount: amount,
-      });
-      alert(`Funds for ${ward} ward disbursed successfully!`);
-      setAmount('');
-      setWard('');
-    } catch (error) {
-      console.error('Error disbursing funds:', error);
-      alert('Error submitting funds. Please try again.');
-    }
-  };
+  try {
+    await axios.post('https://e-bursary-backend.onrender.com/api/bursary-funds', {
+      amount,               // ✅ correct key
+      ward_allocated: ward, // ✅ correct key
+    });
+    alert(`Funds for ${ward} ward disbursed successfully!`);
+    setAmount('');
+    setWard('');
+  } catch (error) {
+    console.error('Error disbursing funds:', error);
+    alert('Error submitting funds. Please try again.');
+  }
+};
 
-  // ✅ Adjust funds for a specific ward
-  const handleAdjust = async () => {
-    if (!amount || !ward) {
-      alert('Please select a ward and enter an amount.');
-      return;
-    }
+const handleAdjust = async () => {
+  if (!amount || !ward) {
+    alert('Please select a ward and enter an amount.');
+    return;
+  }
 
-    try {
-      await axios.put('https://e-bursary-backend.onrender.com/api/adjust-funds', {
-        ward,
-        ward_amount: amount,
-      });
-      alert(`Funds for ${ward} ward adjusted successfully!`);
-      setAmount('');
-      setWard('');
-    } catch (error) {
-      console.error('Error adjusting funds:', error);
-      alert('Error adjusting funds. Please try again.');
-    }
-  };
+  try {
+    await axios.put('https://e-bursary-backend.onrender.com/api/adjust-funds', {
+      amount,               // ✅ matches backend
+      ward_allocated: ward, // ✅ matches backend
+    });
+
+    alert(`Funds for ${ward} ward adjusted successfully!`);
+    setAmount('');
+    setWard('');
+  } catch (error) {
+    console.error('Error adjusting funds:', error);
+    alert('Error adjusting funds. Please try again.');
+  }
+};
+
 
 const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/admindashboard' },
