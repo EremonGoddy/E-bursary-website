@@ -23,6 +23,7 @@ const BursaryFundManagement = () => {
 const [sidebarActive, setSidebarActive] = useState(false);
 const [adminDetails, setAdminDetails] = useState({});
 const [amount, setAmount] = useState('');
+const [ward, setWard] = useState('');
 const navigate = useNavigate();
 
 const toggleSidebar = () => setSidebarActive(!sidebarActive);
@@ -44,22 +45,47 @@ email: response.data.email,
 .catch(error => console.error('Error fetching admin details:', error));
 }, [navigate]);
 
-const handleSubmit = async () => {
-await axios.post('https://e-bursary-backend.onrender.com/api/bursary-funds', { amount });
-alert('Funds disbursed successfully!');
-setAmount('');
-};
+// ✅ Submit funds for a specific ward
+  const handleSubmit = async () => {
+    if (!amount || !ward) {
+      alert('Please select a ward and enter an amount.');
+      return;
+    }
 
-const handleAdjust = async () => {
-try {
-await axios.put('https://e-bursary-backend.onrender.com/api/adjust-funds', { amount });
-alert('Funds adjusted successfully!');
-setAmount('');
-} catch (error) {
-console.error('Error adjusting funds:', error);
-alert('Error in adjusting funds. Please try again.');
-}
-};
+    try {
+      await axios.post('https://e-bursary-backend.onrender.com/api/bursary-funds', {
+        ward,
+        ward_amount: amount,
+      });
+      alert(`Funds for ${ward} ward disbursed successfully!`);
+      setAmount('');
+      setWard('');
+    } catch (error) {
+      console.error('Error disbursing funds:', error);
+      alert('Error submitting funds. Please try again.');
+    }
+  };
+
+  // ✅ Adjust funds for a specific ward
+  const handleAdjust = async () => {
+    if (!amount || !ward) {
+      alert('Please select a ward and enter an amount.');
+      return;
+    }
+
+    try {
+      await axios.put('https://e-bursary-backend.onrender.com/api/adjust-funds', {
+        ward,
+        ward_amount: amount,
+      });
+      alert(`Funds for ${ward} ward adjusted successfully!`);
+      setAmount('');
+      setWard('');
+    } catch (error) {
+      console.error('Error adjusting funds:', error);
+      alert('Error adjusting funds. Please try again.');
+    }
+  };
 
 const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/admindashboard' },
@@ -222,6 +248,33 @@ onChange={(e) => setAmount(e.target.value)}
 Please enter the total funds received for allocation.
 </p>
 </div>
+
+{/* ✅ Ward Dropdown */}
+<div className="mb-3">
+  <label htmlFor="ward" className="block font-medium text-[#14213d] mb-1">
+    Ward
+  </label>
+  <select
+    id="ward"
+    className="form-select w-full px-3 py-2 border border-gray-300 rounded"
+    value={ward}
+    onChange={(e) => setWard(e.target.value)}
+    required
+  >
+    <option value="">Select Ward</option>
+    {[
+      "Kanamkemer", "Kerio Delta", "Kang’atotha", "Kalokol", "Lodwar Township",
+      "Lokori/Kochodin", "Katilia", "Kapedo/Napeitom", "Kaputir", "Katilu", "Lobokat",
+      "Lokichar", "Kalapata", "Lokiriama/Lorengipi", "Lobei/Kotaruk", "Loima", "Turkwel",
+      "Kaeris", "Kaaleng/Kaikor", "Lake Zone", "Kibish", "Nakalale", "Lapur", "Letea",
+      "Kalobeyei", "Kakuma", "Lopur", "Songot"
+    ].map((w, i) => (
+      <option key={i} value={w}>{w}</option>
+    ))}
+  </select>
+</div>
+
+
 <div className="flex gap-3">
 <button
 className="bg-blue-600 hover:bg-blue-700 cursor-pointer disabled:bg-blue-300 text-white px-6 py-2 rounded font-semibold"

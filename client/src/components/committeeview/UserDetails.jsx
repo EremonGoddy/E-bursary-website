@@ -182,7 +182,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </div>
 {/* Main Content */}
 <div
-className={`flex-1 ml-0 md:ml-64 md:p-4 mt-0 md:mt-2 transition-all duration-100 md:pr-10 md:pl-10 ${
+className={`flex-1 ml-0 md:ml-64 md:p-4 -mt-10 md:-mt-8 transition-all duration-100 md:pr-10 md:pl-10 ${
 sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[0px] md:ml-[10px]'
 }`}
 >
@@ -193,55 +193,55 @@ Personal Information
 </h2>
 
 {/* Scroll wrapper with height limit */}
-<div className="overflow-x-auto w-full max-h-[600px] md:max-h-[400px] overflow-y-auto">
+<div className="overflow-x-auto  w-full max-h-[600px] md:max-h-[400px] overflow-y-auto">
 <table className="min-w-[600px] w-full border-collapse border border-gray-300">
 <thead className="bg-[#14213d] text-white">
-        <tr>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Full Name</th>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Email</th>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Institution</th>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Admission</th>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Sub County</th>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Reviewed By</th>
-          <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((item) => (
-          <tr key={item.id} className="hover:bg-gray-100">
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.fullname}</td>
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.email}</td>
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.institution}</td>
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.admission}</td>
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.subcounty}</td>
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">
-              {item.approved_by_committee || 'Not Reviewed'}
-            </td>
-            <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap text-center">
-              {(item.approved_by_committee && item.approved_by_committee !== userName) ? (
-                <span className="text-gray-500 text-[0.85rem] italic">
-                  Approved by {item.approved_by_committee}
-                </span>
-              ) : (
-                <Link
-                  to={`/PersonalInformation/${item.user_id}`}
-                  onClick={() => handleApproveStudent(item.user_id)}
-                  className="text-blue-500 font-bold hover:text-blue-700 no-underline"
-                >
-                  User Details
-                </Link>
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+<tr>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Full Name</th>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Email</th>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Institution</th>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Admission</th>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Sub County</th>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Reviewed By</th>
+<th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Action</th>
+</tr>
+</thead>
+<tbody>
+{data.map((item) => (
+<tr key={item.id} className="hover:bg-gray-100">
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.fullname}</td>
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.email}</td>
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.institution}</td>
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.admission}</td>
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.subcounty}</td>
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">
+{item.approved_by_committee || 'Not Reviewed'}
+</td>
+<td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap text-center">
+{(item.approved_by_committee && item.approved_by_committee !== userName) ? (
+<span className="text-gray-500 text-[0.85rem] italic">
+Approved by {item.approved_by_committee}
+</span>
+) : (
+<Link
+to={`/PersonalInformation/${item.user_id}`}
+onClick={() => handleApproveStudent(item.user_id)}
+className="text-blue-500 font-bold hover:text-blue-700 no-underline"
+>
+User Details
+</Link>
+)}
+</td>
+</tr>
+))}
+</tbody>
+</table>
 
-    {/* Hint for mobile users */}
-    <div className="md:hidden text-center text-gray-500 mt-2">
-      Swipe left/right to see all columns
-    </div>
-  </div>
+{/* Hint for mobile users */}
+<div className="md:hidden text-center text-gray-500 mt-2">
+Swipe left/right to see all columns
+</div>
+</div>
 </div>
 
 

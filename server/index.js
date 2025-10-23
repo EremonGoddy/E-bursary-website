@@ -1059,6 +1059,51 @@ app.get('/api/committee-count', async (req, res) => {
   }
 });
 
+// Committee Count Route (Ward-Based)
+app.get('/api/bursary-count/:ward', async (req, res) => {
+  const { ward } = req.params;
+
+  // Query total funds for this ward
+  const queryTotalFunds = `
+    SELECT amount 
+    FROM bursary.bursary_funds 
+    WHERE ward_allocated = $1
+  `;
+
+  // Query total allocated funds for this ward (students belonging to that ward)
+  const queryAllocatedFunds = `
+    SELECT SUM(bursary) AS total_allocated
+    FROM bursary.personal_details
+    WHERE ward = $1
+  `;
+
+  try {
+    // Get total fund for the ward
+    const totalResult = await pool.query(queryTotalFunds, [ward]);
+    if (totalResult.rows.length === 0) {
+      return res.status(404).json({ error: `No bursary fund found for ward: ${ward}` });
+    }
+
+    const totalAmount = totalResult.rows[0].amount;
+
+    // Get allocated funds for that ward
+    const allocatedResult = await pool.query(queryAllocatedFunds, [ward]);
+    const allocatedAmount = allocatedResult.rows[0].total_allocated || 0;
+    const remainingAmount = totalAmount - allocatedAmount;
+
+    res.status(200).json({
+      ward,
+      amount: totalAmount,
+      allocated: allocatedAmount,
+      remaining: remainingAmount
+    });
+  } catch (err) {
+    console.error('Error in fund calculations:', err);
+    res.status(500).json({ error: 'Server error calculating funds per ward' });
+  }
+});
+
+
 // Quick Statistics Route
 app.get('/api/quick-statistics', async (req, res) => {
   const queryTotal = 'SELECT COUNT(*) AS total FROM bursary.personal_details';
@@ -1446,14 +1491,18 @@ app.get('/api/activity-logs', (req, res) => {
 });
 
 app.post('/api/bursary-funds', (req, res) => {
-  const { amount } = req.body;
+  const { amount, ward_allocated } = req.body;
 
-  if (!amount || isNaN(amount)) {
-    return res.status(400).json({ message: 'Invalid amount provided' });
+  if (!amount || isNaN(amount) || !ward_allocated) {
+    return res.status(400).json({ message: 'Invalid amount or ward provided' });
   }
 
-  const query = 'INSERT INTO bursary.bursary_funds (amount) VALUES ($1)';
-  pool.query(query, [amount], (err) => {
+  const query = `
+    INSERT INTO bursary.bursary_funds (amount, ward_allocated)
+    VALUES ($1, $2)
+  `;
+
+  pool.query(query, [amount, ward_allocated], (err) => {
     if (err) {
       console.error('Error inserting data:', err);
       return res.status(500).json({ message: 'Server error' });
@@ -1462,18 +1511,27 @@ app.post('/api/bursary-funds', (req, res) => {
   });
 });
 
+
+// ✅ Adjust existing record
 app.put('/api/adjust-funds', (req, res) => {
-  const { amount } = req.body;
-  const id = 1;
+  const { amount, ward_allocated } = req.body;
+  const id = 1; // adjust the first record or modify logic as needed
 
-  const updateQuery = 'UPDATE bursary.bursary_funds SET amount = $1 WHERE id = $2';
+  const updateQuery = `
+    UPDATE bursary.bursary_funds 
+    SET amount = $1, ward_allocated = $2 
+    WHERE id = $3
+  `;
 
-  pool.query(updateQuery, [amount, id], async (err) => {
+  pool.query(updateQuery, [amount, ward_allocated, id], async (err) => {
     if (err) return res.status(500).send(err);
 
     try {
-      const logMessage = `Bursary fund adjusted to ${amount} shillings.`;
-      await pool.query('INSERT INTO bursary.activity_log (log_message) VALUES ($1)', [logMessage]);
+      const logMessage = `Bursary fund for ${ward_allocated} adjusted to ${amount} shillings.`;
+      await pool.query(
+        'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
+        [logMessage]
+      );
 
       res.status(200).json({ message: 'Fund allocation adjusted successfully!' });
     } catch (logErr) {

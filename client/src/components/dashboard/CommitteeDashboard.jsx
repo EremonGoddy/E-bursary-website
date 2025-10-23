@@ -14,100 +14,107 @@ faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 const CommitteeDashboard = () => {
-const [sidebarActive, setSidebarActive] = useState(false);
-const [committeeDetails, setCommitteeDetails] = useState({});
-const [bursaryAmount, setBursaryAmount] = useState(0);
-const [allocatedAmount, setAllocatedAmount] = useState(0);
-const [remainingAmount, setRemainingAmount] = useState(0);
-const [totalApplications, setTotalApplications] = useState(0);
-const [approvedApplications, setApprovedApplications] = useState(0);
-const [rejectedApplications, setRejectedApplications] = useState(0);
-const [pendingApplications, setPendingApplications] = useState(0);
-const [incompleteApplications, setIncompleteApplications] = useState(0);
-const [userName, setUserName] = useState('');
-const [data, setData] = useState([]);
-const navigate = useNavigate();
+ const [sidebarActive, setSidebarActive] = useState(false);
+  const [committeeDetails, setCommitteeDetails] = useState({});
+  const [bursaryAmount, setBursaryAmount] = useState(0);
+  const [allocatedAmount, setAllocatedAmount] = useState(0);
+  const [remainingAmount, setRemainingAmount] = useState(0);
+  const [totalApplications, setTotalApplications] = useState(0);
+  const [approvedApplications, setApprovedApplications] = useState(0);
+  const [rejectedApplications, setRejectedApplications] = useState(0);
+  const [pendingApplications, setPendingApplications] = useState(0);
+  const [incompleteApplications, setIncompleteApplications] = useState(0);
+  const [userName, setUserName] = useState('');
+  const [data, setData] = useState([]);
+  const navigate = useNavigate();
 
-const toggleSidebar = () => setSidebarActive(!sidebarActive);
+  const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
-useEffect(() => {
-const token = sessionStorage.getItem('authToken');
-const name = sessionStorage.getItem('userName');
-if (!token) {
-navigate('/signin');
-} else {
-setUserName(name);
-axios
-.get('https://e-bursary-backend.onrender.com/api/committee-count')
-.then((response) => {
-setBursaryAmount(response.data.amount);
-setAllocatedAmount(response.data.allocated);
-setRemainingAmount(response.data.amount - response.data.allocated);
-})
-.catch((error) => {
-console.error('Error fetching bursary data:', error);
-});
+  // ✅ STEP 1: Fetch committee profile (to get ward)
+  useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    const name = sessionStorage.getItem('userName');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
 
-axios
-.get('https://e-bursary-backend.onrender.com/api/quick-statistics')
-.then((response) => {
-const { total, approved, rejected, pending, incomplete } = response.data;
-setTotalApplications(total);
-setApprovedApplications(approved);
-setRejectedApplications(rejected);
-setPendingApplications(pending || 0);
-setIncompleteApplications(incomplete || 0);
-})
-.catch((error) => {
-console.error('Error fetching application statistics:', error);
-});
-}
-}, [navigate]);
+    setUserName(name);
 
-const loadData = async () => {
-try {
-const response = await axios.get('https://e-bursary-backend.onrender.com/api/personalInformation');
-setData(response.data);
-} catch (error) {
-console.error('Error fetching personal information:', error);
-}
-};
+    axios
+      .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(async (response) => {
+        const profile = response.data;
+        setCommitteeDetails(profile);
 
-useEffect(() => {
-loadData();
-}, []);
+        // ✅ STEP 2: Use the ward from profile to fetch bursary data
+        if (profile.ward) {
+          try {
+            const res = await axios.get(
+              `https://e-bursary-backend.onrender.com/api/bursary-count/${profile.ward}`
+            );
+            setBursaryAmount(res.data.amount);
+            setAllocatedAmount(res.data.allocated);
+            setRemainingAmount(res.data.remaining);
+          } catch (error) {
+            console.error('Error fetching bursary data:', error);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching committee profile:', error);
+      });
+  }, [navigate]);
 
-useEffect(() => {
-const token = sessionStorage.getItem('authToken');
-if (!token) {
-navigate('/signin');
-} else {
-axios
-.get('https://e-bursary-backend.onrender.com/api/profile-committee', {
-headers: { Authorization: `Bearer ${token}` },
-})
-.then((response) => {
-setCommitteeDetails(response.data);
-})
-.catch((error) => {
-console.error('Error fetching profile data:', error);
-});
-}
-}, [navigate]);
+  // ✅ Fetch statistics
+  useEffect(() => {
+    axios
+      .get('https://e-bursary-backend.onrender.com/api/quick-statistics')
+      .then((response) => {
+        const { total, approved, rejected, pending, incomplete } = response.data;
+        setTotalApplications(total);
+        setApprovedApplications(approved);
+        setRejectedApplications(rejected);
+        setPendingApplications(pending || 0);
+        setIncompleteApplications(incomplete || 0);
+      })
+      .catch((error) => {
+        console.error('Error fetching application statistics:', error);
+      });
+  }, []);
 
-const handleApproveStudent = async (studentUserId) => {
-try {
-const committeeName = sessionStorage.getItem('userName');
-if (!committeeName) return;
-await axios.post('https://e-bursary-backend.onrender.com/api/approve-student', {
-studentUserId,
-committeeName,
-});
-} catch (error) {
-console.error('Error approving student:', error);
-}
-};
+  // ✅ Load personal info data
+  const loadData = async () => {
+    try {
+      const response = await axios.get(
+        'https://e-bursary-backend.onrender.com/api/personalInformation'
+      );
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching personal information:', error);
+    }
+  };
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // ✅ Approve student handler
+  const handleApproveStudent = async (studentUserId) => {
+    try {
+      const committeeName = sessionStorage.getItem('userName');
+      if (!committeeName) return;
+      await axios.post('https://e-bursary-backend.onrender.com/api/approve-student', {
+        studentUserId,
+        committeeName,
+      });
+    } catch (error) {
+      console.error('Error approving student:', error);
+    }
+  };
+  
 const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
 { icon: faUser, label: 'Profile', to: '/committeeprofile' },
@@ -289,7 +296,7 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <h2 className="text-center text-xl font-bold text-[#14213d] mb-2 md:mb-4">Personal Information</h2>
 <div className="overflow-x-auto w-full">
 <table className="min-w-[600px] w-full border-collapse border border-gray-300 ">
-<thead className="bg-gray-200 text-[#14213d]">
+<thead className="bg-[#14213d] text-white">
 <tr>
 <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Full Name</th>
 <th className="border border-gray-300 px-1 py-1 md:px-4 md:py-2 whitespace-nowrap">Email</th>
@@ -301,7 +308,7 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 </thead>
 <tbody>
 {data.map((item) => (
-<tr key={item.id} className="hover:bg-gray-100">
+<tr key={item.id} className="hover:bg-gray-100 text-[#14213d]">
 <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.fullname}</td>
 <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.email}</td>
 <td className="border border-gray-300 px-1 py-1 md:px-4 md:py-1 whitespace-nowrap">{item.institution}</td>
