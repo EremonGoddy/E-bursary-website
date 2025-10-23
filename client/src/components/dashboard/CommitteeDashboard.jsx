@@ -88,9 +88,9 @@ const CommitteeDashboard = () => {
   // ✅ Load personal info data
   const loadData = async () => {
     try {
-      const response = await axios.get(
-        'https://e-bursary-backend.onrender.com/api/personalInformation'
-      );
+     const response = await axios.get(
+  `https://e-bursary-backend.onrender.com/api/personalInformation/${committeeDetails.ward}`
+);
       setData(response.data);
     } catch (error) {
       console.error('Error fetching personal information:', error);
@@ -114,7 +114,7 @@ const CommitteeDashboard = () => {
       console.error('Error approving student:', error);
     }
   };
-  
+
 const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
 { icon: faUser, label: 'Profile', to: '/committeeprofile' },

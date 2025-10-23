@@ -1194,6 +1194,28 @@ app.get("/api/personalInformation", async (req, res) => {
   }
 });
 
+// ✅ Committee-based Personal Information Route
+app.get("/api/personalInformation/:ward", async (req, res) => {
+  const { ward } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM bursary.personal_details WHERE ward = $1",
+      [ward]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: `No students found in ${ward} ward` });
+    }
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching ward-based data:", error);
+    res.status(500).send("Error fetching personal information for this ward");
+  }
+});
+
+
 app.get("/api/personalInformation/:id", async (req, res) => {
   const userId = req.params.id;
   console.log(userId);
