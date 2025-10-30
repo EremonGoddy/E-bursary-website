@@ -239,165 +239,174 @@ className={`flex items-center space-x-2 transition-all duration-200 ${sidebarAct
 <div className={`flex-1 ml-0 md:ml-64 md:p-4 -mt-6 md:-mt-6 ${sidebarActive ? 'ml-[2px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}`}>
 <div className="md:w-[98%] w-full backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[500px] mx-auto p-3 md:p-6">
 {isProfileFetched ? (
-profileExists ? (
-<div className="relative py-2">
-<FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl inline-block align-middle mr-2" />
-<h2 className="text-xl font-bold inline-block align-middle text-[#14213d]">Profile</h2>
+  profileExists ? (
+    isEditFormVisible ? (
+      // ---------- EDIT FORM ----------
+      <form onSubmit={handleSubmit}>
+        <h2 className="text-[#14213d] text-2xl font-bold text-center mb-5">
+          Edit Profile
+        </h2>
 
-<button
-onClick={() => setEditFormVisible(true)}
-className="absolute right-0 top-2 bg-blue-500 cursor-pointer text-white px-1 py-1 md:px-3 md:py-1 font-bold rounded hover:bg-blue-600 flex items-center"
->
-<FontAwesomeIcon icon={faEdit} className="mr-1 font-bold" /> Edit Profile
-</button>
+        {/* Full Name */}
+        <div className="flex items-center gap-3 mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">
+            Full Name:
+          </label>
+          <input
+            type="text"
+            name="fullname"
+            value={formData.fullname}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+            required
+          />
+        </div>
 
-<hr className="my-4" />
+        {/* Email */}
+        <div className="flex items-center gap-3 mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+            required
+          />
+        </div>
 
-<div className="space-y-5 text-[#14213d]">
-{Object.entries(formData).map(([key, value]) => (
-<div className="flex items-start gap-3 md:gap-24" key={key}>
-<span className="w-32 font-bold capitalize">
-{key.replace('_', ' ')}:
-</span>
-<span className="flex-1">{String(value ?? '')}</span>
-</div>
-))}
-</div>
-</div>
+        {/* Phone */}
+        <div className="flex items-center gap-3 mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">Phone No:</label>
+          <input
+            type="text"
+            name="phone_no"
+            value={formData.phone_no}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+            required
+          />
+        </div>
+
+        {/* Gender */}
+        <div className="flex items-center mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">Gender:</label>
+          <div className="flex gap-6">
+            {['Male', 'Female'].map((g) => (
+              <label className="flex items-center gap-2" key={g}>
+                <input
+                  type="radio"
+                  name="gender"
+                  value={g}
+                  checked={formData.gender === g}
+                  onChange={handleChange}
+                  className="accent-[#14213d]"
+                />
+                {g}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Subcounty Dropdown */}
+        <div className="flex items-center gap-3 mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">Subcounty:</label>
+          <select
+            name="subcounty"
+            value={formData.subcounty}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+            required
+          >
+            <option value="">Select Subcounty</option>
+            {subcounties.map((opt, i) => (
+              <option key={i} value={opt}>{opt}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Ward Dropdown */}
+        <div className="flex items-center gap-3 mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">Ward:</label>
+          <select
+            name="ward"
+            value={formData.ward}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+            required
+          >
+            <option value="">Select Ward</option>
+            {(subcountyWards[formData.subcounty] || []).map((ward, i) => (
+              <option key={i} value={ward}>{ward}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Position Dropdown */}
+        <div className="flex items-center gap-3 mb-5">
+          <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
+          <select
+            name="position"
+            value={formData.position}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+            required
+          >
+            <option value="">Select Position</option>
+            {positions.map((pos, i) => (
+              <option key={i} value={pos}>{pos}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Buttons */}
+        <button
+          type="submit"
+          className="text-white w-full py-2 rounded-lg bg-[#14213d] hover:bg-gray-700"
+        >
+          Update Profile
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditFormVisible(false)}
+          className="w-full mt-2 text-[#14213d] font-semibold border border-[#14213d] py-2 rounded-lg hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+      </form>
+    ) : (
+      // ---------- PROFILE VIEW ----------
+      <div className="relative py-2">
+        <FontAwesomeIcon icon={faUser} className="text-[#14213d] text-2xl inline-block align-middle mr-2" />
+        <h2 className="text-xl font-bold inline-block align-middle text-[#14213d]">Profile</h2>
+
+        <button
+          onClick={() => setEditFormVisible(true)}
+          className="absolute right-0 top-2 bg-blue-500 cursor-pointer text-white px-1 py-1 md:px-3 md:py-1 font-bold rounded hover:bg-blue-600 flex items-center"
+        >
+          <FontAwesomeIcon icon={faEdit} className="mr-1 font-bold" /> Edit Profile
+        </button>
+
+        <hr className="my-4" />
+
+        <div className="space-y-5 text-[#14213d]">
+          {Object.entries(formData).map(([key, value]) => (
+            <div className="flex items-start gap-3 md:gap-24" key={key}>
+              <span className="w-32 font-bold capitalize">{key.replace('_', ' ')}:</span>
+              <span className="flex-1">{String(value ?? '')}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  ) : (
+    // ---------- CREATE PROFILE ----------
+    <form onSubmit={handleSubmit}>
+      {/* keep your existing create profile form here */}
+    </form>
+  )
 ) : (
-<form onSubmit={handleSubmit}>
-<h2 className="text-[#14213d] text-2xl font-bold text-center mb-5">Create Profile</h2>
-
-{/* Manual labels for main fields */}
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Full Name:</label>
-<input
-type="text"
-name="fullname"
-value={formData.fullname}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
-/>
-</div>
-
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Email:</label>
-<input
-type="email"
-name="email"
-value={formData.email}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
-/>
-</div>
-
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Phone No:</label>
-<input
-type="text"
-name="phone_no"
-value={formData.phone_no}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
-/>
-</div>
-
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">National Id:</label>
-<input
-type="text"
-name="national_id"
-value={formData.national_id}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
-/>
-</div>
-
-{/* Gender */}
-<div className="flex items-center mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Gender:</label>
-<div className="flex gap-6">
-{['Male', 'Female'].map((g) => (
-<label className="flex items-center gap-2" key={g}>
-<input
-type="radio"
-name="gender"
-value={g}
-checked={formData.gender === g}
-onChange={handleChange}
-className="accent-[#14213d]"
-/>
-{g}
-</label>
-))}
-</div>
-</div>
-
-{/* Subcounty Dropdown */}
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Subcounty:</label>
-<select
-name="subcounty"
-value={formData.subcounty}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
->
-<option value="">Select Subcounty</option>
-{subcounties.map((opt, i) => (
-<option key={i} value={opt}>{opt}</option>
-))}
-</select>
-</div>
-
-{/* Ward Dropdown */}
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Ward:</label>
-<select
-name="ward"
-value={formData.ward}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
->
-<option value="">Select Ward</option>
-{(subcountyWards[formData.subcounty] || []).map((ward, i) => (
-<option key={i} value={ward}>{ward}</option>
-))}
-</select>
-</div>
-
-{/* Position Dropdown */}
-<div className="flex items-center gap-3 mb-5">
-<label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
-<select
-name="position"
-value={formData.position}
-onChange={handleChange}
-className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-required
->
-<option value="">Select Position</option>
-{positions.map((pos, i) => (
-<option key={i} value={pos}>{pos}</option>
-))}
-</select>
-</div>
-
-<button
-type="submit"
-className="text-white w-full py-2 cursor-pointer rounded-lg bg-[#14213d] hover:bg-gray-700"
->
-Create Profile
-</button>
-</form>
-)
-) : (
-<p className="text-center">Loading...</p>
+  <p className="text-center">Loading...</p>
 )}
 </div>
 </div>

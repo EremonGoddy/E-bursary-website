@@ -69,37 +69,45 @@ const CommitteeDashboard = () => {
   }, [navigate]);
 
   // ✅ Fetch statistics
-  useEffect(() => {
-    axios
-      .get('https://e-bursary-backend.onrender.com/api/quick-statistics')
-      .then((response) => {
-        const { total, approved, rejected, pending, incomplete } = response.data;
-        setTotalApplications(total);
-        setApprovedApplications(approved);
-        setRejectedApplications(rejected);
-        setPendingApplications(pending || 0);
-        setIncompleteApplications(incomplete || 0);
-      })
-      .catch((error) => {
-        console.error('Error fetching application statistics:', error);
-      });
-  }, []);
+  // ✅ Fetch committee statistics (using token)
+useEffect(() => {
+  const token = sessionStorage.getItem('authToken');
+  if (!token) return;
 
-  // ✅ Load personal info data
-  const loadData = async () => {
+  axios
+    .get('https://e-bursary-backend.onrender.com/api/committee-statistics', {
+      headers: { Authorization: token },
+    })
+    .then((response) => {
+      const { total, approved, rejected, incomplete } = response.data;
+      setTotalApplications(total);
+      setApprovedApplications(approved);
+      setRejectedApplications(rejected);
+      setIncompleteApplications(incomplete || 0);
+    })
+    .catch((error) => {
+      console.error('Error fetching committee statistics:', error);
+    });
+}, []);
+
+
+  // ✅ Fetch personal information once committee ward is known
+useEffect(() => {
+  const fetchPersonalInformation = async () => {
     try {
-     const response = await axios.get(
-  `https://e-bursary-backend.onrender.com/api/personalInformation/${committeeDetails.ward}`
-);
+      const response = await axios.get(
+        `https://e-bursary-backend.onrender.com/api/personalInformation/${committeeDetails.ward}`
+      );
       setData(response.data);
     } catch (error) {
       console.error('Error fetching personal information:', error);
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  if (committeeDetails.ward) {
+    fetchPersonalInformation();
+  }
+}, [committeeDetails.ward]);
 
   // ✅ Approve student handler
   const handleApproveStudent = async (studentUserId) => {

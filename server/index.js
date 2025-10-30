@@ -1621,7 +1621,7 @@ app.get('/api/profile-committee', (req, res) => {
 });
 
 
-// POST profile-form without digital_signature
+// POST or UPDATE committee profile
 app.post('/api/profile-form', (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token is required');
@@ -1637,13 +1637,23 @@ app.post('/api/profile-form', (req, res) => {
 
     const email = decoded.email;
 
-    const sqlInsert = `
+    const sqlUpsert = `
       INSERT INTO bursary.profile_committee 
-      (fullname, email, phone_no, national_id, subcounty, ward, position, gender) 
+        (fullname, email, phone_no, national_id, subcounty, ward, position, gender)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ON CONFLICT (email) 
+      DO UPDATE SET
+        fullname = EXCLUDED.fullname,
+        phone_no = EXCLUDED.phone_no,
+        national_id = EXCLUDED.national_id,
+        subcounty = EXCLUDED.subcounty,
+        ward = EXCLUDED.ward,
+        position = EXCLUDED.position,
+        gender = EXCLUDED.gender
+      RETURNING *;
     `;
 
-    pool.query(sqlInsert, [
+    pool.query(sqlUpsert, [
       fullname,
       email,
       phone_no,
@@ -1654,29 +1664,18 @@ app.post('/api/profile-form', (req, res) => {
       gender
     ], (err, result) => {
       if (err) {
-        console.error('Error inserting committee data:', err);
-        if (err.code === '23505') {
-          return res.status(409).send('Profile already exists with this email or national ID');
-        }
-        return res.status(500).send('Error submitting data');
+        console.error('Error inserting/updating committee data:', err);
+        return res.status(500).send('Error saving profile');
       }
 
-      res.status(201).send({
-        message: 'Profile created successfully',
-        data: {
-          fullname,
-          email,
-          phone_no,
-          national_id,
-          subcounty,
-          ward,
-          position,
-          gender
-        }
+      res.status(200).send({
+        message: result.rows.length > 0 ? 'Profile updated successfully' : 'Profile created successfully',
+        data: result.rows[0]
       });
     });
   });
 });
+
 
 
 app.get('/api/comreport', (req, res) => {
