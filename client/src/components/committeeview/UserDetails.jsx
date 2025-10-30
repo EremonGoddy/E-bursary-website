@@ -56,7 +56,7 @@ const UserDetails = () => {
   const fetchWardData = async (ward) => {
     try {
       const response = await axios.get(
-        `https://e-bursary-backend.onrender.com/api/personalInformation/${ward}`
+        `https://e-bursary-backend.onrender.com/api/personalInformation/ward/${ward}`
       );
       setData(response.data);
     } catch (error) {

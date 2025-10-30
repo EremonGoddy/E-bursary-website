@@ -1195,7 +1195,7 @@ app.get("/api/personalInformation", async (req, res) => {
 });
 
 // ✅ Committee-based Personal Information Route
-app.get("/api/personalInformation/:ward", async (req, res) => {
+app.get("/api/personalInformation/ward/:ward", async (req, res) => {
   const { ward } = req.params;
 
   try {
