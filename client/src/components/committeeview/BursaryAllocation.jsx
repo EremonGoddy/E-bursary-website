@@ -147,7 +147,7 @@ console.error('Error fetching amount information:', error);
 <div className="flex justify-between items-center">
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
 <div className="flex items-center space-x-1">
-<h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
 Welcome: {committeeDetails.name || userName}
 </h2>
 <div className="flex items-center space-x-2">
@@ -166,7 +166,7 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
 <div className="block md:hidden">
 <FontAwesomeIcon
 icon={faBars}
-className="text-[1.7rem] cursor-pointer text-[#14213d]"
+className="text-xl cursor-pointer text-[#14213d]"
 onClick={toggleSidebar}
 />
 </div>
@@ -182,13 +182,13 @@ fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
 transition-all duration-100 ease-in-out
 overflow-visible
 ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
+${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
 `}
 >
 <div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
 onClick={toggleSidebar}
 />
 </div>
@@ -215,10 +215,10 @@ className={`flex items-center space-x-2 transition-all duration-200 ${
 sidebarActive ? 'justify-start' : 'justify-center'
 }`}
 >
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -231,10 +231,10 @@ className={`flex items-center space-x-2 transition-all duration-200 ${
 sidebarActive ? 'justify-start' : 'justify-center'
 }`}
 >
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -242,7 +242,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </Link>
 )}
 {!sidebarActive && (
-<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
 {item.label}
 </span>
 )}
@@ -261,14 +261,20 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
   <div className="text-center text-[#14213d] text-[0.8rem] md:text-[1rem] font-bold">
     <p>Total Funds Available:</p>
     <strong>
-      {bursaryAmount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Ksh
-    </strong>
+  {Number(bursaryAmount).toLocaleString("en-KE", { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  })} Ksh
+</strong>
   </div>
   <div className="text-center text-[#14213d]  text-[0.8rem] md:text-[1rem] font-bold">
     <p>Amount Allocated to Students:</p>
-    <strong>
-      {allocatedAmount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Ksh
-    </strong>
+   <strong>
+  {Number(allocatedAmount).toLocaleString("en-KE", { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  })} Ksh
+</strong>
   </div>
   <div className="text-center text-[0.8rem] text-[#14213d]  md:text-[1rem] font-bold">
     <p>Remaining Funds:</p>
@@ -318,19 +324,24 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
                   ))}
                 </div>
                 <div className='flex justify-center'>
-                  <button
-                    onClick={() => {
-                      if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
-                    }}
-                    className={`mt-4 w-full px-4 py-2 rounded font-bold text-white transition-colors duration-200
-                      ${(submitted[item.user_id] || remainingAmount <= 0)
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}
-                    `}
-                    disabled={submitted[item.user_id] || remainingAmount <= 0}
-                  >
-                    {remainingAmount <= 0 ? 'No Funds' : submitted[item.user_id] ? 'Allocated' : 'Allocate'}
-                  </button>
+              <button
+  onClick={() => {
+    if (!submitted[item.user_id] && !loading) handleAllocate(item.user_id);
+  }}
+  className={`mt-4 w-full px-4 py-3 rounded-xl font-bold text-white transition-all duration-200
+    ${(submitted[item.user_id] || remainingAmount <= 0)
+      ? 'bg-gray-400 cursor-not-allowed'
+      : 'bg-blue-600 shadow-[0_5px_0_#1e3a8a] hover:translate-y-[-2px] active:translate-y-[3px] active:shadow-[0_2px_0_#1e3a8a] cursor-pointer'}
+  `}
+  disabled={submitted[item.user_id] || remainingAmount <= 0}
+>
+  {remainingAmount <= 0
+    ? 'No Funds'
+    : submitted[item.user_id]
+    ? 'Allocated'
+    : 'Allocate'}
+</button>
+
                 </div>
               </div>
             ))}

@@ -165,7 +165,7 @@ return (
 <div className="flex justify-between items-center">
 <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
 <div className="flex items-center space-x-1">
-<h2 className="mr-1 md:mr-5 text-[1rem] md:text-[1.2rem] font-bold text-[#14213d]">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
 Welcome: {committeeDetails.name || userName}
 </h2>
 <div className="flex items-center space-x-2">
@@ -184,7 +184,7 @@ className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
 <div className="block md:hidden">
 <FontAwesomeIcon
 icon={faBars}
-className="text-[1.7rem] cursor-pointer text-[#14213d]"
+className="text-xl cursor-pointer text-[#14213d]"
 onClick={toggleSidebar}
 />
 </div>
@@ -200,13 +200,13 @@ fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
 transition-all duration-100 ease-in-out
 overflow-visible
 ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[45px] md:p-2'}
+${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
 `}
 >
 <div className="hidden md:flex justify-end mb-4">
 <FontAwesomeIcon
 icon={faBars}
-className={`text-white cursor-pointer text-[1.5rem] ${sidebarActive ? 'ml-auto' : 'mr-2'}`}
+className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
 onClick={toggleSidebar}
 />
 </div>
@@ -233,10 +233,10 @@ className={`flex items-center space-x-2 transition-all duration-200 ${
 sidebarActive ? 'justify-start' : 'justify-center'
 }`}
 >
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -249,10 +249,10 @@ className={`flex items-center space-x-2 transition-all duration-200 ${
 sidebarActive ? 'justify-start' : 'justify-center'
 }`}
 >
-<FontAwesomeIcon icon={item.icon} className="text-[1.2rem] md:text-[1.4rem]" />
+<FontAwesomeIcon icon={item.icon} className="text-xl" />
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -260,7 +260,7 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </Link>
 )}
 {!sidebarActive && (
-<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
 {item.label}
 </span>
 )}
@@ -270,15 +270,15 @@ sidebarActive ? 'inline-block ml-2 text-[1rem] md:text-[1.1rem] font-semibold' :
 </div>
 
 {/* Main Content */}
-<div className={`flex-1 ml-0 md:ml-64 p-4 -mt-6 -md:mt-10 transition-all duration-100 pr-3 pl-3 md:pr-10 md:pl-10
-${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
+<div className={`flex-1 ml-0 md:ml-64 p-1 md:p-4 -mt-8 -md:mt-10 transition-all duration-100 pr-1 pl-1 md:pr-10 md:pl-10
+${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 `}>
 {/* Header Info */}
 {personalData.length > 0 && (
-<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] mb-4  p-4 text-center">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] mb-2  p-4 text-center">
 <h1 className="text-2xl font-bold text-[#14213d]">{personalData[0].fullname}</h1>
-<p className="font-semibold text-[1.2rem] text-[#14213d]">Admission Number: {personalData[0].admission}</p>
-<p className="font-semibold text-[1.2rem] text-[#14213d]">Institution: {personalData[0].institution}</p>
+<p className="font-semibold text-[1.1rem] text-[#14213d]">Admission Number: {personalData[0].admission}</p>
+<p className="font-semibold text-[1.1rem] text-[#14213d]">Institution: {personalData[0].institution}</p>
 </div>
 )}
 
@@ -336,7 +336,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 ))}
 </div>
 {/* Disclosure Info */}
-<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-0 md:mb-4">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-3 md:mb-4">
 <h2 className="text-xl font-bold mb-2 text-[#14213d] ">Disclosure Information</h2>
 {disclosureData.map((item) => (
 <div key={item.user_id} className="mb-2 text-[#14213d] space-y-3">
@@ -350,7 +350,7 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[35px] md:ml-[30px]'}
 ))}
 </div>
 </div>
-<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-0 md:mb-4">
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-3 md:mb-4">
 <h2 className="text-xl text-[#14213d] font-bold mb-2">Uploaded Documents</h2>
 {documentData.map((item) => (
 <div key={item.user_id} className="mb-2 text-[#14213d] space-y-3">
@@ -371,27 +371,39 @@ View Document
 </div>
 {/* Approval and Rejection Buttons */}
 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <button
-            className={`px-4 py-3 cursor-pointer rounded-xl font-bold text-white ${isAllDataAvailable ? 'bg-green-500 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'}`}
-            onClick={() => updateStatus(id, 'Approved')}
-            disabled={!isAllDataAvailable}
-          >
-            Approve Application
-          </button>
+<button
+  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ease-in-out
+    ${isAllDataAvailable 
+      ? 'bg-emerald-600 text-white shadow-[0_5px_0_#064e3b] cursor-pointer hover:bg-emerald-700 hover:translate-y-[-2px] active:translate-y-[3px] active:shadow-[0_2px_0_#064e3b]' 
+      : 'bg-gray-400 text-gray-300 cursor-not-allowed'}`}
+  onClick={() => updateStatus(id, 'Approved')}
+  disabled={!isAllDataAvailable}
+>
+  Approve Application
+</button>
 
-          <button
-            className="bg-red-500 cursor-pointer hover:bg-red-700 text-white px-4 py-3 rounded-xl font-bold"
-            onClick={() => updateStatus(id, 'Rejected')}
-          >
-            Reject Application
-          </button>
 
-          <button
-            className="bg-blue-500 cursor-pointer hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-bold"
-            onClick={() => updateStatus(id, 'Incomplete')}
-          >
-            Incomplete Application
-          </button>
+         <button
+  className={`px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300 ease-in-out
+    bg-red-600 shadow-[0_5px_0_#7f1d1d] cursor-pointer 
+    hover:bg-red-700 hover:translate-y-[-2px] 
+    active:translate-y-[3px] active:shadow-[0_2px_0_#7f1d1d]`}
+  onClick={() => updateStatus(id, 'Rejected')}
+>
+  Reject Application
+</button>
+
+
+<button
+  className={`px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300 ease-in-out
+    bg-blue-600 shadow-[0_5px_0_#1e3a8a] cursor-pointer 
+    hover:bg-blue-700 hover:translate-y-[-2px] 
+    active:translate-y-[3px] active:shadow-[0_2px_0_#1e3a8a]`}
+  onClick={() => updateStatus(id, 'Incomplete')}
+>
+  Incomplete Application
+</button>
+
         </div>
 </div>
 </div>

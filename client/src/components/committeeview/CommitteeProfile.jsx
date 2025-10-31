@@ -362,14 +362,14 @@ className={`flex items-center space-x-2 transition-all duration-200 ${sidebarAct
         {/* Buttons */}
         <button
           type="submit"
-          className="text-white w-full py-2 rounded-lg bg-[#14213d] hover:bg-gray-700"
+          className="text-white w-full py-2 rounded-lg bg-[#14213d] cursor-pointer hover:bg-gray-700"
         >
           Update Profile
         </button>
         <button
           type="button"
           onClick={() => setEditFormVisible(false)}
-          className="w-full mt-2 text-[#14213d] font-semibold border border-[#14213d] py-2 rounded-lg hover:bg-gray-100"
+          className="w-full mt-2 text-[#14213d] cursor-pointer font-semibold border border-[#14213d] py-2 rounded-lg hover:bg-gray-100"
         >
           Cancel
         </button>

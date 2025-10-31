@@ -96,7 +96,7 @@ useEffect(() => {
   const fetchPersonalInformation = async () => {
     try {
       const response = await axios.get(
-        `https://e-bursary-backend.onrender.com/api/personalInformation/${committeeDetails.ward}`
+        `https://e-bursary-backend.onrender.com/api/personalInformation/ward/${committeeDetails.ward}`
       );
       setData(response.data);
     } catch (error) {
@@ -257,15 +257,21 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-4">
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Funds Available</p>
-<strong className="text-blue-700 text-xl">{bursaryAmount}</strong>
+<strong className="text-blue-700 text-lg">
+   {Number(bursaryAmount || 0).toLocaleString('en-KE', { minimumFractionDigits: 2 })} KSh
+</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-green-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-green-700 font-semibold mb-0 md:mb-1">Allocated to Students</p>
-<strong className="text-green-700 text-xl">{allocatedAmount}</strong>
+<strong className="text-green-700 text-lg">
+  {Number(allocatedAmount || 0).toLocaleString('en-KE', { minimumFractionDigits: 2 })} KSh 
+</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-yellow-500 rounded-xl p-0 md:p-3  shadow-sm">
 <p className="text-yellow-700 font-semibold mb-0 md:mb-1">Remaining Funds</p>
-<strong className="text-yellow-700 text-xl">{remainingAmount}</strong>
+<strong className="text-yellow-700 text-lg">
+ {Number(remainingAmount || 0).toLocaleString('en-KE', { minimumFractionDigits: 2 })}  KSh 
+</strong>
 </div>
 </div>
 </div>
@@ -277,23 +283,23 @@ transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
 <div className="flex flex-col gap-2 md:flex-row md:justify-around md:gap-2">
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-yellow-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-yellow-700 font-semibold mb-0 md:mb-1">Pending</p>
-<strong className="text-yellow-700 text-xl">{pendingApplications}</strong>
+<strong className="text-yellow-700 text-lg">{pendingApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-gray-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-gray-700 font-semibold mb-0 md:mb-1">Incomplete</p>
-<strong className="text-gray-600 text-xl">{incompleteApplications}</strong>
+<strong className="text-gray-600 text-lg">{incompleteApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-blue-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-blue-700 font-semibold mb-0 md:mb-1">Total Student</p>
-<strong className="text-blue-700 text-xl">{totalApplications}</strong>
+<strong className="text-blue-700 text-lg">{totalApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-3 border-green-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-green-700 font-semibold mb-0 md:mb-1">Approved</p>
-<strong className="text-green-700 text-xl">{approvedApplications}</strong>
+<strong className="text-green-700 text-lg">{approvedApplications}</strong>
 </div>
 <div className="flex-1 text-center bg-white border-3 md:border-3  border-red-500 rounded-xl p-0 md:p-3 shadow-sm">
 <p className="text-red-700 font-semibold mb-0 md:mb-1">Rejected</p>
-<strong className="text-red-700 text-xl">{rejectedApplications}</strong>
+<strong className="text-red-700 text-lg">{rejectedApplications}</strong>
 </div>
 </div>
 </div>

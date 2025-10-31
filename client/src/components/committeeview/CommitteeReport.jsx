@@ -72,22 +72,26 @@ axios.get("https://e-bursary-backend.onrender.com/api/committee-statistics", {
 }, [navigate]);
 
 useEffect(() => {
-const token = sessionStorage.getItem('authToken');
-if (!token) {
-navigate('/signin');
-} else {
-axios
-.get('https://e-bursary-backend.onrender.com/api/profile-committee', {
-headers: { Authorization: `Bearer ${token}` },
-})
-.then((response) => {
-setCommitteeDetails(response.data);
-})
-.catch((error) => {
-console.error('Error fetching profile data:', error);
-});
-}
+  const token = sessionStorage.getItem('authToken');
+  if (!token) {
+    navigate('/signin');
+  } else {
+    axios
+      .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setCommitteeDetails((prev) => ({
+          ...prev,
+          ...response.data, // merge both datasets
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching profile data:', error);
+      });
+  }
 }, [navigate]);
+
 
 const downloadReport = () => {
 const doc = new jsPDF();

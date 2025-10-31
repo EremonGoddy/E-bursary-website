@@ -1031,23 +1031,25 @@ app.put('/api/student/update', (req, res) => {
   });
 });
 
-// Committee Count Route
+// Committee Count Route (Updated)
 app.get('/api/committee-count', async (req, res) => {
-  const queryTotalFunds = 'SELECT amount FROM bursary.bursary_funds WHERE id = 1';
+  // ✅ Sum all funds from all wards
+  const queryTotalFunds = 'SELECT SUM(amount) AS total_amount FROM bursary.bursary_funds';
   const queryAllocatedFunds = 'SELECT SUM(bursary) AS total_allocated FROM bursary.personal_details';
 
   try {
+    // Get total amount from all wards
     const totalResult = await pool.query(queryTotalFunds);
-    if (totalResult.rows.length === 0) {
-      return res.status(404).json({ error: 'No bursary fund found' });
-    }
+    const totalAmount = totalResult.rows[0].total_amount || 0;
 
-    const totalAmount = totalResult.rows[0].amount;
-
+    // Get total allocated to students
     const allocatedResult = await pool.query(queryAllocatedFunds);
     const allocatedAmount = allocatedResult.rows[0].total_allocated || 0;
+
+    // Compute remaining amount
     const remainingAmount = totalAmount - allocatedAmount;
 
+    // Send response
     res.status(200).json({
       amount: totalAmount,
       allocated: allocatedAmount,
@@ -1058,6 +1060,7 @@ app.get('/api/committee-count', async (req, res) => {
     res.status(500).json({ error: 'Server error calculating funds' });
   }
 });
+
 
 // Committee Count Route (Ward-Based)
 app.get('/api/bursary-count/:ward', async (req, res) => {
