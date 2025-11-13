@@ -377,21 +377,27 @@ Bursary Fund Details
 <div className="flex-1 text-center  border-3 border-[#1565C0] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#1565C0] font-semibold mb-1">Total Funds Available</p>
-<strong className="text-[#1565C0] text-xl">{bursaryAmount}</strong>
+<strong className="text-blue-700 text-lg">
+  {Number(bursaryAmount || 0).toLocaleString('en-KE', { minimumFractionDigits: 2 })} KSh
+</strong>
 </div>
 
 {/* Allocated to Students */}
 <div className="flex-1 text-center  border-3 border-[#2E7D32] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#2E7D32] font-semibold mb-1">Allocated to Students</p>
-<strong className="text-[#2E7D32] text-xl">{allocatedAmount}</strong>
+<strong className="text-green-700 text-lg">
+  {Number(allocatedAmount || 0).toLocaleString('en-KE', { minimumFractionDigits: 2 })} KSh
+</strong>
 </div>
 
 {/* Remaining Funds */}
 <div className="flex-1 text-center  border-3 border-[#F9A825] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#F9A825] font-semibold mb-1">Remaining Funds</p>
-<strong className="text-[#F9A825] text-xl">{remainingAmount}</strong>
+<strong className="text-yellow-600 text-lg">
+{Number(remainingAmount || 0).toLocaleString('en-KE', { minimumFractionDigits: 2 })} KSh
+</strong>
 </div>
 </div>
 </div>
@@ -408,35 +414,35 @@ Quick Statistics
 <div className="flex-1 text-center  border-3 border-[#F9A825] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#F9A825] font-semibold mb-1">Pending</p>
-<strong className="text-[#F9A825] text-xl">{pendingApplications}</strong>
+<strong className="text-[#F9A825] text-lg">{pendingApplications}</strong>
 </div>
 
 {/* Incomplete */}
 <div className="flex-1 text-center  border-3 border-[#616161] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#424242] font-semibold mb-1">Incomplete</p>
-<strong className="text-[#424242] text-xl">{incompleteApplications}</strong>
+<strong className="text-[#424242] text-lg">{incompleteApplications}</strong>
 </div>
 
 {/* Total Student */}
 <div className="flex-1 text-center  border-3 border-[#1565C0] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#1565C0] font-semibold mb-1">Total Student</p>
-<strong className="text-[#1565C0] text-xl">{totalApplications}</strong>
+<strong className="text-[#1565C0] text-lg">{totalApplications}</strong>
 </div>
 
 {/* Approved */}
 <div className="flex-1 text-center  border-3 border-[#2E7D32] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#2E7D32] font-semibold mb-1">Approved</p>
-<strong className="text-[#2E7D32] text-xl">{approvedApplications}</strong>
+<strong className="text-[#2E7D32] text-lg">{approvedApplications}</strong>
 </div>
 
 {/* Rejected */}
 <div className="flex-1 text-center  border-3 border-[#C62828] rounded-xl p-3 shadow-md 
 transition-transform hover:scale-105">
 <p className="text-[#C62828] font-semibold mb-1">Rejected</p>
-<strong className="text-[#C62828] text-xl">{rejectedApplications}</strong>
+<strong className="text-[#C62828] text-lg">{rejectedApplications}</strong>
 </div>
 </div>
 </div>
@@ -521,7 +527,7 @@ className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition flex justify-b
 </div>
 
 {/* Approval Status Chart */}
-<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3 md:mt-0 ">
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3 mb-4 md:mt-0 ">
 {/* Pie Chart Container */}
 <div className="w-full max-h-[500px] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
 transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
@@ -629,10 +635,203 @@ Incomplete: <span>{incompleteApplications}</span>
 </div>
 </div>
 </div>
-
-
 </div>
 
+{/* Bursary Fund Overview Charts */}
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3 md:mt-0">
+
+  {/* Pie Chart Container */}
+  <div className="w-full max-h-[500px] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+  transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+    <h2 className="text-xl md:text-2xl font-bold text-center text-[#14213d] mb-4">
+      Bursary Fund Overview (Pie)
+    </h2>
+
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-0 md:gap-6">
+      {/* Pie Chart */}
+      <div className="w-full lg:w-2/3 flex justify-center">
+        <div className="w-[300px] h-[300px]">
+          <Pie
+            data={{
+              labels: ['Total Funds', 'Allocated', 'Remaining'],
+              datasets: [
+                {
+                  label: 'Bursary Distribution',
+                  data: [bursaryAmount, allocatedAmount, remainingAmount],
+                  backgroundColor: ['#1565C0', '#2E7D32', '#F9A825'],
+                  borderColor: ['#fff', '#fff', '#fff'],
+                  borderWidth: 2,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                datalabels: {
+                  color: '#fff',
+                  font: { weight: 'bold', size: 15 },
+                  formatter: (value) =>
+                    `${Number(value).toLocaleString('en-KE', {
+                      minimumFractionDigits: 2,
+                    })}`,
+                },
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Vertical Stat Circles */}
+      <div className="flex flex-col items-start lg:items-start gap-0 md:gap-4 w-full lg:w-auto mt-4 lg:mt-0">
+        {/* Total Funds */}
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-blue-100 border-3 border-blue-500 shadow-md"></div>
+          <p className="text-blue-700 font-bold">
+            Total Funds:{" "}
+            <strong className="text-blue-700 ">
+              {Number(bursaryAmount || 0).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+              })}{" "}
+              KSh
+            </strong>
+          </p>
+        </div>
+
+        {/* Allocated */}
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-green-100 border-3 border-green-500 shadow-md"></div>
+          <p className="text-green-700 font-bold">
+            Allocated:{" "}
+            <strong className="text-green-700 ">
+              {Number(allocatedAmount || 0).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+              })}{" "}
+              KSh
+            </strong>
+          </p>
+        </div>
+
+        {/* Remaining */}
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-yellow-100 border-3 border-yellow-500 shadow-md"></div>
+          <p className="text-yellow-700 font-bold">
+            Remaining:{" "}
+            <strong className="text-yellow-700">
+              {Number(remainingAmount || 0).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+              })}{" "}
+              KSh
+            </strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Bar Chart Container */}
+  <div className="w-full max-h-[500px] backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl 
+  transition-all duration-300 transform hover:scale-[1.01] p-3 md:p-3">
+    <h2 className="text-xl md:text-2xl font-bold text-center text-[#14213d] mb-4">
+      Bursary Fund Overview (Bar)
+    </h2>
+
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-0 md:gap-6">
+      {/* Bar Chart */}
+      <div className="w-full lg:w-2/3 flex justify-center">
+        <div className="w-[330px] h-[300px] md:w-[380px] md:h-[300px]">
+          <Bar
+            data={{
+              labels: ['Total Funds', 'Allocated', 'Remaining'],
+              datasets: [
+                {
+                  label: 'Funds (KSh)',
+                  data: [bursaryAmount, allocatedAmount, remainingAmount],
+                  backgroundColor: ['#1565C0', '#2E7D32', '#F9A825'],
+                  borderColor: ['#0D47A1', '#1B5E20', '#F57F17'],
+                  borderWidth: 2,
+                  barThickness: 60,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                datalabels: {
+                  color: '#000',
+                  anchor: 'end',
+                  align: 'top',
+                  font: { weight: 'bold', size: 14 },
+                  formatter: (value) =>
+                    `${Number(value).toLocaleString('en-KE', {
+                      minimumFractionDigits: 2,
+                    })}`,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    callback: (value) =>
+                      `${Number(value).toLocaleString('en-KE')}`,
+                  },
+                },
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Vertical Stat Circles */}
+      <div className="flex flex-col items-start lg:items-start w-full lg:w-auto mt-4 gap-0 md:gap-4 lg:mt-0">
+        {/* Total Funds */}
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-blue-100 border-3 border-blue-500 shadow-md"></div>
+          <p className="text-blue-700 font-bold">
+            Total Funds:{" "}
+            <strong className="text-blue-700">
+              {Number(bursaryAmount || 0).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+              })}{" "}
+              KSh
+            </strong>
+          </p>
+        </div>
+
+        {/* Allocated */}
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-green-100 border-3 border-green-500 shadow-md"></div>
+          <p className="text-green-700 font-bold">
+            Allocated:{" "}
+            <strong className="text-green-700 ">
+              {Number(allocatedAmount || 0).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+              })}{" "}
+              KSh
+            </strong>
+          </p>
+        </div>
+
+        {/* Remaining */}
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-yellow-100 border-3 border-yellow-500 shadow-md"></div>
+          <p className="text-yellow-700 font-bold">
+            Remaining:{" "}
+            <strong className="text-yellow-700 ">
+              {Number(remainingAmount || 0).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+              })}{" "}
+              KSh
+            </strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div>
 </div>

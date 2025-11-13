@@ -31,6 +31,7 @@ import ProgressStepper from './components/applicationform/ProgressStepper';
 import ForgotPassword from './components/authentication/ForgotPassword';
 import PasswordReset from './components/authentication/ResetPassword';
 import MessagePage from './components/applicationform/MessagesPage';
+import CommitteeNotify from './components/committeeview/CommitteeNotify';
 
 
 function App() {
@@ -62,6 +63,7 @@ return (
 <Route path="/userdetails" element={<UserDetails/>} />
 <Route path="/committeeprofile" element={<CommitteeProfile/>} />
 <Route path="/committeesetting" element={<CommitteeSetting/>} />
+<Route path="/committeenotify" element={<CommitteeNotify/>}/>
 <Route path="/adminreport" element={<AdminReport/>} />
 <Route path="/adminsetting" element={<AdminSetting/>} />
 <Route path="/auditlogs" element={<AuditLogs/>} />

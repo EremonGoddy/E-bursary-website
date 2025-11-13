@@ -408,8 +408,8 @@ sidebarActive ? 'inline-block ml-2 text-xl font-semibold' : 'hidden'
 {/* Main Content Area */}
 <div className={`
 flex-1 md:ml-25 transition-all duration-300
-${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
-<div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[800px]  mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-0 md:p-8">
+${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[40px]'}`}>
+<div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[1500px]  mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-0 md:p-8">
 <h1 className="text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Report</h1>
 {/* Responsive Report Info: vertical on mobile, table on md+ */}
 <div>
@@ -429,13 +429,13 @@ ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
 </div>
 {/* Desktop table layout */}
 <div className="hidden md:block w-full overflow-x-auto">
-<table className="w-full min-w-[420px] border-collapse bg-white shadow-md rounded">
+<table className="w-full min-w-[720px] border-collapse bg-white shadow-md rounded">
 <thead>
-<tr className="bg-[#14213d] text-white ">
-<th className="p-2 text-left">Reference Number</th>
-<th className="p-2 text-left">Application Title</th>
-<th className="p-2 text-left">Application Status</th>
-<th className="p-2 text-left">Download Application</th>
+<tr className="bg-[#14213d] text-white">
+<th className="p-2 text-centre">Reference Number</th>
+<th className="p-2 text-centre">Application Title</th>
+<th className="p-2 text-centre">Application Status</th>
+<th className="p-2 text-centre">Download Application</th>
 </tr>
 </thead>
 <tbody>
