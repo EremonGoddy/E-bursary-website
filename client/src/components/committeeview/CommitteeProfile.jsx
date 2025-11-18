@@ -396,9 +396,146 @@ className={`flex items-center space-x-2 transition-all duration-200 ${sidebarAct
     )
   ) : (
     // ---------- CREATE PROFILE ----------
-    <form onSubmit={handleSubmit}>
-      {/* keep your existing create profile form here */}
-    </form>
+    // ---------- CREATE PROFILE ----------
+<form onSubmit={handleSubmit}>
+  <h2 className="text-[#14213d] text-2xl font-bold text-center mb-5">
+    Create Profile
+  </h2>
+
+  {/* Full Name */}
+  <div className="flex items-center gap-3 mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">
+      Full Name:
+    </label>
+    <input
+      type="text"
+      name="fullname"
+      value={formData.fullname}
+      onChange={handleChange}
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+      required
+    />
+  </div>
+
+  {/* Email */}
+  <div className="flex items-center gap-3 mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">Email:</label>
+    <input
+      type="email"
+      name="email"
+      value={formData.email}
+      onChange={handleChange}
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+      required
+    />
+  </div>
+
+  {/* Phone */}
+  <div className="flex items-center gap-3 mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">Phone No:</label>
+    <input
+      type="text"
+      name="phone_no"
+      value={formData.phone_no}
+      onChange={handleChange}
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+      required
+    />
+  </div>
+
+  <div className="flex items-center gap-3 mb-5">
+  <label className="text-[#14213d] font-semibold w-[110px]">National ID:</label>
+  <input
+    type="text"
+    name="national_id"
+    value={formData.national_id}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+    required
+  />
+</div>
+
+
+  {/* Gender */}
+  <div className="flex items-center mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">Gender:</label>
+    <div className="flex gap-6">
+      {['Male', 'Female'].map((g) => (
+        <label className="flex items-center gap-2" key={g}>
+          <input
+            type="radio"
+            name="gender"
+            value={g}
+            checked={formData.gender === g}
+            onChange={handleChange}
+            className="accent-[#14213d]"
+          />
+          {g}
+        </label>
+      ))}
+    </div>
+  </div>
+
+  {/* Subcounty */}
+  <div className="flex items-center gap-3 mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">Subcounty:</label>
+    <select
+      name="subcounty"
+      value={formData.subcounty}
+      onChange={handleChange}
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+      required
+    >
+      <option value="">Select Subcounty</option>
+      {subcounties.map((opt, i) => (
+        <option key={i} value={opt}>{opt}</option>
+      ))}
+    </select>
+  </div>
+
+  {/* Ward */}
+  <div className="flex items-center gap-3 mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">Ward:</label>
+    <select
+      name="ward"
+      value={formData.ward}
+      onChange={handleChange}
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+      required
+    >
+      <option value="">Select Ward</option>
+      {(subcountyWards[formData.subcounty] || []).map((ward, i) => (
+        <option key={i} value={ward}>{ward}</option>
+      ))}
+    </select>
+  </div>
+
+  {/* Position */}
+  <div className="flex items-center gap-3 mb-5">
+    <label className="text-[#14213d] font-semibold w-[110px]">Position:</label>
+    <select
+      name="position"
+      value={formData.position}
+      onChange={handleChange}
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+      required
+    >
+      <option value="">Select Position</option>
+      {positions.map((pos, i) => (
+        <option key={i} value={pos}>{pos}</option>
+      ))}
+    </select>
+  </div>
+
+  {/* Submit Button */}
+  <button
+    type="submit"
+    className="text-white w-full py-2 rounded-lg bg-[#14213d] cursor-pointer hover:bg-gray-700"
+  >
+    Create Profile
+  </button>
+</form>
+
   )
 ) : (
   <p className="text-center">Loading...</p>
