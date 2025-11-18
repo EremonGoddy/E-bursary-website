@@ -630,24 +630,42 @@ app.get('/api/amount-details/user/:userId', async (req, res) => {
   }
 });
 
-// ✅ Insert into amount_details
 app.post('/api/amount-details', async (req, res) => {
   const { userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch } = req.body;
 
-  const sql = `
+  const insertAmountSql = `
     INSERT INTO bursary.amount_details 
     (user_id, payable_words, payable_figures, outstanding_words, outstanding_figures, school_accountname, school_accountnumber, school_branch) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING user_id
   `;
 
   try {
-    await pool.query(sql, [userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch]);
-    res.send('Data inserted successfully');
+    // 1️⃣ Insert amount details
+    await pool.query(insertAmountSql, [userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch]);
+
+    // 2️⃣ Fetch student's personal details to check status
+    const personalQuery = 'SELECT name, email, status FROM bursary.personal_details WHERE user_id = $1';
+    const personalResult = await pool.query(personalQuery, [userId]);
+    const student = personalResult.rows[0];
+
+    if (!student) return res.status(404).send('Student personal details not found');
+
+    // ✅ Only log activity if status is 'incomplete'
+    if (student.status.toLowerCase() === 'incomplete') {
+      const logMessage = `${student.name} (${student.email}) has completed updating amount details`;
+      const logSql = 'INSERT INTO bursary.activity_log (log_message, log_time) VALUES ($1, NOW())';
+      await pool.query(logSql, [logMessage]);
+    }
+
+    res.send('Data inserted successfully and activity logged if status was incomplete');
+
   } catch (err) {
-    console.error('Error inserting data:', err);
+    console.error('Error inserting amount details or logging activity:', err);
     res.status(500).send('Server error');
   }
 });
+
 
 // ✅ Get family details by user ID (for frontend check/redirect)
 app.get('/api/family-details/user/:userId', async (req, res) => {

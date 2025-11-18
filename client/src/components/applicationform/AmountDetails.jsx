@@ -38,34 +38,45 @@ const toggleSidebar = () => {
 setSidebarActive(!sidebarActive);
 };
 
-const handleSubmit = (e) => {
-e.preventDefault();
-const userId = sessionStorage.getItem('userId');
-if (!userId) {
-alert('User ID not found. Please complete personal details first.');
-return;
-}
-const dataWithUserId = { ...formData, userId };
-axios.post('https://e-bursary-backend.onrender.com/api/amount-details', dataWithUserId)
-.then(response => {
-alert('Data inserted successfully');
-navigate('/Familydetails');
-})
-.catch(error => {
-if (
-error.response &&
-(error.response.status === 409 ||
-(error.response.data &&
-/already submitted|duplicate/i.test(error.response.data.message || "")))
-) {
-alert("You have already submitted amount details.");
-navigate('/Familydetails');
-} else {
-alert('There was an error inserting the data!');
-}
-console.error('There was an error inserting the data!', error);
-});
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const userId = sessionStorage.getItem('userId');
+  if (!userId) {
+    alert('User ID not found. Please complete personal details first.');
+    return;
+  }
+
+  const dataWithUserId = { ...formData, userId };
+
+  try {
+    const response = await axios.post(
+      'https://e-bursary-backend.onrender.com/api/amount-details',
+      dataWithUserId
+    );
+
+    // Backend handles activity_log insertion if personal_details.status === 'incomplete'
+    alert(response.data || 'Data submitted successfully');
+
+    // Optionally navigate to the next step
+    navigate('/Familydetails');
+
+  } catch (error) {
+    console.error('Error submitting amount details:', error);
+
+    if (
+      error.response &&
+      (error.response.status === 409 ||
+        /already submitted|duplicate/i.test(error.response.data.message || ""))
+    ) {
+      alert("You have already submitted amount details.");
+      navigate('/Familydetails');
+    } else {
+      alert('There was an error submitting the data. Please try again.');
+    }
+  }
 };
+
 
 // Fetch student info and document upload status
 useEffect(() => {
