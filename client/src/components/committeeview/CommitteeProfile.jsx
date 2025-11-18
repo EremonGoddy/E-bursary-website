@@ -53,35 +53,47 @@ const subcounties = Object.keys(subcountyWards);
 const positions = ["Chairperson", "Secretary", "Treasurer", "Member"];
 
 useEffect(() => {
-const token = sessionStorage.getItem('authToken');
-const name = sessionStorage.getItem('userName');
+  const token = sessionStorage.getItem('authToken');
+  const name = sessionStorage.getItem('userName');
 
-if (!token) {
-navigate('/signin');
-} else {
-setUserName(name || '');
-axios
-.get('https://e-bursary-backend.onrender.com/api/profile-committee', {
-headers: { Authorization: `Bearer ${token}` },
-})
-.then((response) => {
-setIsProfileFetched(true);
-const data = response.data;
-if (data) {
-setFormData(prev => ({
-...prev,
-...data
-}));
-setProfileExists(true);
-}
-})
-.catch((error) => {
-console.error('Error fetching profile data:', error);
-setIsProfileFetched(true);
-setProfileExists(false);
-});
-}
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
+
+  setUserName(name || '');
+
+  axios
+    .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((response) => {
+      setIsProfileFetched(true);
+
+      const data = response.data;
+
+      // --- CASE 1: Profile DOES NOT exist ---
+      if (!data || Object.keys(data).length === 0) {
+        setProfileExists(false);
+        return;
+      }
+
+      // --- CASE 2: Profile EXISTS ---
+      setProfileExists(true);
+      setCommitteeDetails(data);
+
+      setFormData((prev) => ({
+        ...prev,
+        ...data,
+      }));
+    })
+    .catch((error) => {
+      console.error('Error fetching profile data:', error);
+      setIsProfileFetched(true);
+      setProfileExists(false);
+    });
 }, [navigate]);
+
 
 const handleChange = (e) => {
 setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -108,23 +120,6 @@ alert('Error submitting data. Please try again.');
 });
 };
 
-useEffect(() => {
-const token = sessionStorage.getItem('authToken');
-if (!token) {
-navigate('/signin');
-} else {
-axios
-.get('https://e-bursary-backend.onrender.com/api/profile-committee', {
-headers: { Authorization: `Bearer ${token}` },
-})
-.then((response) => {
-setCommitteeDetails(response.data || {});
-})
-.catch((error) => {
-console.error('Error fetching profile data:', error);
-});
-}
-}, [navigate]);
 
 const navItems = [
 { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
