@@ -38,110 +38,85 @@ const toggleSidebar = () => {
 setSidebarActive(!sidebarActive);
 };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const userId = sessionStorage.getItem('userId');
-  if (!userId) {
-    alert('User ID not found. Please complete personal details first.');
-    return;
-  }
-
-  const dataWithUserId = { ...formData, userId };
-
-  try {
-    const response = await axios.post(
-      'https://e-bursary-backend.onrender.com/api/amount-details',
-      dataWithUserId
-    );
-
-    // Backend handles activity_log insertion if personal_details.status === 'incomplete'
-    alert(response.data || 'Data submitted successfully');
-
-    // Optionally navigate to the next step
-    navigate('/Familydetails');
-
-  } catch (error) {
-    console.error('Error submitting amount details:', error);
-
-    if (
-      error.response &&
-      (error.response.status === 409 ||
-        /already submitted|duplicate/i.test(error.response.data.message || ""))
-    ) {
-      alert("You have already submitted amount details.");
-      navigate('/Familydetails');
-    } else {
-      alert('There was an error submitting the data. Please try again.');
-    }
-  }
+const handleSubmit = (e) => {
+e.preventDefault();
+const userId = sessionStorage.getItem('userId');
+if (!userId) {
+alert('User ID not found. Please complete personal details first.');
+return;
+}
+const dataWithUserId = { ...formData, userId };
+axios.post('https://e-bursary-backend.onrender.com/api/amount-details', dataWithUserId)
+.then(response => {
+alert('Data inserted successfully');
+navigate('/Familydetails');
+})
+.catch(error => {
+if (
+error.response &&
+(error.response.status === 409 ||
+(error.response.data &&
+/already submitted|duplicate/i.test(error.response.data.message || "")))
+) {
+alert("You have already submitted amount details.");
+navigate('/Familydetails');
+} else {
+alert('There was an error inserting the data!');
+}
+console.error('There was an error inserting the data!', error);
+});
 };
 
-
+// Fetch student info and document upload status
 useEffect(() => {
-  const token = sessionStorage.getItem('authToken');
-  const name = sessionStorage.getItem('userName');
-  const userId = sessionStorage.getItem('userId');
+const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
+const userId = sessionStorage.getItem('userId');
 
-  if (!token) {
-    navigate('/signin');
-    return;
-  }
+if (!token) {
+navigate('/signin');
+return;
+}
 
-  setUserName(name);
-  setLoading(true);
+setUserName(name);
+setLoading(true);
 
-  // Fetch student details
-  if (token) {
-    axios
-      .get('https://e-bursary-backend.onrender.com/api/student', {
-        headers: {
-          Authorization: token,
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-          Expires: '0',
-        },
-      })
-      .then((response) => {
-        const data = response.data;
+// ✅ Fetch student details only if token is present
+axios.get('https://e-bursary-backend.onrender.com/api/student', {
+headers: {
+Authorization: token,
+'Cache-Control': 'no-cache',
+Pragma: 'no-cache',
+Expires: '0',
+},
+})
+.then((response) => {
+setStudentDetails(response.data);
+setFormData(response.data);
+setLoading(false);
+})
+.catch((error) => {
+setLoading(false);
+if (error.response && error.response.status === 401) {
+navigate('/signin');
+}
+});
 
-        setStudentDetails(data);
+// ✅ Only call document status API if both token and userId exist
+if (userId) {
+axios
+.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
+headers: { Authorization: token }  // Optional but recommended for security
+})
+.then((res) => {
+const isUploaded = res.data && res.data.uploaded === true;
+setDocumentUploaded(isUploaded);
+        
+})
+.catch(() => setDocumentUploaded(false));
+}
 
-        // ✅ Populate formData safely (fallback to empty string if undefined)
-        setFormData({
-          payablewords: data.payablewords || '',
-          payablefigures: data.payablefigures || '',
-          outstandingwords: data.outstandingwords || '',
-          outstandingfigures: data.outstandingfigures || '',
-          accountname: data.accountname || '',
-          accountnumber: data.accountnumber || '',
-          branch: data.branch || '',
-        });
-
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching student details:', error);
-        setLoading(false);
-        if (error.response && error.response.status === 401) {
-          navigate('/signin');
-        }
-      });
-  }
-
-  // Fetch document upload status
-  if (userId) {
-    axios
-      .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
-        headers: { Authorization: token },
-      })
-      .then((res) => {
-        setDocumentUploaded(res.data?.uploaded === true);
-      })
-      .catch(() => setDocumentUploaded(false));
-  }
 }, [navigate]);
-
 
 useEffect(() => {
 const token = sessionStorage.getItem('authToken');
