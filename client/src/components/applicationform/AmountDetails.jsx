@@ -39,33 +39,40 @@ setSidebarActive(!sidebarActive);
 };
 
 const handleSubmit = (e) => {
-e.preventDefault();
-const userId = sessionStorage.getItem('userId');
-if (!userId) {
-alert('User ID not found. Please complete personal details first.');
-return;
-}
-const dataWithUserId = { ...formData, userId };
-axios.post('https://e-bursary-backend.onrender.com/api/amount-details', dataWithUserId)
-.then(response => {
-alert('Data inserted successfully');
-navigate('/Familydetails');
-})
-.catch(error => {
-if (
-error.response &&
-(error.response.status === 409 ||
-(error.response.data &&
-/already submitted|duplicate/i.test(error.response.data.message || "")))
-) {
-alert("You have already submitted amount details.");
-navigate('/Familydetails');
-} else {
-alert('There was an error inserting the data!');
-}
-console.error('There was an error inserting the data!', error);
-});
+  e.preventDefault();
+  const userId = sessionStorage.getItem('userId');
+  if (!userId) {
+    alert('User ID not found. Please complete personal details first.');
+    return;
+  }
+  const dataWithUserId = { ...formData, userId };
+
+  axios.post('https://e-bursary-backend.onrender.com/api/amount-details', dataWithUserId)
+    .then(response => {
+
+      // ⭐ Notify the reviewing committee ONLY if status is Incomplete
+      axios.post(`https://e-bursary-backend.onrender.com/api/notify-committee-update/${userId}`)
+        .catch(() => {});
+
+      alert('Data inserted successfully');
+      navigate('/Familydetails');
+    })
+    .catch(error => {
+      if (
+        error.response &&
+        (error.response.status === 409 ||
+          (error.response.data &&
+            /already submitted|duplicate/i.test(error.response.data.message || "")))
+      ) {
+        alert("You have already submitted amount details.");
+        navigate('/Familydetails');
+      } else {
+        alert('There was an error inserting the data!');
+      }
+      console.error('There was an error inserting the data!', error);
+    });
 };
+
 
 // Fetch student info and document upload status
 useEffect(() => {

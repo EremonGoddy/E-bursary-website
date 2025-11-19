@@ -1717,6 +1717,72 @@ app.get('/api/comreport', (req, res) => {
   });
 });
 
+// ================================================
+// API: Amount form submission notification logic
+// ================================================
+app.post('/api/notify-committee-update/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // 1️⃣ Get student status + reviewer name
+    const studentSql = `
+      SELECT status, approved_by_committee
+      FROM bursary.personal_details
+      WHERE user_id = $1
+    `;
+    const studentResult = await pool.query(studentSql, [userId]);
+
+    if (studentResult.rows.length === 0) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const { status, approved_by_committee } = studentResult.rows[0];
+
+    // 2️⃣ IF STATUS IS PENDING → DO NOTHING
+    if (!approved_by_committee || status === "Pending") {
+      return res.json({
+        message: "No notification needed (status is pending)",
+        notified: false
+      });
+    }
+
+    // 3️⃣ IF STATUS IS INCOMPLETE → SEND NOTIFICATION
+    if (status === "Incomplete") {
+      const committeeSql = `
+        UPDATE bursary.profile_committee
+        SET 
+          status_message = 'The student has updated his/her information.',
+          is_new = true
+        WHERE fullname = $1
+        RETURNING id, fullname, status_message, is_new
+      `;
+
+      const committeeResult = await pool.query(committeeSql, [approved_by_committee]);
+
+      if (committeeResult.rows.length === 0) {
+        return res.status(404).json({ message: "Committee member not found" });
+      }
+
+      return res.json({
+        message: "Notification sent to reviewing committee member",
+        notified: true,
+        committee: committeeResult.rows[0]
+      });
+    }
+
+    // 4️⃣ OTHER STATUSES → NO ACTION
+    return res.json({
+      message: "No notification required for this status",
+      notified: false
+    });
+
+  } catch (error) {
+    console.error("Error processing committee notification:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
