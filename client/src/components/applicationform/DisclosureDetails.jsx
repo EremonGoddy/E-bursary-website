@@ -17,168 +17,211 @@ faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 const DisclosureDetails = () => {
- const [sidebarActive, setSidebarActive] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [studentDetails, setStudentDetails] = useState({});
-  const [documentUploaded, setDocumentUploaded] = useState(false);
-  const [hasNewMessage, setHasNewMessage] = useState(false);
-  const [formData, setFormData] = useState({
-    bursary: '',
-    bursarysource: '',
-    bursaryamount: '',
-    helb: '',
-    granted: '',
-    noreason: '',
-  });
-  const [loading, setLoading] = useState(true);
+const [sidebarActive, setSidebarActive] = useState(false);
+const [userName, setUserName] = useState('');
+const [studentDetails, setStudentDetails] = useState({});
+const [documentUploaded, setDocumentUploaded] = useState(false);
+const [hasNewMessage, setHasNewMessage] = useState(false);
+const [formData, setFormData] = useState({
+bursary: '',
+bursarysource: '',
+bursaryamount: '',
+helb: '',
+granted: '',
+noreason: '',
+});
+const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
+const handleChange = (e) => {
+const { name, value } = e.target;
+setFormData({
+...formData,
+[name]: value
+});
+};
 
-  const toggleSidebar = () => setSidebarActive(!sidebarActive);
+const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const userId = sessionStorage.getItem('userId');
-    if (!userId) {
-      alert('User ID not found. Please complete personal details first.');
-      return;
-    }
+const handleSubmit = (e) => {
+e.preventDefault();
+const userId = sessionStorage.getItem('userId');
+if (!userId) {
+alert('User ID not found. Please complete personal details first.');
+return;
+}
+const dataWithUserId = { ...formData, userId };
+axios.post('https://e-bursary-backend.onrender.com/api/disclosure-details', dataWithUserId)
+.then(response => {
+alert('Data inserted successfully');
+// navigate to document upload and pass disclosure data via state
+navigate('/documentupload', { state: formData });
+})
+.catch(error => {
+if (
+error.response &&
+(error.response.status === 409 ||
+(error.response.data &&
+/already submitted|duplicate/i.test(error.response.data.message || "")))
+) {
+alert("You have already submitted disclosure details.");
+navigate('/documentupload', { state: formData });
+} else {
+alert('There was an error inserting the data!');
+}
+console.error('There was an error inserting the data!', error);
+});
+};
 
-    try {
-      const response = await axios.post(
-        'https://e-bursary-backend.onrender.com/api/disclosure-details',
-        { ...formData, userId }
-      );
+useEffect(() => {
+const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
+const userId = sessionStorage.getItem('userId');
+  
+if (!token) {
+navigate('/signin');
+return;
+}
+  
+setUserName(name);
+setLoading(true);
+  
+// ✅ Fetch student details only if token is present
+axios.get('https://e-bursary-backend.onrender.com/api/student', {
+headers: {
+Authorization: token,
+'Cache-Control': 'no-cache',
+Pragma: 'no-cache',
+Expires: '0',
+},
+})
+.then((response) => {
+setStudentDetails(response.data);
+setFormData(response.data);
+setLoading(false);
+})
+.catch((error) => {
+setLoading(false);
+if (error.response && error.response.status === 401) {
+navigate('/signin');
+}
+});
+  
+// ✅ Only call document status API if both token and userId exist
+if (userId) {
+axios
+.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
+headers: { Authorization: token }  // Optional but recommended for security
+})
+.then((res) => {
+const isUploaded = res.data && res.data.uploaded === true;
+setDocumentUploaded(isUploaded);
+          
+})
+.catch(() => setDocumentUploaded(false));
+}
+  
+}, [navigate]);
 
-      alert('Data inserted successfully');
-      navigate('/documentupload', { state: formData });
-    } catch (error) {
-      if (
-        error.response &&
-        (error.response.status === 409 ||
-          (error.response.data &&
-            /already submitted|duplicate/i.test(error.response.data.message || "")))
-      ) {
-        alert("You have already submitted disclosure details.");
-        navigate('/documentupload', { state: formData });
-      } else {
-        console.error('There was an error inserting the data!', error);
-        alert('There was an error inserting the data!');
-      }
-    }
-  };
+useEffect(() => {
+const token = sessionStorage.getItem('authToken');
+const userId = sessionStorage.getItem('userId');
+  
+if (!token) {
+navigate('/signin');
+return;
+}
+  
+if (userId) {
+axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
+headers: { Authorization: token }
+})
+.then(response => {
+const message = response.data.status_message;
+if (message && message.toLowerCase().includes("new")) {
+setHasNewMessage(true);
+} else {
+setHasNewMessage(false);
+}
+})
+.catch(err => {
+console.error('Error checking status message:', err);
+});
+}
+}, []);
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const name = sessionStorage.getItem('userName');
-    const userId = sessionStorage.getItem('userId');
+useEffect(() => {
+const token = sessionStorage.getItem('authToken');
+const name = sessionStorage.getItem('userName');
+const userId = sessionStorage.getItem('userId');
+if (!token) {
+navigate('/signin');
+return;
+}
+setUserName(name);
 
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
+// Check if disclosure details already exist for this userId
+if (userId) {
+axios
+.get(`https://e-bursary-backend.onrender.com/api/disclosure-details/user/${userId}`)
+.then(res => {
+if (res.data && res.data.user_id) {
+// Disclosure details already exist, go to next step
+navigate('/documentupload');
+} else {
+setLoading(false);
+}
+})
+.catch(() => setLoading(false));
+} else {
+setLoading(false);
+}
+}, [navigate]);
 
-    setUserName(name);
-    setLoading(true);
+if (loading) return null; // Prevent flash before redirect or loading complete
 
-    // Fetch student details
-    axios.get('https://e-bursary-backend.onrender.com/api/student', {
-      headers: { Authorization: token, 'Cache-Control': 'no-cache' },
-    })
-      .then((res) => {
-        setStudentDetails(res.data);
-        setFormData(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        if (err.response && err.response.status === 401) navigate('/signin');
-      });
-
-    // Check document upload status
-    if (userId) {
-      axios.get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
-        headers: { Authorization: token }
-      })
-        .then((res) => {
-          setDocumentUploaded(res.data?.uploaded === true);
-        })
-        .catch(() => setDocumentUploaded(false));
-    }
-
-  }, [navigate]);
-
-  // Check if disclosure details exist to skip step
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const userId = sessionStorage.getItem('userId');
-    if (!token) { navigate('/signin'); return; }
-
-    if (userId) {
-      axios.get(`https://e-bursary-backend.onrender.com/api/disclosure-details/user/${userId}`)
-        .then(res => {
-          if (res.data?.user_id) {
-            // Already exists, skip to next step
-            navigate('/documentupload');
-          } else {
-            setLoading(false);
-          }
-        })
-        .catch(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, [navigate]);
-
-  // Check for new notifications
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const userId = sessionStorage.getItem('userId');
-    if (!token || !userId) return;
-
-    axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
-      headers: { Authorization: token }
-    })
-      .then(res => setHasNewMessage(res.data.status_message?.toLowerCase().includes("new") || false))
-      .catch(err => console.error('Error checking status message:', err));
-  }, []);
-
-  if (loading) return null;
 return (
 <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
 {/* Top Bar */}
-      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
-          <div className="flex items-center space-x-1">
-            <h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">Welcome: {userName}</h2>
-            <img
-              src={
-                studentDetails.gender === 'Female' ? '/images/woman.png' :
-                studentDetails.gender === 'Male' ? '/images/patient.png' : '/images/user.png'
-              }
-              alt="User"
-              className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
-            />
-            <div className="block md:hidden">
-              <FontAwesomeIcon
-                icon={faBars}
-                className="text-xl cursor-pointer text-[#14213d]"
-                onClick={toggleSidebar}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
+<div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
+<div className="flex justify-between items-center">
+             
+     
+<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
+<div className="flex items-center space-x-1">
+<h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
+Welcome: {userName}
+</h2>
+<div className="flex items-center space-x-2">
+<img
+src={
+studentDetails.gender === 'Female'
+? '/images/woman.png'
+: studentDetails.gender === 'Male'
+? '/images/patient.png'
+: '/images/user.png'
+}
+alt="User"
+className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
+/>
+     
+     
+     
+</div>
+{/* Sidebar toggle only visible on small screens */}
+{/* Toggle Button for opening sidebar on mobile */}
+<div className="block md:hidden">
+<FontAwesomeIcon
+icon={faBars}
+className="text-xl cursor-pointer text-[#14213d]"
+onClick={toggleSidebar}
+/>
+</div>
+     
+</div>
+</div>
+</div>
 
 <div className="flex pt-20 min-h-screen">
 {/* Sidebar */}
@@ -347,58 +390,68 @@ sidebarActive
   </ul>
 </div>
 
-{/* Main Content */}
-      <div className={`flex-1 md:ml-25 transition-all mt-2 duration-300 ${sidebarActive ? 'ml-0 md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
-        <ProgressStepper currentStep={3} />
-        <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl max-w-[350px] md:max-w-[600px] mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8 transition-all duration-300 transform hover:scale-[1.01]">
-          <h1 className="text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Application Form</h1>
-          <h2 className="text-lg font-semibold mb-6 text-center text-[#14213d]">Other Disclosure</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-[#14213d]">
-            {/* Bursary question */}
-            <div>
-              <label className="block font-medium mb-2">Are you currently receiving any other bursaries or scholarships?</label>
-              <div className="flex flex-col space-y-2">
-                <label className="flex items-center"><input type="radio" name="bursary" value="yes" checked={formData.bursary === "yes"} onChange={handleChange} className="mr-2 cursor-pointer" />Yes</label>
-                <label className="flex items-center"><input type="radio" name="bursary" value="no" checked={formData.bursary === "no"} onChange={handleChange} className="mr-2 cursor-pointer" />No</label>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="bursarysource" className="block font-medium mb-2">If yes, state the source:</label>
-              <input type="text" id="bursarysource" name="bursarysource" value={formData.bursarysource} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter the source" />
-            </div>
-
-            <div>
-              <label htmlFor="bursaryamount" className="block font-medium mb-2">State the amount in Ksh:</label>
-              <input type="text" id="bursaryamount" name="bursaryamount" value={formData.bursaryamount} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter amount in Ksh" />
-            </div>
-
-            <div>
-              <label className="block font-medium mb-2">Have you applied for financial support from HELB?</label>
-              <div className="flex flex-col space-y-2">
-                <label className="flex items-center"><input type="radio" name="helb" value="Yes" checked={formData.helb === "Yes"} onChange={handleChange} className="mr-2 cursor-pointer" />Yes</label>
-                <label className="flex items-center"><input type="radio" name="helb" value="No" checked={formData.helb === "No"} onChange={handleChange} className="mr-2 cursor-pointer" />No</label>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="granted" className="block font-medium mb-2">If yes, state the outcome and reasons for grant:</label>
-              <textarea id="granted" name="granted" value={formData.granted} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter reasons"></textarea>
-            </div>
-
-            <div>
-              <label htmlFor="noreason" className="block font-medium mb-2">If no, state the reasons:</label>
-              <textarea id="noreason" name="noreason" value={formData.noreason} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter reasons"></textarea>
-            </div>
-
-            <div className="flex justify-end mt-4 md:col-span-2">
-              <button type="submit" className="bg-[#14213d] text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-gray-700 transition duration-200">
-                Next
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+{/* Main Content Area */}
+<div className={`flex-1 md:ml-25 transition-all mt-2 duration-300
+${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}
+`}>
+<ProgressStepper currentStep={3} />
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[350px] md:max-w-[600px]  mx-auto -mt-4 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
+<h1 className="text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Application Form</h1>
+<h2 className="text-lg font-semibold mb-6 text-center text-[#14213d]">Other Disclosure</h2>
+<form onSubmit={handleSubmit} className="grid grid-cols-1 text-[#14213d] md:grid-cols-2 gap-3 md:gap-4">
+<div>
+<label className="block font-medium mb-2">Are you currently receiving any other bursaries or scholarships?</label>
+<div className="flex flex-col space-y-2 accent-gray-600">
+<label className="flex items-center">
+<input type="radio" name="bursary" value="yes" checked={formData.bursary === "yes"} onChange={handleChange} className="mr-2 cursor-pointer" />
+Yes
+</label>
+<label className="flex items-center">
+<input type="radio" name="bursary" value="no" checked={formData.bursary === "no"} onChange={handleChange} className="mr-2 cursor-pointer" />
+No
+</label>
+</div>
+</div>
+<div>
+<label htmlFor="bursarysource" className="block font-medium mb-2">If yes, state the source:</label>
+<input type="text" id="bursarysource" name="bursarysource" value={formData.bursarysource} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter the source" />
+</div>
+<div>
+<label htmlFor="bursaryamount" className="block font-medium mb-2">State the amount in Ksh:</label>
+<input type="text" id="bursaryamount" name="bursaryamount" value={formData.bursaryamount} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter amount in Ksh" />
+</div>
+<div>
+<label className="block font-medium mb-2">Have you applied for financial support from HELB?</label>
+<div className="flex flex-col space-y-2 accent-gray-600">
+<label className="flex items-center">
+<input type="radio" name="helb" value="Yes" checked={formData.helb === "Yes"} onChange={handleChange} className="mr-2 cursor-pointer" />
+Yes
+</label>
+<label className="flex items-center">
+<input type="radio" name="helb" value="No" checked={formData.helb === "No"} onChange={handleChange} className="mr-2 cursor-pointer" />
+No
+</label>
+</div>
+</div>
+<div>
+<label htmlFor="granted" className="block font-medium mb-2">If yes, state the outcome and reasons for grant:</label>
+<textarea id="granted" name="granted" value={formData.granted} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter reasons"></textarea>
+</div>
+<div>
+<label htmlFor="noreason" className="block font-medium mb-2">If no, state the reasons:</label>
+<textarea id="noreason" name="noreason" value={formData.noreason} onChange={handleChange} className="form-input w-full border border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]" placeholder="Enter reasons"></textarea>
+</div>
+<div className="flex justify-end mt-4 md:col-span-2">
+<button
+type="submit"
+className="bg-[#14213d] text-white px-10 cursor-pointer py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-gray-700 transition duration-200"
+>
+Next
+</button>
+</div>
+</form>
+</div>
+</div>
 </div>
 </div>
 );

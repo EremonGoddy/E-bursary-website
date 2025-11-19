@@ -665,76 +665,24 @@ app.get('/api/family-details/user/:userId', async (req, res) => {
   }
 });
 
+// ✅ Insert into family_details
 app.post('/api/family-details', async (req, res) => {
-  const {
-    userId,
-    family_status,
-    disability,
-    parentname,
-    relationship,
-    contact,
-    occupation,
-    guardian_children,
-    working_siblings,
-    studying_siblings,
-    monthly_income
-  } = req.body;
+  const { userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income } = req.body;
 
-  const insertSql = `
-    INSERT INTO bursary.family_details
-    (user_id, family_status, disability, parent_guardian_name, relationship, contact_info, occupation, guardian_children, working_siblings, studying_siblings, monthly_income)
+  const sql = `
+    INSERT INTO bursary.family_details 
+    (user_id, family_status, disability, parent_guardian_name, relationship, contact_info, occupation, guardian_children, working_siblings, studying_siblings, monthly_income) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    ON CONFLICT (user_id) DO UPDATE
-    SET family_status = EXCLUDED.family_status,
-        disability = EXCLUDED.disability,
-        parent_guardian_name = EXCLUDED.parent_guardian_name,
-        relationship = EXCLUDED.relationship,
-        contact_info = EXCLUDED.contact_info,
-        occupation = EXCLUDED.occupation,
-        guardian_children = EXCLUDED.guardian_children,
-        working_siblings = EXCLUDED.working_siblings,
-        studying_siblings = EXCLUDED.studying_siblings,
-        monthly_income = EXCLUDED.monthly_income
   `;
 
   try {
-    // 1️⃣ Insert or update family details
-    await pool.query(insertSql, [
-      userId,
-      family_status,
-      disability,
-      parentname,
-      relationship,
-      contact,
-      occupation,
-      guardian_children,
-      working_siblings,
-      studying_siblings,
-      monthly_income
-    ]);
-
-    // 2️⃣ Check student status in personal_details
-    const statusResult = await pool.query(
-      'SELECT status FROM personal_details WHERE user_id = $1',
-      [userId]
-    );
-
-    if (statusResult.rows.length > 0 && statusResult.rows[0].status === 'Incomplete') {
-      // 3️⃣ Update profile_committee only if student status is Incomplete
-      await pool.query(
-        'UPDATE profile_committee SET status_message = $1 WHERE student_id = $2',
-        ['Student updated family details', userId]
-      );
-    }
-    // If status is Pending, do nothing (status_message stays NULL)
-
-    res.json({ message: 'Family details submitted successfully' });
+    await pool.query(sql, [userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income]);
+    res.send('Data inserted successfully');
   } catch (err) {
-    console.error('Error inserting family details:', err);
+    console.error('Error inserting data:', err);
     res.status(500).send('Server error');
   }
 });
-
 
 // ✅ Get disclosure details by user ID (for frontend check/redirect)
 app.get('/api/disclosure-details/user/:userId', async (req, res) => {
@@ -752,48 +700,21 @@ app.get('/api/disclosure-details/user/:userId', async (req, res) => {
   }
 });
 
+// ✅ Insert into disclosure_details
 app.post('/api/disclosure-details', async (req, res) => {
   const { userId, bursary, bursarysource, bursaryamount, helb, granted, noreason } = req.body;
 
-  const insertSql = `
+  const sql = `
     INSERT INTO bursary.disclosure_details 
     (user_id, receiving_bursary, bursary_source, bursary_amount, applied_helb, helb_outcome, helb_noreason) 
     VALUES ($1, $2, $3, $4, $5, $6, $7)
-    ON CONFLICT (user_id) DO UPDATE
-    SET receiving_bursary = EXCLUDED.receiving_bursary,
-        bursary_source = EXCLUDED.bursary_source,
-        bursary_amount = EXCLUDED.bursary_amount,
-        applied_helb = EXCLUDED.applied_helb,
-        helb_outcome = EXCLUDED.helb_outcome,
-        helb_noreason = EXCLUDED.helb_noreason
   `;
 
   try {
-    // 1️⃣ Insert or update disclosure details
-    await pool.query(insertSql, [userId, bursary, bursarysource, bursaryamount, helb, granted, noreason]);
-
-    // 2️⃣ Get student's status and approved_by_committee
-    const studentResult = await pool.query(
-      'SELECT status, approved_by_committee FROM bursary.personal_details WHERE user_id = $1',
-      [userId]
-    );
-
-    if (studentResult.rows.length > 0) {
-      const { status, approved_by_committee: committeeName } = studentResult.rows[0];
-
-      // 3️⃣ Only update status_message if status is 'Incomplete' AND committeeName exists
-      if (status === 'Incomplete' && committeeName) {
-        await pool.query(
-          'UPDATE bursary.profile_committee SET status_message = $1 WHERE committee_name = $2 AND student_id = $3',
-          [`Student updated disclosure details`, committeeName, userId]
-        );
-      }
-      // If status is Pending, do nothing
-    }
-
+    await pool.query(sql, [userId, bursary, bursarysource, bursaryamount, helb, granted, noreason]);
     res.send('Data inserted successfully');
   } catch (err) {
-    console.error('Error inserting disclosure details:', err);
+    console.error('Error inserting data:', err);
     res.status(500).send('Server error');
   }
 });
