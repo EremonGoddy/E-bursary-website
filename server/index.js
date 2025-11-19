@@ -1782,7 +1782,7 @@ app.post('/api/notify-committee-update/:userId', async (req, res) => {
   }
 });
 
-// ✅ GET committee status_message
+// GET committee status_message
 app.get('/api/committee/status-message', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token missing');
@@ -1790,16 +1790,14 @@ app.get('/api/committee/status-message', async (req, res) => {
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized');
 
-    const committeeId = decoded.id;
-
     const sql = `
       SELECT status_message, is_new
       FROM bursary.profile_committee
-      WHERE id = $1
+      WHERE email = $1
     `;
 
     try {
-      const { rows } = await pool.query(sql, [committeeId]);
+      const { rows } = await pool.query(sql, [decoded.email]);
       if (!rows[0]) return res.status(404).json({ message: 'Committee member not found' });
 
       res.json({
@@ -1813,7 +1811,8 @@ app.get('/api/committee/status-message', async (req, res) => {
   });
 });
 
-// ✅ POST mark message as read (set is_new = false)
+
+// POST mark message as read (set is_new = false)
 app.post('/api/committee/status-message/read', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token missing');
@@ -1821,16 +1820,15 @@ app.post('/api/committee/status-message/read', async (req, res) => {
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized');
 
-    const committeeId = decoded.id;
     const sql = `
       UPDATE bursary.profile_committee
       SET is_new = false
-      WHERE id = $1
+      WHERE email = $1
       RETURNING status_message, is_new
     `;
 
     try {
-      const { rows } = await pool.query(sql, [committeeId]);
+      const { rows } = await pool.query(sql, [decoded.email]);
       res.json(rows[0] || {});
     } catch (error) {
       console.error('Error updating is_new flag:', error);
@@ -1838,6 +1836,7 @@ app.post('/api/committee/status-message/read', async (req, res) => {
     }
   });
 });
+
 
 
 // ✅ Start server
