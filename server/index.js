@@ -1793,10 +1793,11 @@ app.get('/api/committee/status-message', (req, res) => {
     const committeeId = decoded.id; // committee ID from token
 
     const sql = `
-      SELECT status_message 
-      FROM bursary.profile_committee 
-      WHERE user_id = $1
-    `;
+  SELECT status_message
+  FROM bursary.profile_committee
+  WHERE id = $1
+`;
+
 
     try {
       const { rows } = await pool.query(sql, [committeeId]);

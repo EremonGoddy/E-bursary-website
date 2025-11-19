@@ -23,6 +23,7 @@ const CommitteeNotify = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [committeeDetails, setCommitteeDetails] = useState({});
+  const [statusMessage, setStatusMessage] = useState('');
   const [sidebarActive, setSidebarActive] = useState(false);
   const [hasNewNotification, setHasNewNotification] = useState(false);
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ const CommitteeNotify = () => {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
       navigate('/signin');
+      return;
     }
 
     axios
@@ -44,6 +46,16 @@ const CommitteeNotify = () => {
         setCommitteeDetails(res.data || {});
       })
       .catch((err) => console.error('Error fetching profile data:', err));
+
+    // Fetch status_message
+    axios
+      .get('https://e-bursary-backend.onrender.com/api/committee/status-message', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        setStatusMessage(res.data.status_message || '');
+      })
+      .catch((err) => console.error('Error fetching status message:', err));
   }, [navigate]);
 
   // Fetch notifications specific to committee
@@ -53,48 +65,17 @@ const CommitteeNotify = () => {
 
     axios
       .get('https://e-bursary-backend.onrender.com/api/notifications/committee', {
-        headers: { Authorization: token }
+        headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => {
         setNotifications(res.data.notifications || []);
         setLoading(false);
 
-        // Badge alert for new notifications
         const hasUnread = res.data.notifications?.some((n) => !n.is_read);
         setHasNewNotification(hasUnread);
       })
       .catch(() => setLoading(false));
   }, []);
-
-  // 🔵 Fetch committee status_message
-useEffect(() => {
-  const token = sessionStorage.getItem('authToken');
-  if (!token) return;
-
-  axios.get('https://e-bursary-backend.onrender.com/api/committee/status-message', {
-    headers: { Authorization: token }
-  })
-  .then(res => {
-    const msg = res.data.status_message;
-
-    if (msg) {
-      setNotifications(prev => [
-        {
-          id: 'status_msg',
-          title: "Status Update",
-          message: msg,
-          type: "status_message",
-          is_read: false,
-          created_at: new Date(),
-          student_name: "System"
-        },
-        ...prev
-      ]);
-    }
-  })
-  .catch(err => console.error("Error fetching status_message:", err));
-}, []);
-
 
   // Handler for marking notification as read
   const markNotificationRead = async (id) => {
@@ -104,7 +85,7 @@ useEffect(() => {
     await axios.put(
       `https://e-bursary-backend.onrender.com/api/notifications/committee/${id}/read`,
       {},
-      { headers: { Authorization: token } }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
 
     setNotifications((prev) =>
@@ -142,7 +123,6 @@ useEffect(() => {
 
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
@@ -157,8 +137,8 @@ useEffect(() => {
                   committeeDetails.gender === 'Female'
                     ? '/images/woman.png'
                     : committeeDetails.gender === 'Male'
-                      ? '/images/patient.png'
-                      : '/images/user.png'
+                    ? '/images/patient.png'
+                    : '/images/user.png'
                 }
                 alt="User"
                 className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
@@ -177,16 +157,11 @@ useEffect(() => {
 
       {/* Main layout */}
       <div className="flex flex-col md:flex-row pt-20 min-h-screen">
-
         {/* Sidebar */}
         <div
-          className={`
-          fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14
-          transition-all duration-100 ease-in-out
-          overflow-visible
+          className={`fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14 transition-all duration-100 ease-in-out overflow-visible
           ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-          ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
-        `}
+          ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}`}
         >
           <div className="hidden md:flex justify-end mb-4">
             <FontAwesomeIcon
@@ -215,9 +190,7 @@ useEffect(() => {
                           navigate('/');
                         });
                     }}
-                    className={`flex items-center space-x-2 transition-all duration-200 ${
-                      sidebarActive ? 'justify-start' : 'justify-center'
-                    }`}
+                    className={`flex items-center space-x-2 transition-all duration-200 ${sidebarActive ? 'justify-start' : 'justify-center'}`}
                   >
                     <FontAwesomeIcon icon={item.icon} className="text-xl" />
                     <span className={`${sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'}`}>
@@ -227,9 +200,7 @@ useEffect(() => {
                 ) : (
                   <Link
                     to={item.to}
-                    className={`flex items-center space-x-2 transition-all duration-200 ${
-                      sidebarActive ? 'justify-start' : 'justify-center'
-                    }`}
+                    className={`flex items-center space-x-2 transition-all duration-200 ${sidebarActive ? 'justify-start' : 'justify-center'}`}
                   >
                     <FontAwesomeIcon icon={item.icon} className="text-xl" />
                     <span className={`${sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'}`}>
@@ -249,12 +220,16 @@ useEffect(() => {
         </div>
 
         {/* Content */}
-        <div className={`flex-1 ml-0 md:ml-64 md:p-4 mt-0 md:mt-2 transition-all duration-100 md:pr-10 md:pl-10 ${
-            sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[0px] md:ml-[10px]'
-          }`}
-        >
+        <div className={`flex-1 ml-0 md:ml-64 md:p-4 mt-0 md:mt-2 transition-all duration-100 md:pr-10 md:pl-10 ${sidebarActive ? 'ml-[10px] md:ml-[190px]' : 'ml-[0px] md:ml-[10px]'}`}>
           <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[800px] mx-auto p-6">
             <h2 className="text-xl md:text-2xl font-bold text-[#14213d] mb-4">Recent Student Notifications</h2>
+
+            {/* Display committee status_message */}
+            {statusMessage && (
+              <div className="mb-4 p-4 bg-yellow-100 text-yellow-900 rounded-lg border-l-4 border-yellow-400">
+                <strong>Status Message:</strong> {statusMessage}
+              </div>
+            )}
 
             {loading ? (
               <div className="text-center text-gray-600">Loading notifications...</div>
@@ -265,48 +240,25 @@ useEffect(() => {
                 {notifications.map((notification) => (
                   <li
                     key={notification.id}
-                    className={`flex items-center p-4 rounded-lg shadow-md bg-white border-l-4 transition ${
-                      notification.is_read ? 'border-gray-300 bg-gray-50' : 'border-blue-400 bg-white'
-                    }`}
+                    className={`flex items-center p-4 rounded-lg shadow-md bg-white border-l-4 transition ${notification.is_read ? 'border-gray-300 bg-gray-50' : 'border-blue-400 bg-white'}`}
                   >
-                    {/* Icon */}
                     {getNotificationIcon(notification.type)}
-
-                    {/* Content */}
                     <div className="flex-grow ml-4">
                       <div className="flex items-center space-x-2">
-                        <span
-                          className={`font-bold ${
-                            notification.is_read ? 'text-gray-500' : 'text-[#14213d]'
-                          }`}
-                        >
-                          {notification.title ||
-                            (notification.type === 'document_completed'
-                              ? 'Document Completed'
-                              : notification.type === 'document_edited'
-                                ? 'Document Edited'
-                                : notification.type === 'document_uploaded'
-                                  ? 'New Document Uploaded'
-                                  : notification.type === 'document_incomplete'
-                                    ? 'Incomplete Document Alert'
-                                    : 'New Notification')}
+                        <span className={`font-bold ${notification.is_read ? 'text-gray-500' : 'text-[#14213d]'}`}>
+                          {notification.title || 'New Notification'}
                         </span>
                         {!notification.is_read && (
-                          <span className="text-xs text-blue-500 font-semibold px-2 py-0.5 bg-blue-100 rounded">
-                            New
-                          </span>
+                          <span className="text-xs text-blue-500 font-semibold px-2 py-0.5 bg-blue-100 rounded">New</span>
                         )}
                       </div>
-
                       <div className="text-gray-700 mt-1 text-sm break-words">
                         {notification.message || notification.description}
                       </div>
-
                       <div className="mt-2 text-xs text-gray-400">
                         {notification.student_name} &middot;&nbsp;
                         {new Date(notification.created_at).toLocaleString()}
                       </div>
-
                       {!notification.is_read && (
                         <button
                           onClick={() => markNotificationRead(notification.id)}
@@ -316,8 +268,6 @@ useEffect(() => {
                         </button>
                       )}
                     </div>
-
-                    {/* Link to student record */}
                     {notification.student_id && (
                       <Link
                         to={`/PersonalInformation/${notification.student_id}`}
