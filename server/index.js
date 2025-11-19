@@ -1801,79 +1801,13 @@ app.get('/api/committee/status-message', (req, res) => {
     try {
       const { rows } = await pool.query(sql, [committeeId]);
 
-      if (rows.length === 0) {
-        return res.json({ status_message: null });
-      }
-
-      res.json({ status_message: rows[0].status_message });
+      res.json({ status_message: rows[0]?.status_message ?? null });
     } catch (error) {
       console.error('Error fetching committee status_message:', error);
       res.status(500).send('Database error');
     }
   });
 });
-
-// ✅ GET recent notifications for committee
-app.get('/api/committee/notifications', (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token missing');
-
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized');
-
-    const committeeId = decoded.id;
-
-    const sql = `
-      SELECT n.id, n.title, n.message, n.type, n.is_read, n.created_at,
-             s.id AS student_id, s.name AS student_name
-      FROM bursary.notifications n
-      LEFT JOIN bursary.students s ON n.student_id = s.id
-      WHERE n.committee_id = $1
-      ORDER BY n.created_at DESC
-      LIMIT 50
-    `;
-
-    try {
-      const { rows } = await pool.query(sql, [committeeId]);
-      res.json(rows);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      res.status(500).send('Database error');
-    }
-  });
-});
-
-// ✅ POST mark notification as read
-app.post('/api/committee/notifications/:id/read', (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token missing');
-
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized');
-
-    const committeeId = decoded.id;
-    const notificationId = req.params.id;
-
-    const sql = `
-      UPDATE bursary.notifications
-      SET is_read = true
-      WHERE id = $1 AND committee_id = $2
-      RETURNING *
-    `;
-
-    try {
-      const { rows } = await pool.query(sql, [notificationId, committeeId]);
-      if (rows.length === 0) return res.status(404).send('Notification not found');
-
-      res.json({ success: true, notification: rows[0] });
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      res.status(500).send('Database error');
-    }
-  });
-});
-
-
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;

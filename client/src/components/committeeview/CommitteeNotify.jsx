@@ -11,6 +11,11 @@ import {
   faChartBar,
   faCog,
   faSignOutAlt,
+  faCheckCircle,
+  faUserEdit,
+  faFileUpload,
+  faTimesCircle,
+  faFileAlt,
   faEye
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -20,61 +25,42 @@ const CommitteeNotify = () => {
   const [committeeDetails, setCommitteeDetails] = useState({});
   const [statusMessage, setStatusMessage] = useState('');
   const [sidebarActive, setSidebarActive] = useState(false);
+  const [hasNewNotification, setHasNewNotification] = useState(false);
   const navigate = useNavigate();
 
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
-  const token = sessionStorage.getItem('authToken');
-  if (!token) navigate('/signin');
+   useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
 
-  // Fetch profile, status_message, notifications
-  useEffect(() => {
     const fetchData = async () => {
       try {
-        // Profile info
+        // Fetch committee profile info
         const profileRes = await axios.get(
           'https://e-bursary-backend.onrender.com/api/profile-committee',
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCommitteeDetails(profileRes.data || {});
 
-        // Status message
+        // Fetch status_message
         const statusRes = await axios.get(
           'https://e-bursary-backend.onrender.com/api/committee/status-message',
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setStatusMessage(statusRes.data?.status_message ?? '');
-
-        // Notifications
-        const notificationsRes = await axios.get(
-          'https://e-bursary-backend.onrender.com/api/committee/notifications',
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setNotifications(notificationsRes.data || []);
-      } catch (error) {
-        console.error('Error fetching committee data:', error);
+      } catch (err) {
+        console.error('Error fetching committee data:', err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [token]);
-
-  const markNotificationRead = async (id) => {
-    try {
-      await axios.post(
-        `https://e-bursary-backend.onrender.com/api/committee/notifications/${id}/read`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-      );
-    } catch (err) {
-      console.error('Error marking notification as read:', err);
-    }
-  };
+  }, [navigate]);
 
   const navItems = [
     { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
@@ -86,11 +72,6 @@ const CommitteeNotify = () => {
     { icon: faSignOutAlt, label: 'Logout', isLogout: true }
   ];
 
-  const getNotificationIcon = (type) => {
-    // Customize icons per notification type
-    return <FontAwesomeIcon icon={faBell} className="text-xl text-blue-500" />;
-  };
-
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       {/* Top Bar */}
@@ -101,6 +82,19 @@ const CommitteeNotify = () => {
             <h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
               Welcome: {committeeDetails.name || sessionStorage.getItem('userName')}
             </h2>
+            <div className="flex items-center space-x-2">
+              <img
+                src={
+                  committeeDetails.gender === 'Female'
+                    ? '/images/woman.png'
+                    : committeeDetails.gender === 'Male'
+                    ? '/images/patient.png'
+                    : '/images/user.png'
+                }
+                alt="User"
+                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
+              />
+            </div>
             <div className="block md:hidden">
               <FontAwesomeIcon
                 icon={faBars}
@@ -120,16 +114,32 @@ const CommitteeNotify = () => {
           ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
           ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}`}
         >
+          <div className="hidden md:flex justify-end mb-4">
+            <FontAwesomeIcon
+              icon={faBars}
+              className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
+              onClick={toggleSidebar}
+            />
+          </div>
+
           <ul className="flex flex-col h-full mt-6 space-y-10">
             {navItems.map((item, index) => (
-              <li key={index} className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`}>
+              <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
                 {item.isLogout ? (
                   <a
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      sessionStorage.clear();
-                      navigate('/');
+                      const token = sessionStorage.getItem('authToken');
+                      axios
+                        .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+                          headers: { Authorization: `Bearer ${token}` }
+                        })
+                        .catch(() => { })
+                        .finally(() => {
+                          sessionStorage.clear();
+                          navigate('/');
+                        });
                     }}
                     className={`flex items-center space-x-2 transition-all duration-200 ${sidebarActive ? 'justify-start' : 'justify-center'}`}
                   >
@@ -149,70 +159,30 @@ const CommitteeNotify = () => {
                     </span>
                   </Link>
                 )}
+
+                {!sidebarActive && (
+                  <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
+                    {item.label}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Content */}
-        <div className={`flex-1 ml-0 md:ml-64 md:p-4 mt-0 md:mt-2 transition-all duration-100 md:pr-10 md:pl-10`}>
+   {/* Content */}
+        <div className="flex-1 ml-0 md:ml-64 md:p-4 mt-0 md:mt-2 transition-all duration-100 md:pr-10 md:pl-10">
           <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[800px] mx-auto p-6">
-            <h2 className="text-xl md:text-2xl font-bold text-[#14213d] mb-4">Recent Student Notifications</h2>
-
-            {statusMessage && (
-              <div className="mb-4 p-4 bg-yellow-100 text-yellow-900 rounded-lg border-l-4 border-yellow-400">
-                <strong>Status Message:</strong> {statusMessage}
-              </div>
-            )}
+            <h2 className="text-xl md:text-2xl font-bold text-[#14213d] mb-4">Committee Status Message</h2>
 
             {loading ? (
-              <div className="text-center text-gray-600">Loading notifications...</div>
-            ) : notifications.length === 0 ? (
-              <div className="text-center text-gray-500">No notifications at this time.</div>
+              <div className="text-center text-gray-600">Loading status message...</div>
+            ) : statusMessage ? (
+              <div className="mb-4 p-4 bg-yellow-100 text-yellow-900 rounded-lg border-l-4 border-yellow-400">
+                {statusMessage}
+              </div>
             ) : (
-              <ul className="space-y-6">
-                {notifications.map((notification) => (
-                  <li
-                    key={notification.id}
-                    className={`flex items-center p-4 rounded-lg shadow-md bg-white border-l-4 transition ${notification.is_read ? 'border-gray-300 bg-gray-50' : 'border-blue-400 bg-white'}`}
-                  >
-                    {getNotificationIcon(notification.type)}
-                    <div className="flex-grow ml-4">
-                      <div className="flex items-center space-x-2">
-                        <span className={`font-bold ${notification.is_read ? 'text-gray-500' : 'text-[#14213d]'}`}>
-                          {notification.title || 'New Notification'}
-                        </span>
-                        {!notification.is_read && (
-                          <span className="text-xs text-blue-500 font-semibold px-2 py-0.5 bg-blue-100 rounded">New</span>
-                        )}
-                      </div>
-                      <div className="text-gray-700 mt-1 text-sm break-words">
-                        {notification.message}
-                      </div>
-                      <div className="mt-2 text-xs text-gray-400">
-                        {notification.student_name} &middot;&nbsp;
-                        {new Date(notification.created_at).toLocaleString()}
-                      </div>
-                      {!notification.is_read && (
-                        <button
-                          onClick={() => markNotificationRead(notification.id)}
-                          className="mt-3 px-2 py-1 rounded bg-blue-600 text-white font-semibold hover:bg-blue-800 transition"
-                        >
-                          Mark as read
-                        </button>
-                      )}
-                    </div>
-                    {notification.student_id && (
-                      <Link
-                        to={`/PersonalInformation/${notification.student_id}`}
-                        className="ml-6 text-blue-600 font-bold hover:underline flex items-center space-x-1"
-                      >
-                        <FontAwesomeIcon icon={faEye} /> <span>View Student</span>
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <div className="text-center text-gray-500">No status message available.</div>
             )}
           </div>
         </div>
