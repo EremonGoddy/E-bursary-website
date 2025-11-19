@@ -1782,15 +1782,15 @@ app.post('/api/notify-committee-update/:userId', async (req, res) => {
   }
 });
 
-// ✅ GET committee status_message and is_new
-app.get('/api/committee/status-message', (req, res) => {
+// ✅ GET committee status_message
+app.get('/api/committee/status-message', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token missing');
 
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized');
 
-    const committeeId = decoded.id; // committee ID from token
+    const committeeId = decoded.id;
 
     const sql = `
       SELECT status_message, is_new
@@ -1800,10 +1800,7 @@ app.get('/api/committee/status-message', (req, res) => {
 
     try {
       const { rows } = await pool.query(sql, [committeeId]);
-
-      if (!rows[0]) {
-        return res.status(404).json({ message: 'Committee member not found' });
-      }
+      if (!rows[0]) return res.status(404).json({ message: 'Committee member not found' });
 
       res.json({
         status_message: rows[0].status_message ?? null,
@@ -1816,8 +1813,8 @@ app.get('/api/committee/status-message', (req, res) => {
   });
 });
 
-// ✅ Optional: Mark message as read (set is_new = false)
-app.post('/api/committee/status-message/read', (req, res) => {
+// ✅ POST mark message as read (set is_new = false)
+app.post('/api/committee/status-message/read', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token missing');
 
@@ -1825,7 +1822,6 @@ app.post('/api/committee/status-message/read', (req, res) => {
     if (err) return res.status(401).send('Unauthorized');
 
     const committeeId = decoded.id;
-
     const sql = `
       UPDATE bursary.profile_committee
       SET is_new = false
@@ -1842,6 +1838,7 @@ app.post('/api/committee/status-message/read', (req, res) => {
     }
   });
 });
+
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;

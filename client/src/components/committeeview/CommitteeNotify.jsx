@@ -3,19 +3,27 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faBars, faHouse, faUser, faUsers, faBell, faChartBar, faCog, faSignOutAlt
+  faBars,
+  faHouse,
+  faUser,
+  faUsers,
+  faBell,
+  faChartBar,
+  faCog,
+  faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 const CommitteeNotify = () => {
   const [loading, setLoading] = useState(true);
   const [committeeDetails, setCommitteeDetails] = useState({});
   const [statusMessage, setStatusMessage] = useState('');
-  const [isNew, setIsNew] = useState(false);
   const [sidebarActive, setSidebarActive] = useState(false);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
   const navigate = useNavigate();
 
   const toggleSidebar = () => setSidebarActive(!sidebarActive);
 
+  // ✅ Fetch committee profile & status message
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
@@ -23,41 +31,42 @@ const CommitteeNotify = () => {
       return;
     }
 
-    const fetchStatus = async () => {
+    const fetchData = async () => {
       try {
-        // Fetch committee info and status_message
-        const res = await axios.get(
-          'https://e-bursary-backend.onrender.com/api/committee/status-message',
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setStatusMessage(res.data.status_message || '');
-        setIsNew(res.data.is_new || false);
-
-        // Fetch committee name and gender for top bar
+        // Fetch committee profile info
         const profileRes = await axios.get(
           'https://e-bursary-backend.onrender.com/api/profile-committee',
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCommitteeDetails(profileRes.data || {});
 
-        // Optional: Mark as read after displaying
-        if (res.data.is_new) {
+        // Fetch committee status message
+        const statusRes = await axios.get(
+          'https://e-bursary-backend.onrender.com/api/committee/status-message',
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setStatusMessage(statusRes.data?.status_message ?? '');
+        setHasNewMessage(statusRes.data?.is_new ?? false);
+
+        // Mark message as read immediately
+        if (statusRes.data?.is_new) {
           await axios.post(
             'https://e-bursary-backend.onrender.com/api/committee/status-message/read',
             {},
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          setIsNew(false);
+          setHasNewMessage(false);
+          sessionStorage.setItem('hasNewMessage', 'false');
         }
       } catch (err) {
-        console.error('Error fetching committee status:', err);
+        console.error('Error fetching committee data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStatus();
+    fetchData();
   }, [navigate]);
 
   const navItems = [
@@ -67,17 +76,17 @@ const CommitteeNotify = () => {
     { icon: faBell, label: 'Notification', to: '/committeenotify' },
     { icon: faChartBar, label: 'Reports', to: '/committeereport' },
     { icon: faCog, label: 'Settings', to: '/committeesetting' },
-    { icon: faSignOutAlt, label: 'Logout', isLogout: true }
+    { icon: faSignOutAlt, label: 'Logout', isLogout: true },
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       {/* Top Bar */}
       <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-[#14213d]">EBursary</h1>
-          <div className="flex items-center space-x-2">
-            <h2 className="font-bold text-[#14213d]">
+          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">EBursary</h1>
+          <div className="flex items-center space-x-1">
+            <h2 className="mr-1 md:mr-5 text-sm md:text-lg font-bold text-[#14213d]">
               Welcome: {committeeDetails.name || sessionStorage.getItem('userName')}
             </h2>
             <img
@@ -94,7 +103,7 @@ const CommitteeNotify = () => {
             <div className="block md:hidden">
               <FontAwesomeIcon
                 icon={faBars}
-                className="text-xl cursor-pointer"
+                className="text-xl cursor-pointer text-[#14213d]"
                 onClick={toggleSidebar}
               />
             </div>
@@ -106,39 +115,51 @@ const CommitteeNotify = () => {
       <div className="flex flex-col md:flex-row pt-20 min-h-screen">
         {/* Sidebar */}
         <div
-          className={`fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14 transition-all duration-100 ease-in-out
-            ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
-            ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}`}
+          className={`fixed top-0 left-0 z-40 bg-[#14213d] text-white h-full mt-10 md:mt-14 transition-all duration-100 ease-in-out overflow-visible
+          ${sidebarActive ? 'w-[180px] p-4' : 'w-0 p-0'}
+          ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}`}
         >
+          <div className="hidden md:flex justify-end mb-4">
+            <FontAwesomeIcon
+              icon={faBars}
+              className={`text-white cursor-pointer text-xl ${sidebarActive ? 'ml-auto' : 'mr-1'}`}
+              onClick={toggleSidebar}
+            />
+          </div>
+
           <ul className="flex flex-col h-full mt-6 space-y-10">
             {navItems.map((item, index) => (
-              <li key={index}>
+              <li className={`group relative ${item.isLogout ? 'mt-30 md:mt-45' : ''}`} key={index}>
                 {item.isLogout ? (
                   <a
                     href="#"
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
                       const token = sessionStorage.getItem('authToken');
-                      axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
-                        headers: { Authorization: `Bearer ${token}` }
-                      }).finally(() => {
-                        sessionStorage.clear();
-                        navigate('/');
-                      });
+                      await axios.post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+                        headers: { Authorization: `Bearer ${token}` },
+                      }).catch(() => {});
+                      sessionStorage.clear();
+                      navigate('/');
                     }}
-                    className="flex items-center space-x-2"
+                    className={`flex items-center space-x-2 transition-all duration-200 ${sidebarActive ? 'justify-start' : 'justify-center'}`}
                   >
-                    <FontAwesomeIcon icon={item.icon} />
-                    <span>{item.label}</span>
+                    <FontAwesomeIcon icon={item.icon} className="text-xl" />
+                    <span className={`${sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'}`}>{item.label}</span>
                   </a>
                 ) : (
-                  <Link to={item.to} className="flex items-center space-x-2">
-                    <FontAwesomeIcon icon={item.icon} />
-                    <span>{item.label}</span>
-                    {item.label === 'Notification' && isNew && (
-                      <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
-                    )}
+                  <Link
+                    to={item.to}
+                    className={`flex items-center space-x-2 transition-all duration-200 ${sidebarActive ? 'justify-start' : 'justify-center'}`}
+                  >
+                    <FontAwesomeIcon icon={item.icon} className="text-xl" />
+                    <span className={`${sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'}`}>{item.label}</span>
                   </Link>
+                )}
+                {!sidebarActive && (
+                  <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
+                    {item.label}
+                  </span>
                 )}
               </li>
             ))}
@@ -146,14 +167,13 @@ const CommitteeNotify = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 ml-0 md:ml-64 md:p-4 mt-2">
-          <div className="backdrop-blur-xl bg-white/80 border shadow-xl rounded-2xl max-w-[800px] mx-auto p-6">
-            <h2 className="text-xl font-bold text-[#14213d] mb-4">Committee Status Message</h2>
-
+        <div className="flex-1 ml-0 md:ml-64 md:p-4 mt-0 md:mt-2 transition-all duration-100 md:pr-10 md:pl-10">
+          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl max-w-[800px] mx-auto p-6">
+            <h2 className="text-xl md:text-2xl font-bold text-[#14213d] mb-4">Committee Status Message</h2>
             {loading ? (
               <div className="text-center text-gray-600">Loading status message...</div>
             ) : statusMessage ? (
-              <div className={`mb-4 p-4 rounded-lg border-l-4 ${isNew ? 'bg-yellow-100 border-yellow-400 text-yellow-900' : 'bg-gray-100 border-gray-300 text-gray-700'}`}>
+              <div className="mb-4 p-4 bg-yellow-100 text-yellow-900 rounded-lg border-l-4 border-yellow-400">
                 {statusMessage}
               </div>
             ) : (
