@@ -1782,6 +1782,40 @@ app.post('/api/notify-committee-update/:userId', async (req, res) => {
   }
 });
 
+// ✅ GET committee status_message
+app.get('/api/committee/status-message', (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return res.status(403).send('Token missing');
+
+  jwt.verify(token, secret, async (err, decoded) => {
+    if (err) return res.status(401).send('Unauthorized');
+
+    const committeeId = decoded.id; // committee ID from token
+
+    const sql = `
+      SELECT status_message 
+      FROM bursary.profile_committee 
+      WHERE user_id = $1
+    `;
+
+    try {
+      const { rows } = await pool.query(sql, [committeeId]);
+
+      if (rows.length === 0) {
+        return res.json({ status_message: null });
+      }
+
+      res.json({
+        status_message: rows[0].status_message
+      });
+    } catch (error) {
+      console.error('Error fetching committee status_message:', error);
+      res.status(500).send('Database error');
+    }
+  });
+});
+
+
 
 
 // ✅ Start server

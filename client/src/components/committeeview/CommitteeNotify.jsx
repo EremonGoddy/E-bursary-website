@@ -66,6 +66,36 @@ const CommitteeNotify = () => {
       .catch(() => setLoading(false));
   }, []);
 
+  // 🔵 Fetch committee status_message
+useEffect(() => {
+  const token = sessionStorage.getItem('authToken');
+  if (!token) return;
+
+  axios.get('https://e-bursary-backend.onrender.com/api/committee/status-message', {
+    headers: { Authorization: token }
+  })
+  .then(res => {
+    const msg = res.data.status_message;
+
+    if (msg) {
+      setNotifications(prev => [
+        {
+          id: 'status_msg',
+          title: "Status Update",
+          message: msg,
+          type: "status_message",
+          is_read: false,
+          created_at: new Date(),
+          student_name: "System"
+        },
+        ...prev
+      ]);
+    }
+  })
+  .catch(err => console.error("Error fetching status_message:", err));
+}, []);
+
+
   // Handler for marking notification as read
   const markNotificationRead = async (id) => {
     const token = sessionStorage.getItem('authToken');
