@@ -10,9 +10,45 @@ const images = [
 "/images/homepic.jpg",
 "/images/homephoto.jpg",
 ];
-
 const [currentImageIndex, setCurrentImageIndex] = useState(0);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const [timeLeft, setTimeLeft] = useState({
+days: 0,
+hours: 0,
+minutes: 0,
+seconds: 0,
+});
+
+
+useEffect(() => {
+const deadline = new Date("2025-11-26T16:50:59").getTime();
+
+const timer = setInterval(() => {
+const now = new Date().getTime();
+const distance = deadline - now;
+
+if (distance <= 0) {
+clearInterval(timer);
+setTimeLeft({
+days: 0,
+hours: 0,
+minutes: 0,
+seconds: 0,
+});
+return;
+}
+
+setTimeLeft({
+days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+seconds: Math.floor((distance % (1000 * 60)) / 1000),
+});
+}, 1000);
+
+return () => clearInterval(timer);
+}, []);
+
 
 useEffect(() => {
 const interval = setInterval(() => {
@@ -163,7 +199,24 @@ The Turkana County Bursary Program is designed to support deserving students fro
 <h2 className="text-[1.3rem] md:text-[1.35rem]  font-bold text-[#14213d] text-center">Key Dates</h2>
 <ul className=" pl-5 mt-4  text-[1rem] md:text-[1.1rem] ">
 <li className="text-[#14213d] px-3 py-2">📅 Application Open: <strong>12/3/2024</strong></li>
-<li className="text-[#14213d] px-3 py-2">📅 Deadline: <strong>25/3/2024</strong></li>
+<li className="text-[#14213d] px-3 py-2">
+📅Deadline: <strong>25/3/2024</strong>
+<div
+className={`mt-1 font-semibold text-[0.95rem] md:text-[1rem] ${
+timeLeft.days === 0 &&
+timeLeft.hours === 0 &&
+timeLeft.minutes === 0 &&
+timeLeft.seconds === 0
+? "text-red-600" // Deadline reached
+: "text-green-600" // Countdown running
+}`}
+>
+Countdown: {timeLeft.days}d : {timeLeft.hours}h : {timeLeft.minutes}m :{" "}
+{timeLeft.seconds}s
+</div>
+</li>
+
+
 <li className="text-[#14213d] px-3 py-2">📢 Recipients Announced: <strong>2/4/2024</strong></li>
 <li className="text-[#14213d] px-3 py-2">💰 Disbursement: <strong>12/4/2024</strong></li>
 </ul>
