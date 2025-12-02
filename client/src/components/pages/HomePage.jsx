@@ -21,7 +21,7 @@ seconds: 0,
 
 
 useEffect(() => {
-const deadline = new Date("2025-11-26T16:50:59").getTime();
+const deadline = new Date("2026-03-25T16:50:59").getTime();
 
 const timer = setInterval(() => {
 const now = new Date().getTime();
@@ -198,9 +198,9 @@ The Turkana County Bursary Program is designed to support deserving students fro
 </div>
 <h2 className="text-[1.3rem] md:text-[1.35rem]  font-bold text-[#14213d] text-center">Key Dates</h2>
 <ul className=" pl-5 mt-4  text-[1rem] md:text-[1.1rem] ">
-<li className="text-[#14213d] px-3 py-2">📅 Application Open: <strong>12/3/2024</strong></li>
+<li className="text-[#14213d] px-3 py-2">📅 Application Open: <strong>12/11/2025</strong></li>
 <li className="text-[#14213d] px-3 py-2">
-📅Deadline: <strong>25/3/2024</strong>
+📅Deadline: <strong>25/3/2026</strong>
 <div
 className={`mt-1 font-semibold text-[0.95rem] md:text-[1rem] ${
 timeLeft.days === 0 &&
