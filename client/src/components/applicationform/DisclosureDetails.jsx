@@ -444,7 +444,7 @@ No
 <div className="flex justify-end mt-4 md:col-span-2">
 <button
 type="submit"
-className="bg-[#14213d] text-white px-10 cursor-pointer py-2 min-w-[100px] md:min-w-[160px] rounded hover:bg-gray-700 transition duration-200"
+className="bg-[#14213d] text-white px-10 cursor-pointer py-2 min-w-[100px] md:min-w-[160px] rounded focus:ring-2 focus:ring-indigo-600 transition duration-200"
 >
 Next
 </button>

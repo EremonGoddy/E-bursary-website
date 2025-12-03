@@ -497,7 +497,7 @@ required
 <button
 type="submit"
 onClick={handleSubmit}
-className="bg-[#14213d] text-white cursor-pointer px-10 py-2 font-bold min-w-[100px] md:min-w-[160px] rounded hover:bg-gray-600 transition duration-200"
+className="bg-[#14213d] text-white cursor-pointer px-10 py-2 font-bold min-w-[100px] md:min-w-[160px] rounded focus:ring-2 focus:ring-indigo-600 transition duration-200"
 >
 Next
 </button>

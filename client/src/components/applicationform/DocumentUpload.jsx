@@ -504,7 +504,7 @@ className="form-input w-full border border-gray-300 rounded px-2 py-1 focus:bord
 <div className="flex justify-end mt-8">
 <button
 type="submit"
-className="bg-[#14213d] text-white px-10 py-2 font-bold cursor-pointer min-w-[100px] md:min-w-[160px] rounded hover:bg-gray-700 transition duration-200"
+className="bg-[#14213d] text-white px-10 py-2 font-bold cursor-pointer min-w-[100px] md:min-w-[160px] rounded focus:ring-2 focus:ring-indigo-600 transition duration-200"
 >
 Submit
 </button>

@@ -683,7 +683,7 @@ required
 <button
 type="submit"
 onClick={handleSubmit}
-className="bg-[#14213d] font-bold text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded cursor-pointer hover:bg-gray-600 transition duration-200"
+className="bg-[#14213d] font-bold text-white px-10 py-2 min-w-[100px] md:min-w-[160px] rounded cursor-pointer focus:ring-2 focus:ring-indigo-600 transition duration-200"
 >
 Next
 </button>
