@@ -586,17 +586,23 @@ villages[formData.ward]?.map((village) => (
 </select>
 </div>
 <div>
-<label htmlFor="birth" className="block text-[#14213d] font-medium mb-1">Date of Birth</label>
-<input
-type="date"
-id="birth"
-name="birth"
-value={formData.birth}
-onChange={handleChange}
-className="form-input w-full border cursor-pointer text-[#14213d] border-gray-300 rounded px-3 py-2 focus-within:ring-[#14213d]"
-required
-/>
+  <label className="block text-[#14213d] font-medium mb-1">
+    Date of Birth
+  </label>
+
+  <input
+    type="date"
+    id="birth"
+    name="birth"
+    value={formData.birth}
+    onChange={handleChange}
+    min="1950-01-01"
+    max="2025-12-31"
+    className="w-full border cursor-pointer text-[#14213d] border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
+    required
+  />
 </div>
+
 <div>
 <label className="block text-[#14213d] font-medium mb-1">Gender</label>
 <div className="flex items-center gap-4 ">
