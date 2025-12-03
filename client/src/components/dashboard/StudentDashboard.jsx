@@ -521,7 +521,7 @@ ${sidebarActive
 `}
               >
                 <div className="text-center space-y-2">
-                  <h2 className="text-xl font-bold text-[#14213d]">
+                  <h2 className="text-lg md:text-xl font-bold text-[#14213d]">
                     {userName}, your Dashboard is currently empty
                   </h2>
                   <p className=" text-[#14213d]">
