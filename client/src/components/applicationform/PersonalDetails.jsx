@@ -590,17 +590,24 @@ villages[formData.ward]?.map((village) => (
     Date of Birth
   </label>
 
-  <input
-    type="date"
-    id="birth"
-    name="birth"
-    value={formData.birth}
-    onChange={handleChange}
-    min="1950-01-01"
-    max="2025-12-31"
-    className="w-full border cursor-pointer text-[#14213d] border-gray-300 rounded px-3 py-2 focus:ring-[#14213d]"
-    required
-  />
+ <input
+  type="text"
+  placeholder="YYYY-MM-DD"
+  value={formData.birth}
+  onChange={(e) => {
+    const v = e.target.value.replace(/[^0-9]/g, "");
+    let formatted = v;
+
+    if (v.length > 4) formatted = v.slice(0, 4) + "-" + v.slice(4);
+    if (v.length > 6) formatted = formatted.slice(0, 7) + "-" + v.slice(6, 8);
+
+    handleChange({
+      target: { name: "birth", value: formatted }
+    });
+  }}
+  className="w-full border border-gray-300 rounded px-3 py-2 text-[#14213d]"
+/>
+
 </div>
 
 <div>
