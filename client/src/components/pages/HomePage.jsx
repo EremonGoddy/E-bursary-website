@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faXmark, faArrowRight, faBookOpen, faCalendarDays, faBullhorn, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faArrowRight, faBookOpen, faCalendarDays, faBullhorn, faGraduationCap, faHourglassStart, faHourglassEnd,faCoins  } from "@fortawesome/free-solid-svg-icons";
 import "./HomePage.css";
 
 const HomePage = () => {
@@ -67,7 +67,7 @@ Ebursary
 </Link>
 <div className="space-x-4 hidden md:flex">
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-1 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -75,7 +75,7 @@ to="/">
 Home
 </Link>
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -83,7 +83,7 @@ to="/about">
 About
 </Link>
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -91,7 +91,7 @@ to="/services">
 Services
 </Link>
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -142,7 +142,7 @@ Contact
 </nav>
 
 {/* Image Slider */}
-<div id="carouselExample" className="relative mt-[50px]">
+<div id="carouselExample" className="relative mt-[45px]">
 <div className="carousel-inner">
 {images.map((image, index) => (
 <div
@@ -198,9 +198,9 @@ The Turkana County Bursary Program is designed to support deserving students fro
 </div>
 <h2 className="text-[1.3rem] md:text-[1.35rem]  font-bold text-[#14213d] text-center">Key Dates</h2>
 <ul className=" pl-5 mt-4  text-[1rem] md:text-[1.1rem] ">
-<li className="text-[#14213d] px-3 py-2">📅 Application Open: <strong>12/11/2025</strong></li>
+<li className="text-[#14213d] px-3 py-2"><FontAwesomeIcon icon={faHourglassStart} className="text-green-600 text-[1.4rem] md:text-[1.4rem]"/> Application Open: <strong>12/11/2025</strong></li>
 <li className="text-[#14213d] px-3 py-2">
-📅Deadline: <strong>25/3/2026</strong>
+<FontAwesomeIcon icon={faHourglassEnd} className="text-red-600 text-[1.4rem] md:text-[1.4rem]"/> Deadline: <strong>25/7/2026</strong>
 <div
 className={`mt-1 font-semibold text-[0.95rem] md:text-[1rem] ${
 timeLeft.days === 0 &&
@@ -217,8 +217,8 @@ Countdown: {timeLeft.days}d : {timeLeft.hours}h : {timeLeft.minutes}m :{" "}
 </li>
 
 
-<li className="text-[#14213d] px-3 py-2">📢 Recipients Announced: <strong>2/4/2024</strong></li>
-<li className="text-[#14213d] px-3 py-2">💰 Disbursement: <strong>12/4/2024</strong></li>
+<li className="text-[#14213d] px-3 py-2"> <FontAwesomeIcon icon={faBullhorn} className=" text-[1.4rem] md:text-[1.4rem]"/>  Recipients Announced: <strong>2/4/2024</strong></li>
+<li className="text-[#14213d] px-3 py-2"><FontAwesomeIcon icon={faCoins} className="text-[#0D6EFD] text-[1.4rem] md:text-[1.4rem]"/> Disbursement: <strong>12/4/2024</strong></li>
 </ul>
 </div>
 
