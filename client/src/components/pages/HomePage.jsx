@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faXmark, faArrowRight, faBookOpen, faCalendarDays, faBullhorn, faGraduationCap, faHourglassStart, faHourglassEnd,faCoins  } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faArrowRight, faBookOpen, faCalendarDays, faBullhorn, faGraduationCap, faHourglassStart, faHourglassEnd,faCoins, faStopwatch  } from "@fortawesome/free-solid-svg-icons";
 import "./HomePage.css";
 
 const HomePage = () => {
@@ -201,24 +201,34 @@ The Turkana County Bursary Program is designed to support deserving students fro
 <li className="text-[#14213d] px-3 py-2"><FontAwesomeIcon icon={faHourglassStart} className="text-green-600 text-[1.4rem] md:text-[1.4rem]"/> Application Open: <strong>12/11/2025</strong></li>
 <li className="text-[#14213d] px-3 py-2">
 <FontAwesomeIcon icon={faHourglassEnd} className="text-red-600 text-[1.4rem] md:text-[1.4rem]"/> Deadline: <strong>25/7/2026</strong>
-<div
-className={`mt-1 font-semibold text-[0.95rem] md:text-[1rem] ${
-timeLeft.days === 0 &&
-timeLeft.hours === 0 &&
-timeLeft.minutes === 0 &&
-timeLeft.seconds === 0
-? "text-red-600" // Deadline reached
-: "text-green-600" // Countdown running
-}`}
->
-Countdown: {timeLeft.days}d : {timeLeft.hours}h : {timeLeft.minutes}m :{" "}
-{timeLeft.seconds}s
+<div className="mt-4 font-semibold text-[0.95rem] md:text-[1.1rem]">
+  <FontAwesomeIcon
+    icon={faStopwatch}
+    className="text-blue-600 text-[1.4rem] md:text-[1.4rem]"
+  />
+
+  <span className="text-gray-700 ml-2">
+    Countdown:
+  </span>
+
+  <span
+    className={`ml-1 ${
+      timeLeft.days === 0 &&
+      timeLeft.hours === 0 &&
+      timeLeft.minutes === 0 &&
+      timeLeft.seconds === 0
+        ? "text-red-600"
+        : "text-green-600"
+    }`}
+  >
+    {timeLeft.days}d : {timeLeft.hours}h : {timeLeft.minutes}m : {timeLeft.seconds}s
+  </span>
 </div>
 </li>
 
 
-<li className="text-[#14213d] px-3 py-2"> <FontAwesomeIcon icon={faBullhorn} className=" text-[1.4rem] md:text-[1.4rem]"/>  Recipients Announced: <strong>2/4/2024</strong></li>
-<li className="text-[#14213d] px-3 py-2"><FontAwesomeIcon icon={faCoins} className="text-[#0D6EFD] text-[1.4rem] md:text-[1.4rem]"/> Disbursement: <strong>12/4/2024</strong></li>
+<li className="text-[#14213d] px-3 py-2"> <FontAwesomeIcon icon={faBullhorn} className=" text-[#7c3aed] text-[1.4rem] md:text-[1.4rem]"/>  Recipients Announced: <strong>2/4/2024</strong></li>
+<li className="text-[#14213d] px-3 py-2"><FontAwesomeIcon icon={faCoins} className="text-[#059669] text-[1.4rem] md:text-[1.4rem]"/> Disbursement: <strong>12/4/2024</strong></li>
 </ul>
 </div>
 
