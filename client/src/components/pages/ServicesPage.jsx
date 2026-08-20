@@ -17,7 +17,7 @@ Ebursary
 </Link>
 <div className="space-x-4 hidden md:flex">
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -25,7 +25,7 @@ to="/">
 Home
 </Link>
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -33,7 +33,7 @@ to="/about">
 About
 </Link>
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
@@ -41,7 +41,7 @@ to="/services">
 Services
 </Link>
 <Link
-className="relative text-[1.3rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
+className="relative text-[1.1rem] text-[#14213d] font-semibold px-3 py-2 transition duration-300 hover:text-[#fca311] 
 before:absolute before:bottom-0 before:left-2 before:h-[2.5px] before:w-0 
 before:bg-[#fca311] before:transition-all before:duration-300 
 hover:before:w-[80%]"
