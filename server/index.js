@@ -1632,18 +1632,32 @@ app.post('/api/profile-form', (req, res) => {
   jwt.verify(token, secret, (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
 
-    const { fullname, phone_no, national_id, subcounty, ward, position, gender } = req.body;
+    const { 
+      fullname, 
+      phone_no, 
+      national_id, 
+      subcounty, 
+      ward, 
+      position, 
+      gender,
+      signature  // NEW: Accept signature (base64 image data)
+    } = req.body;
 
     if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position || !gender) {
       return res.status(400).send('All profile fields are required');
+    }
+
+    // NEW: Validate signature if provided
+    if (signature && typeof signature !== 'string') {
+      return res.status(400).send('Signature must be a valid image string');
     }
 
     const email = decoded.email;
 
     const sqlUpsert = `
       INSERT INTO bursary.profile_committee 
-        (fullname, email, phone_no, national_id, subcounty, ward, position, gender)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        (fullname, email, phone_no, national_id, subcounty, ward, position, gender, signature)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       ON CONFLICT (email) 
       DO UPDATE SET
         fullname = EXCLUDED.fullname,
@@ -1652,7 +1666,8 @@ app.post('/api/profile-form', (req, res) => {
         subcounty = EXCLUDED.subcounty,
         ward = EXCLUDED.ward,
         position = EXCLUDED.position,
-        gender = EXCLUDED.gender
+        gender = EXCLUDED.gender,
+        signature = EXCLUDED.signature
       RETURNING *;
     `;
 
@@ -1664,7 +1679,8 @@ app.post('/api/profile-form', (req, res) => {
       subcounty,
       ward,
       position,
-      gender
+      gender,
+      signature || null  // NEW: Pass signature or null if not provided
     ], (err, result) => {
       if (err) {
         console.error('Error inserting/updating committee data:', err);
@@ -1678,7 +1694,6 @@ app.post('/api/profile-form', (req, res) => {
     });
   });
 });
-
 
 
 app.get('/api/comreport', (req, res) => {
