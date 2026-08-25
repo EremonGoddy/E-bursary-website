@@ -24,8 +24,6 @@ const StudentReport = () => {
   const [studentProfile, setStudentProfile] = useState({});
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(false);
-  const [committeeSignature, setCommitteeSignature] = useState(null); // NEW: Store committee signature
-  const [loadingSignature, setLoadingSignature] = useState(false); // NEW: Loading state
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
@@ -41,18 +39,14 @@ const StudentReport = () => {
     } else {
       setUserName(name);
       
-      // Fetch report data
+      // Fetch report data - UPDATED
       axios
         .get('https://e-bursary-backend.onrender.com/api/reports', {
           headers: { Authorization: token },
         })
         .then((response) => {
-          setStudentDetails(response.data);
-          
-          // NEW: Fetch committee signature after getting report details
-          if (response.data.approved_by_committee) {
-            fetchCommitteeSignature(response.data.approved_by_committee, token);
-          }
+          console.log('Report response:', response.data); // DEBUG: Check what's coming back
+          setStudentDetails(response.data); // ✅ This now includes committee_signature
         })
         .catch((error) =>
           console.error('Error fetching student report data:', error)
@@ -71,28 +65,6 @@ const StudentReport = () => {
         });
     }
   }, [navigate]);
-
-  // NEW: Fetch committee signature
-  const fetchCommitteeSignature = async (committeeEmail, token) => {
-    try {
-      setLoadingSignature(true);
-      const response = await axios.get(
-        `https://e-bursary-backend.onrender.com/api/profile-committee/${committeeEmail}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      
-      if (response.data && response.data.signature) {
-        setCommitteeSignature(response.data.signature);
-      }
-    } catch (error) {
-      console.error('Error fetching committee signature:', error);
-      setCommitteeSignature(null);
-    } finally {
-      setLoadingSignature(false);
-    }
-  };
 
   // Check for new messages and document upload status
   useEffect(() => {
@@ -154,7 +126,7 @@ const StudentReport = () => {
     }
   };
 
-  // Download PDF utility - UPDATED with committee signature
+  // Download PDF utility - UPDATED to use committee_signature from studentDetails
   const downloadReport = React.useCallback(() => {
     const doc = new jsPDF();
     doc.setFont('times', 'normal');
@@ -222,10 +194,10 @@ const StudentReport = () => {
       styles: { font: 'times' },
     });
 
-    // NEW: Add Committee Signature Section
+    // UPDATED: Add Committee Signature Section - Using committee_signature from studentDetails
     const signatureSectionY = doc.lastAutoTable.finalY + 20;
     
-    if (committeeSignature) {
+    if (studentDetails.committee_signature) {
       try {
         // Add signature heading
         doc.setFontSize(12);
@@ -233,7 +205,7 @@ const StudentReport = () => {
         doc.text('Committee Signature', 20, signatureSectionY);
         
         // Add signature image
-        doc.addImage(committeeSignature, 'PNG', 20, signatureSectionY + 8, 50, 25);
+        doc.addImage(studentDetails.committee_signature, 'PNG', 20, signatureSectionY + 8, 50, 25);
         
         // Add approval date
         doc.setFont('times', 'normal');
@@ -258,7 +230,7 @@ const StudentReport = () => {
 
     // Save must be LAST after all content is added!
     doc.save('Bursary_Report.pdf');
-  }, [studentDetails, committeeSignature]);
+  }, [studentDetails]);
 
   // Prepare report data (for mobile)
   const reportRows = [
@@ -507,13 +479,13 @@ const StudentReport = () => {
               </div>
             </div>
 
-            {/* Committee Signature Display */}
-            {committeeSignature && (
+            {/* UPDATED: Committee Signature Display */}
+            {studentDetails.committee_signature && (
               <div className="mt-6 pt-6 border-t">
                 <h3 className="text-lg font-bold text-[#14213d] mb-3">Committee Signature</h3>
                 <div className="flex items-center gap-4">
                   <img
-                    src={committeeSignature}
+                    src={studentDetails.committee_signature}
                     alt="Committee Signature"
                     className="border border-gray-300 rounded w-40 h-24 object-contain"
                   />
@@ -524,15 +496,8 @@ const StudentReport = () => {
               </div>
             )}
 
-            {/* Loading signature state */}
-            {loadingSignature && (
-              <div className="mt-6 pt-6 border-t">
-                <p className="text-center text-gray-600">Loading committee signature...</p>
-              </div>
-            )}
-
             {/* No signature message */}
-            {!committeeSignature && !loadingSignature && (
+            {!studentDetails.committee_signature && (
               <div className="text-center mt-4 text-[#14213d] font-medium">
                 Digital Signature: <span className="text-[#e63946]">{studentDetails.digital_signature || 'Pending'}</span>
               </div>
