@@ -926,23 +926,26 @@ app.get('/api/reports', (req, res) => {
 
     const sqlGet = `
       SELECT 
-        'REFXE' || LPAD(user_id::text, 2, '0') AS reference_number,
-        fullname,
-        email,
-        subcounty,
-        ward,
-        village,
-        TO_CHAR(birth, 'YYYY-MM-DD') AS birth,
-        gender,
-        institution,
-        year,
-        admission,
-        status,
-        bursary,
-        approved_by_committee,
-        allocation_date
-      FROM bursary.personal_details 
-      WHERE email = $1
+        'REFXE' || LPAD(pd.user_id::text, 2, '0') AS reference_number,
+        pd.fullname,
+        pd.email,
+        pd.subcounty,
+        pd.ward,
+        pd.village,
+        TO_CHAR(pd.birth, 'YYYY-MM-DD') AS birth,
+        pd.gender,
+        pd.institution,
+        pd.year,
+        pd.admission,
+        pd.status,
+        pd.bursary,
+        pd.approved_by_committee,
+        pd.allocation_date,
+        pc.signature as committee_signature
+      FROM bursary.personal_details pd
+      LEFT JOIN bursary.profile_committee pc 
+        ON pd.approved_by_committee = pc.email
+      WHERE pd.email = $1
     `;
 
     try {
@@ -964,6 +967,7 @@ app.get('/api/reports', (req, res) => {
       res.json({
         ...student,
         digital_signature, // Add placeholder signature to response
+        committee_signature: student.committee_signature || null  // ✅ Add actual signature from database
       });
 
     } catch (err) {
@@ -972,7 +976,6 @@ app.get('/api/reports', (req, res) => {
     }
   });
 });
-
 
 app.put('/api/student/update', (req, res) => {
   const token = req.headers['authorization'];
