@@ -39,18 +39,23 @@ const StudentReport = () => {
     } else {
       setUserName(name);
       
-      // Fetch report data - UPDATED
+      // Fetch report data
       axios
         .get('https://e-bursary-backend.onrender.com/api/reports', {
           headers: { Authorization: token },
         })
         .then((response) => {
-          console.log('Report response:', response.data); // DEBUG: Check what's coming back
-          setStudentDetails(response.data); // ✅ This now includes committee_signature
+          console.log('========== FULL RESPONSE DATA ==========');
+          console.log('Full Response:', response.data);
+          console.log('Committee Signature:', response.data.committee_signature);
+          console.log('Has Signature:', !!response.data.committee_signature);
+          console.log('=========================================');
+          
+          setStudentDetails(response.data);
         })
-        .catch((error) =>
-          console.error('Error fetching student report data:', error)
-        );
+        .catch((error) => {
+          console.error('Error fetching student report data:', error);
+        });
       
       // Fetch student profile data
       axios
@@ -126,7 +131,7 @@ const StudentReport = () => {
     }
   };
 
-  // Download PDF utility - UPDATED to use committee_signature from studentDetails
+  // Download PDF utility
   const downloadReport = React.useCallback(() => {
     const doc = new jsPDF();
     doc.setFont('times', 'normal');
@@ -194,7 +199,7 @@ const StudentReport = () => {
       styles: { font: 'times' },
     });
 
-    // UPDATED: Add Committee Signature Section - Using committee_signature from studentDetails
+    // Add Committee Signature Section
     const signatureSectionY = doc.lastAutoTable.finalY + 20;
     
     if (studentDetails.committee_signature) {
@@ -212,7 +217,7 @@ const StudentReport = () => {
         doc.setFontSize(10);
         doc.text(`Approved: ${new Date().toLocaleDateString()}`, 20, signatureSectionY + 37);
       } catch (error) {
-        console.error('Error adding signature image:', error);
+        console.error('Error adding signature image to PDF:', error);
         // Fallback if image cannot be added
         doc.setFontSize(10);
         doc.text('Committee Signature: [Signature on file]', 20, signatureSectionY);
@@ -479,29 +484,40 @@ const StudentReport = () => {
               </div>
             </div>
 
-            {/* UPDATED: Committee Signature Display */}
-            {studentDetails.committee_signature && (
-              <div className="mt-6 pt-6 border-t">
-                <h3 className="text-lg font-bold text-[#14213d] mb-3">Committee Signature</h3>
-                <div className="flex items-center gap-4">
-                  <img
-                    src={studentDetails.committee_signature}
-                    alt="Committee Signature"
-                    className="border border-gray-300 rounded w-40 h-24 object-contain"
-                  />
-                  <p className="text-sm text-gray-600">
-                    Approved by: <span className="font-semibold text-[#14213d]">{studentDetails.approved_by_committee || 'N/A'}</span>
+            {/* Committee Signature Display Section */}
+            <div className="mt-8 pt-8 border-t-2 border-gray-300">
+              {studentDetails.committee_signature ? (
+                <div>
+                  <h3 className="text-lg font-bold text-[#14213d] mb-4">Committee Signature</h3>
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="flex-shrink-0">
+                      <img
+                        src={studentDetails.committee_signature}
+                        alt="Committee Signature"
+                        className="border-2 border-gray-400 rounded-lg w-48 h-32 object-contain bg-white p-2"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-700 mb-2">
+                        <span className="font-semibold text-[#14213d]">Approved by:</span> {studentDetails.approved_by_committee || 'N/A'}
+                      </p>
+                      <p className="text-gray-700">
+                        <span className="font-semibold text-[#14213d]">Approval Date:</span> {studentDetails.allocation_date || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-[#14213d] font-semibold text-lg mb-2">
+                    Digital Signature: <span className="text-[#e63946]">Pending</span>
+                  </p>
+                  <p className="text-gray-600 text-sm">
+                    Awaiting committee approval and signature
                   </p>
                 </div>
-              </div>
-            )}
-
-            {/* No signature message */}
-            {!studentDetails.committee_signature && (
-              <div className="text-center mt-4 text-[#14213d] font-medium">
-                Digital Signature: <span className="text-[#e63946]">{studentDetails.digital_signature || 'Pending'}</span>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

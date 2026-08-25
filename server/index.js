@@ -924,6 +924,8 @@ app.get('/api/reports', (req, res) => {
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
 
+    console.log('\n🔍 DEBUG: /api/reports called for:', decoded.email);
+
     const sqlGet = `
       SELECT 
         'REFXE' || LPAD(pd.user_id::text, 2, '0') AS reference_number,
@@ -944,7 +946,7 @@ app.get('/api/reports', (req, res) => {
         pc.signature as committee_signature
       FROM bursary.personal_details pd
       LEFT JOIN bursary.profile_committee pc 
-        ON pd.approved_by_committee = pc.email
+        ON LOWER(pd.approved_by_committee) = LOWER(pc.fullname)
       WHERE pd.email = $1
     `;
 
@@ -952,10 +954,22 @@ app.get('/api/reports', (req, res) => {
       const result = await pool.query(sqlGet, [decoded.email]);
 
       if (result.rows.length === 0) {
+        console.log('❌ No student found for email:', decoded.email);
         return res.status(404).send('Student not found');
       }
 
       const student = result.rows[0];
+
+      // DEBUG LOGGING
+      console.log('\n📋 DATABASE QUERY RESULT:');
+      console.log('   Student Name:', student.fullname);
+      console.log('   Approved By Committee:', student.approved_by_committee);
+      console.log('   Committee Signature Exists:', !!student.committee_signature);
+      console.log('   Signature Length:', student.committee_signature?.length || 0);
+      if (student.committee_signature) {
+        console.log('   Signature Preview:', student.committee_signature.substring(0, 80) + '...');
+      }
+      console.log('');
 
       // Extract first letter from the committee name (approved_by_committee)
       let digital_signature = null;
@@ -964,11 +978,15 @@ app.get('/api/reports', (req, res) => {
         digital_signature = `HOLD-${firstLetter}`;  // Placeholder only
       }
 
-      res.json({
+      const responseData = {
         ...student,
         digital_signature, // Add placeholder signature to response
         committee_signature: student.committee_signature || null  // ✅ Add actual signature from database
-      });
+      };
+
+      console.log('📤 Sending response with committee_signature:', responseData.committee_signature ? 'YES' : 'NO');
+
+      res.json(responseData);
 
     } catch (err) {
       console.error('Error fetching data:', err);
