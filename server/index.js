@@ -917,6 +917,7 @@ app.get('/api/student', (req, res) => {
   });
 });
 
+
 app.get('/api/reports', (req, res) => {
   const token = req.headers['authorization'];
   if (!token) return res.status(403).send('Token is required');
@@ -943,10 +944,12 @@ app.get('/api/reports', (req, res) => {
         pd.bursary,
         pd.approved_by_committee,
         pd.allocation_date,
-        pc.signature as committee_signature
+        pc.signature as committee_signature,
+        pc.fullname as committee_fullname,
+        pc.position as committee_position
       FROM bursary.personal_details pd
       LEFT JOIN bursary.profile_committee pc 
-        ON LOWER(pd.approved_by_committee) = LOWER(pc.fullname)
+        ON TRIM(LOWER(pd.approved_by_committee)) = TRIM(LOWER(pc.fullname))
       WHERE pd.email = $1
     `;
 
@@ -963,11 +966,17 @@ app.get('/api/reports', (req, res) => {
       // DEBUG LOGGING
       console.log('\n📋 DATABASE QUERY RESULT:');
       console.log('   Student Name:', student.fullname);
+      console.log('   Student Email:', student.email);
       console.log('   Approved By Committee:', student.approved_by_committee);
+      console.log('   Committee Name (from JOIN):', student.committee_fullname || 'NOT FOUND');
+      console.log('   Committee Position:', student.committee_position || 'N/A');
       console.log('   Committee Signature Exists:', !!student.committee_signature);
       console.log('   Signature Length:', student.committee_signature?.length || 0);
       if (student.committee_signature) {
-        console.log('   Signature Preview:', student.committee_signature.substring(0, 80) + '...');
+        console.log('   Signature Preview:', student.committee_signature.substring(0, 100) + '...');
+        console.log('   ✅ SIGNATURE FOUND AND WILL BE SENT');
+      } else {
+        console.log('   ❌ SIGNATURE NOT FOUND - Check if committee member name matches exactly');
       }
       console.log('');
 
@@ -979,18 +988,35 @@ app.get('/api/reports', (req, res) => {
       }
 
       const responseData = {
-        ...student,
-        digital_signature, // Add placeholder signature to response
-        committee_signature: student.committee_signature || null  // ✅ Add actual signature from database
+        reference_number: student.reference_number,
+        fullname: student.fullname,
+        email: student.email,
+        subcounty: student.subcounty,
+        ward: student.ward,
+        village: student.village,
+        birth: student.birth,
+        gender: student.gender,
+        institution: student.institution,
+        year: student.year,
+        admission: student.admission,
+        status: student.status,
+        bursary: student.bursary,
+        approved_by_committee: student.approved_by_committee,
+        allocation_date: student.allocation_date,
+        digital_signature: digital_signature,
+        committee_signature: student.committee_signature || null,  // ✅ Signature from profile_committee table
+        committee_fullname: student.committee_fullname || null,
+        committee_position: student.committee_position || null
       };
 
-      console.log('📤 Sending response with committee_signature:', responseData.committee_signature ? 'YES' : 'NO');
+      console.log('📤 Sending response with committee_signature:', responseData.committee_signature ? 'YES (Length: ' + responseData.committee_signature.length + ')' : 'NO');
+      console.log('');
 
       res.json(responseData);
 
     } catch (err) {
-      console.error('Error fetching data:', err);
-      res.status(500).send('Error fetching data');
+      console.error('❌ Error fetching data:', err);
+      res.status(500).json({ error: 'Error fetching data', details: err.message });
     }
   });
 });
