@@ -257,10 +257,10 @@ const StudentReport = () => {
 
     // Render Personal Info Table
     autoTable(doc, {
-      startY: 50,
+      startY: 40,
       head: [['Personal Information', 'Details']],
       body: personalInfo,
-      theme: 'striped',
+      theme: 'grid',
       headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255], fontSize: 14 },
       bodyStyles: { fontSize: 12 },
       styles: { font: 'times' },
@@ -268,7 +268,7 @@ const StudentReport = () => {
 
     // Render Bursary Info Table
     autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 10,
+      startY: doc.lastAutoTable.finalY + 8,
       head: [['Bursary Information', 'Details']],
       body: bursaryInfo,
       theme: 'grid',
@@ -285,7 +285,7 @@ const StudentReport = () => {
     ];
 
     autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 20,
+      startY: doc.lastAutoTable.finalY + 8,
       head: [['Declaration', '']],
       body: declarationInfo,
       theme: 'grid',
