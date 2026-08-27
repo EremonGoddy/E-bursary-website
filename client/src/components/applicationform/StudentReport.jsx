@@ -5,16 +5,16 @@ import autoTable from "jspdf-autotable";
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-faHouse,
-faFileAlt,
-faPaperclip,
-faDownload,
-faComments,
-faCog,
-faTimes,
-faSignOutAlt,
-faBars,
-faBell,
+  faHouse,
+  faFileAlt,
+  faPaperclip,
+  faDownload,
+  faComments,
+  faCog,
+  faTimes,
+  faSignOutAlt,
+  faBars,
+  faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 /**
@@ -22,20 +22,15 @@ faBell,
  * - src: image URL or dataURL
  * - options: { bgColor: [r,g,b], fuzz: number(0-255), blurPx: number }
  * Returns a Promise resolving to a PNG dataURL with transparent background.
- *
- * Notes:
- * - If the image is cross-origin, the server must allow CORS (Access-Control-Allow-Origin).
- * - If canvas getImageData throws (tainted), the promise rejects.
  */
 async function removeBackgroundFromImage(src, { bgColor = [245, 245, 245], fuzz = 40, blurPx = 1 } = {}) {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = 'Anonymous'; // required for cross-origin images (backend must allow CORS)
+    img.crossOrigin = 'Anonymous';
     img.onload = () => {
       const w = img.naturalWidth || img.width;
       const h = img.naturalHeight || img.height;
 
-      // Draw image to canvas
       const canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
@@ -54,24 +49,17 @@ async function removeBackgroundFromImage(src, { bgColor = [245, 245, 245], fuzz 
       const [bgR, bgG, bgB] = bgColor;
       const fuzziness = Math.max(1, Math.min(255, fuzz));
 
-      // Create alpha mask by making near-bg pixels transparent
       for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
-
-        // Use max channel difference as a simple distance metric
+        const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
         const maxDiff = Math.max(Math.abs(r - bgR), Math.abs(g - bgG), Math.abs(b - bgB));
-
         if (maxDiff <= fuzziness) {
-          // Proportionally reduce alpha: exact bg -> fully transparent
-          const factor = maxDiff / fuzziness; // 0..1
-          data[i+3] = Math.round(a * factor);
+          const factor = maxDiff / fuzziness;
+          data[i + 3] = Math.round(a * factor);
         }
       }
 
-      // Put data back
       ctx.putImageData(imageData, 0, 0);
 
-      // Optionally blur to smooth edges - use an output canvas if ctx.filter is supported
       if (blurPx > 0 && typeof ctx.filter !== 'undefined') {
         const outCanvas = document.createElement('canvas');
         outCanvas.width = w;
@@ -82,7 +70,6 @@ async function removeBackgroundFromImage(src, { bgColor = [245, 245, 245], fuzz 
         outCtx.drawImage(canvas, 0, 0);
         resolve(outCanvas.toDataURL('image/png'));
       } else {
-        // No blur or browser doesn't support ctx.filter
         resolve(canvas.toDataURL('image/png'));
       }
     };
@@ -91,7 +78,6 @@ async function removeBackgroundFromImage(src, { bgColor = [245, 245, 245], fuzz 
       reject(new Error('Failed to load image: ' + (e?.message || 'unknown error')));
     };
 
-    // If src is a blob/object URL or dataURL, crossOrigin may be ignored but it's fine.
     img.src = src;
   });
 }
@@ -109,7 +95,6 @@ const StudentReport = () => {
     setSidebarActive(!sidebarActive);
   };
 
-  // Fetch reports and student profile, process signature to remove background
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const name = sessionStorage.getItem('userName');
@@ -119,7 +104,6 @@ const StudentReport = () => {
     }
     setUserName(name);
 
-    // Async fetch wrapper
     (async () => {
       try {
         const response = await axios.get('https://e-bursary-backend.onrender.com/api/reports', {
@@ -128,21 +112,15 @@ const StudentReport = () => {
 
         const data = response.data || {};
 
-        // If committee_signature exists, attempt to process it
         if (data.committee_signature) {
           try {
-            // Tune bgColor and fuzz based on the typical signature background.
-            // If the background is pure white, you can use [255,255,255] and a lower fuzz.
             const processedDataUrl = await removeBackgroundFromImage(data.committee_signature, {
-              bgColor: [245, 245, 245], // try [255,255,255] if background is pure white
-              fuzz: 40,                 // increase if the background is grayish
-              blurPx: 1                 // small blur to smooth edges
+              bgColor: [245, 245, 245],
+              fuzz: 40,
+              blurPx: 1,
             });
-
-            // Replace the signature URL with the processed transparent PNG data URL
             data.committee_signature = processedDataUrl;
           } catch (err) {
-            // Processing failed (likely CORS / tainted canvas). Keep original.
             console.warn('Signature background removal failed, using original signature:', err);
           }
         }
@@ -153,7 +131,6 @@ const StudentReport = () => {
       }
     })();
 
-    // Fetch student profile data (unchanged)
     axios
       .get('https://e-bursary-backend.onrender.com/api/student', {
         headers: { Authorization: token },
@@ -161,12 +138,11 @@ const StudentReport = () => {
       .then((response) => {
         setStudentProfile(response.data);
       })
-      .catch((error) => {
+      .catch(() => {
         setStudentProfile({});
       });
   }, [navigate]);
 
-  // Check for new messages and document upload status
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
     const userId = sessionStorage.getItem('userId');
@@ -182,18 +158,12 @@ const StudentReport = () => {
       })
         .then(response => {
           const message = response.data.status_message;
-          if (message && message.toLowerCase().includes("new")) {
-            setHasNewMessage(true);
-          } else {
-            setHasNewMessage(false);
-          }
+          setHasNewMessage(!!(message && message.toLowerCase().includes("new")));
         })
         .catch(err => {
           console.error('Error checking status message:', err);
         });
-    }
 
-    if (userId) {
       axios
         .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
           headers: { Authorization: token }
@@ -206,7 +176,6 @@ const StudentReport = () => {
     }
   }, [navigate]);
 
-  // Handle Apply click
   const handleApplyClick = async (e) => {
     e.preventDefault();
     const userId = sessionStorage.getItem('userId');
@@ -226,19 +195,32 @@ const StudentReport = () => {
     }
   };
 
-  // Download PDF utility
+  // Helpers for formatting
+  const formatDateTimeOrNA = (raw) => {
+    if (!raw) return 'N/A';
+    const d = new Date(raw);
+    return isNaN(d.getTime()) ? 'N/A' : d.toLocaleString();
+  };
+
+  const formatAmount = (raw) => {
+    if (raw === undefined || raw === null || String(raw).trim() === '') return 'N/A';
+    const parsed = Number(String(raw).replace(/[^0-9.-]+/g, ''));
+    if (!isNaN(parsed)) return `${parsed.toLocaleString('en-US')}/=`;
+    return String(raw);
+  };
+
   const downloadReport = React.useCallback(() => {
     const doc = new jsPDF();
     doc.setFont('times', 'normal');
 
-    // Title Section
+    // Title
     doc.setFontSize(25);
     doc.text('Bursary Report', 105, 20, null, null, 'center');
     doc.setFontSize(20);
     doc.text('Generated by Bursary Management System', 105, 30, null, null, 'center');
     doc.line(10, 35, 200, 35);
 
-    // Table Data
+    // Personal info
     const personalInfo = [
       ['Reference Number', studentDetails.reference_number || 'N/A'],
       ['Full Name', studentDetails.fullname || 'N/A'],
@@ -250,12 +232,14 @@ const StudentReport = () => {
       ['Gender', studentDetails.gender || 'N/A'],
     ];
 
+    // Bursary amount formatted
+    const bursaryAmountStr = formatAmount(studentDetails.bursary);
+
     const bursaryInfo = [
-      ['Allocated Amount', studentDetails.bursary || 'N/A'],
+      ['Allocated Amount', bursaryAmountStr],
       ['Application Status', studentDetails.status || 'N/A'],
     ];
 
-    // Render Personal Info Table
     autoTable(doc, {
       startY: 40,
       head: [['Personal Information', 'Details']],
@@ -266,9 +250,8 @@ const StudentReport = () => {
       styles: { font: 'times' },
     });
 
-    // Render Bursary Info Table
     autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 8,
+      startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 8 : 60,
       head: [['Bursary Information', 'Details']],
       body: bursaryInfo,
       theme: 'grid',
@@ -277,15 +260,17 @@ const StudentReport = () => {
       styles: { font: 'times' },
     });
 
-    // Declaration Table
+    // Allocation date formatted
+    const allocationDateStr = formatDateTimeOrNA(studentDetails.allocation_date);
+
     const declarationInfo = [
       ['Declaration', 'I hereby confirm the above details are accurate and complete.'],
       ['Approved by', studentDetails.approved_by_committee || 'N/A'],
-      ['Allocation date', studentDetails.allocation_date || 'N/A'],
+      ['Allocation date', allocationDateStr],
     ];
 
     autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 8,
+      startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 8 : 80,
       head: [['Declaration', '']],
       body: declarationInfo,
       theme: 'grid',
@@ -295,58 +280,67 @@ const StudentReport = () => {
     });
 
     // Add Committee Signature Section
-    const signatureSectionY = doc.lastAutoTable.finalY + 20;
+    const signatureSectionY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 120;
 
     if (studentDetails.committee_signature) {
       try {
-        // Add signature heading
         doc.setFontSize(12);
         doc.setFont('times', 'bold');
         doc.text('Committee Signature', 20, signatureSectionY);
 
-        // Add signature image (supports dataURL PNG)
-        doc.addImage(studentDetails.committee_signature, 'PNG', 20, signatureSectionY + 8, 50, 25);
+        doc.addImage(studentDetails.committee_signature, 'PNG', 20, signatureSectionY + 1, 50, 25);
 
-        // Add approval date
         doc.setFont('times', 'normal');
-        doc.setFontSize(10);
-        doc.text(`Approved: ${studentDetails.allocation_date || new Date().toLocaleDateString()}`, 20, signatureSectionY + 37);
+        doc.setFontSize(11);
+        // Use same formatted allocation date string
+        const approvedDateStr = allocationDateStr === 'N/A' ? new Date().toLocaleString() : allocationDateStr;
+        doc.text(`Approved: ${approvedDateStr}`, 20, signatureSectionY + 30);
       } catch (error) {
         console.error('Error adding signature image to PDF:', error);
-        // Fallback if image cannot be added
         doc.setFontSize(10);
         doc.text('Committee Signature: [Signature on file]', 20, signatureSectionY);
       }
     } else {
-      // No signature available
       doc.setFontSize(10);
       doc.text('Committee Signature: _____________________', 20, signatureSectionY);
     }
 
-    // Footer
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 10, 290);
-    doc.text('Bursary Management System', 105, 290, null, null, 'center');
+    // Footer: generated on (left) and Bursary Management System (right)
+    doc.setFontSize(11);
+    const generatedOnStr = new Date().toLocaleString();
+    doc.text(`Generated on: ${generatedOnStr}`, 10, 290);
 
-    // Save must be LAST after all content is added!
+    const pageWidth = doc.internal.pageSize.getWidth ? doc.internal.pageSize.getWidth() : doc.internal.pageSize.width;
+    const rightMargin = 10;
+    doc.text('Bursary Management System', pageWidth - rightMargin, 290, { align: 'right' });
+
     doc.save('Bursary_Report.pdf');
   }, [studentDetails]);
 
-  // Prepare report data (for mobile)
+  // Format allocation date for on-screen display
+  const allocationDateDisplay = studentDetails.allocation_date ? (() => {
+    const d = new Date(studentDetails.allocation_date);
+    return isNaN(d.getTime()) ? 'N/A' : d.toLocaleString();
+  })() : 'N/A';
+
+  const bursaryDisplay = formatAmount(studentDetails.bursary);
+
   const reportRows = [
     { label: 'Reference Number', value: studentDetails.reference_number || 'N/A' },
     { label: 'Application Title', value: 'Bursary Application' },
     { label: 'Application Status', value: studentDetails.status || 'N/A' },
-    { label: 'Download Application', value: (
-      <button
-        type="button"
-        onClick={downloadReport}
-        aria-label="Download Application"
-        className="bg-transparent border-0 p-0 m-0 cursor-pointer"
-      >
-        <FontAwesomeIcon icon={faDownload} className="text-[#14213d]" />
-      </button>
-    )},
+    {
+      label: 'Download Application', value: (
+        <button
+          type="button"
+          onClick={downloadReport}
+          aria-label="Download Application"
+          className="bg-transparent border-0 p-0 m-0 cursor-pointer"
+        >
+          <FontAwesomeIcon icon={faDownload} className="text-[#14213d]" />
+        </button>
+      )
+    },
   ];
 
   return (
@@ -365,8 +359,8 @@ const StudentReport = () => {
                   studentDetails.gender === 'Female'
                     ? '/images/woman.png'
                     : studentDetails.gender === 'Male'
-                    ? '/images/patient.png'
-                    : '/images/user.png'
+                      ? '/images/patient.png'
+                      : '/images/user.png'
                 }
                 alt="User"
                 className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
@@ -470,10 +464,10 @@ const StudentReport = () => {
         <div className={`
           flex-1 md:ml-25 transition-all duration-300
           ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[40px]'}`}>
-          <div className=" backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[1500px] mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-0 md:p-8">
+          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[1500px] mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-0 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Report</h1>
 
-            {/* Responsive Report Info: vertical on mobile, table on md+ */}
+            {/* Responsive Report Info */}
             <div>
               {/* Mobile vertical layout */}
               <div className="block md:hidden">
@@ -489,38 +483,43 @@ const StudentReport = () => {
                 ))}
               </div>
 
-              {/* Desktop table layout */}
-              <div className="hidden md:block w-full overflow-x-auto">
-                <table className="w-full min-w-[720px] border-collapse bg-white shadow-md rounded">
-                  <thead>
-                    <tr className="bg-[#14213d] text-white">
-                      <th className="p-2 text-centre">Reference Number</th>
-                      <th className="p-2 text-centre">Application Title</th>
-                      <th className="p-2 text-centre">Application Status</th>
-                      <th className="p-2 text-centre">Download Application</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b text-[1.1rem] text-center">
-                      <td className="p-2">{studentDetails.reference_number || 'N/A'}</td>
-                      <td className="p-2">Bursary Application</td>
-                      <td className="p-2">{studentDetails.status || 'N/A'}</td>
-                      <td className="p-2">
-                        <button
-                          type="button"
-                          onClick={downloadReport}
-                          aria-label="Download Application"
-                          className="bg-transparent border-0 p-0 m-0 cursor-pointer"
-                        >
-                          <FontAwesomeIcon
-                            icon={faDownload}
-                            className="text-[#14213d] text-xl"
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              {/* Desktop table layout with rounded corners */}
+              <div className="hidden md:block w-full overflow-x-auto rounded-lg">
+                <div className="overflow-hidden rounded-lg shadow-md">
+                  <table
+                    className="w-full min-w-[720px] bg-white"
+                    style={{ borderCollapse: 'separate', borderSpacing: 0 }}
+                  >
+                    <thead>
+                      <tr className="bg-[#14213d] text-white">
+                        <th className="p-3 text-center">Reference Number</th>
+                        <th className="p-3 text-center">Application Title</th>
+                        <th className="p-3 text-center">Application Status</th>
+                        <th className="p-3 text-center">Download Application</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b text-[1.1rem] text-center">
+                        <td className="p-3">{studentDetails.reference_number || 'N/A'}</td>
+                        <td className="p-3">Bursary Application</td>
+                        <td className="p-3">{studentDetails.status || 'N/A'}</td>
+                        <td className="p-3">
+                          <button
+                            type="button"
+                            onClick={downloadReport}
+                            aria-label="Download Application"
+                            className="bg-transparent border-0 p-0 m-0 cursor-pointer"
+                          >
+                            <FontAwesomeIcon
+                              icon={faDownload}
+                              className="text-[#14213d] text-xl"
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -534,7 +533,6 @@ const StudentReport = () => {
                       <img
                         src={studentDetails.committee_signature}
                         alt="Committee Signature"
-                        // Remove bg-white so transparent PNG displays correctly over page background
                         className="border-2 border-gray-400 rounded-lg w-48 h-32 object-contain"
                       />
                     </div>
@@ -543,7 +541,7 @@ const StudentReport = () => {
                         <span className="font-semibold text-[#14213d]">Approved by:</span> {studentDetails.approved_by_committee || 'N/A'}
                       </p>
                       <p className="text-gray-700">
-                        <span className="font-semibold text-[#14213d]">Approval Date:</span> {studentDetails.allocation_date || 'N/A'}
+                        <span className="font-semibold text-[#14213d]">Approval Date:</span> {allocationDateDisplay}
                       </p>
                     </div>
                   </div>
