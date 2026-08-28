@@ -19,6 +19,9 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+// at top of server.js, after creating `app`
+app.use(express.json({ limit: '10mb' }));        // allow up to 10MB JSON (increase if you must)
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ✅ JWT Secret from .env or fallback
 const secret = process.env.JWT_SECRET || "your_jwt_secret";
@@ -1639,109 +1642,71 @@ app.get('/api/user-report/:id', (req, res) => {
   });
 });
 
-// GET profile-committee
-app.get('/api/profile-committee', (req, res) => {
+const multer = require('multer');
+const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
+
+// ensure dirs
+const SIGN_DIR = path.join(UPLOAD_DIR, 'signatures');
+fs.mkdirSync(SIGN_DIR, { recursive: true });
+
+// static serve uploads (ensure CORS header present so browser can use getImageData)
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const cors = require('cors');
+app.use(cors({ origin: CLIENT_ORIGIN, exposedHeaders: ['Content-Disposition'] }));
+app.use('/uploads', express.static(UPLOAD_DIR, {
+  setHeaders: (res, _path) => {
+    res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
+  }
+}));
+
+// multer temp storage
+
+// helper: sha256 hash
+function sha256(buffer) {
+  return crypto.createHash('sha256').update(buffer).digest('hex');
+}
+
+// helper: build public signature url
+function signatureUrl(req, filename) {
+  return `${req.protocol}://${req.get('host')}/uploads/signatures/${filename}`;
+}
+
+// Upload endpoint
+app.post('/api/upload-signature', upload.single('signature'), async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token is required');
+  if (!token) return res.status(403).json({ error: 'Token required' });
+  try {
+    jwt.verify(token, secret);
+  } catch (e) {
+    if (req.file) fs.unlinkSync(req.file.path);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
-  jwt.verify(token, secret, (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const sqlGet = `
-      SELECT fullname, email, phone_no, national_id, subcounty, 
-             ward, position, gender
-      FROM bursary.profile_committee 
-      WHERE email = $1
-    `;
-
-    pool.query(sqlGet, [decoded.email], (err, result) => {
-      if (err) {
-        console.error('Error fetching committee data:', err);
-        return res.status(500).send('Error fetching data');
-      }
-
-      if (result.rows.length === 0) {
-        return res.status(404).send('Profile not found');
-      }
-
-      const profile = result.rows[0];
-      res.json(profile);
-    });
-  });
-});
-
-
-// POST or UPDATE committee profile
-app.post('/api/profile-form', (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token is required');
-
-  jwt.verify(token, secret, (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
-
-    const { 
-      fullname, 
-      phone_no, 
-      national_id, 
-      subcounty, 
-      ward, 
-      position, 
-      gender,
-      signature  // NEW: Accept signature (base64 image data)
-    } = req.body;
-
-    if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position || !gender) {
-      return res.status(400).send('All profile fields are required');
+  try {
+    const buf = fs.readFileSync(req.file.path);
+    const hash = sha256(buf);
+    // derive ext from original mimetype or originalname
+    const ext = (req.file.mimetype === 'image/png') ? 'png' : (req.file.mimetype === 'image/gif' ? 'gif' : 'jpg');
+    const filename = `${hash}.${ext}`;
+    const dest = path.join(SIGN_DIR, filename);
+    if (!fs.existsSync(dest)) {
+      fs.renameSync(req.file.path, dest);
+    } else {
+      // duplicate: remove temp
+      fs.unlinkSync(req.file.path);
     }
-
-    // NEW: Validate signature if provided
-    if (signature && typeof signature !== 'string') {
-      return res.status(400).send('Signature must be a valid image string');
-    }
-
-    const email = decoded.email;
-
-    const sqlUpsert = `
-      INSERT INTO bursary.profile_committee 
-        (fullname, email, phone_no, national_id, subcounty, ward, position, gender, signature)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      ON CONFLICT (email) 
-      DO UPDATE SET
-        fullname = EXCLUDED.fullname,
-        phone_no = EXCLUDED.phone_no,
-        national_id = EXCLUDED.national_id,
-        subcounty = EXCLUDED.subcounty,
-        ward = EXCLUDED.ward,
-        position = EXCLUDED.position,
-        gender = EXCLUDED.gender,
-        signature = EXCLUDED.signature
-      RETURNING *;
-    `;
-
-    pool.query(sqlUpsert, [
-      fullname,
-      email,
-      phone_no,
-      national_id,
-      subcounty,
-      ward,
-      position,
-      gender,
-      signature || null  // NEW: Pass signature or null if not provided
-    ], (err, result) => {
-      if (err) {
-        console.error('Error inserting/updating committee data:', err);
-        return res.status(500).send('Error saving profile');
-      }
-
-      res.status(200).send({
-        message: result.rows.length > 0 ? 'Profile updated successfully' : 'Profile created successfully',
-        data: result.rows[0]
-      });
-    });
-  });
+    const url = signatureUrl(req, filename);
+    return res.json({ url });
+  } catch (err) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    console.error('Upload error', err);
+    return res.status(500).json({ error: 'Upload error' });
+  }
 });
-
 
 app.get('/api/comreport', (req, res) => {
   const token = req.headers['authorization'];

@@ -17,6 +17,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import "./Overlay.css";
 
+const API_BASE = 'https://e-bursary-backend.onrender.com';
+const MAX_FILE_BYTES = 2 * 1024 * 1024; // server limit you mentioned (2MB)
+const TARGET_BYTES = 1.6 * 1024 * 1024; // aim below this to be safe
+
 const CommitteeProfile = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [committeeDetails, setCommitteeDetails] = useState({});
@@ -34,7 +38,7 @@ const CommitteeProfile = () => {
     subcounty: '',
     ward: '',
     position: '',
-    signature: '', // NEW: for storing signature image path/base64
+    signature: '', // holds either existing URL or compressed base64 data URL
   });
 
   const [isProfileFetched, setIsProfileFetched] = useState(false);
@@ -68,7 +72,7 @@ const CommitteeProfile = () => {
     setUserName(name || '');
 
     axios
-      .get('https://e-bursary-backend.onrender.com/api/profile-committee', {
+      .get(`${API_BASE}/api/profile-committee`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -83,12 +87,13 @@ const CommitteeProfile = () => {
         setProfileExists(true);
         setCommitteeDetails(data);
 
+        // Put returned signature URL (if any) into formData.signature so saving without change re-sends it
         setFormData((prev) => ({
           ...prev,
           ...data,
+          signature: data.signature || '',
         }));
 
-        // Load existing signature preview
         if (data.signature) {
           setSignaturePreview(data.signature);
         }
@@ -104,67 +109,160 @@ const CommitteeProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // NEW: Handle signature file upload
-  const handleSignatureChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!['image/png', 'image/jpeg', 'image/jpg', 'image/gif'].includes(file.type)) {
-        alert('Please upload a valid image file (PNG, JPG, GIF)');
-        return;
-      }
+  // Utility: approximate byte size of dataURL
+  const dataUrlByteSize = (dataUrl) => {
+    if (!dataUrl) return 0;
+    const base64 = dataUrl.split(',')[1] || '';
+    const padding = (base64.endsWith('==') ? 2 : (base64.endsWith('=') ? 1 : 0));
+    return Math.ceil((base64.length * 3) / 4) - padding;
+  };
 
-      // Validate file size (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File size must be less than 2MB');
-        return;
-      }
-
-      setSignatureFile(file);
-
-      // Create preview
+  // Replace resizeAndCompress to fill canvas with white before drawing the image.
+  // This prevents transparent/white background from turning black when exporting as JPEG.
+  const resizeAndCompress = (file, mime = 'image/jpeg', quality = 0.8, maxW = 1200, maxH = 600) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setSignaturePreview(reader.result);
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          const ratio = width / height;
+
+          if (width > maxW) {
+            width = maxW;
+            height = Math.round(width / ratio);
+          }
+          if (height > maxH) {
+            height = maxH;
+            width = Math.round(height * ratio);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+
+          // IMPORTANT: fill background with white so JPEG exports don't get a black background.
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+
+          // draw image on top of the white background
+          ctx.drawImage(img, 0, 0, width, height);
+
+          try {
+            const dataUrl = canvas.toDataURL(mime, quality);
+            resolve(dataUrl);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = () => reject(new Error('Failed to load image (possibly CORS or invalid file)'));
+        img.src = reader.result;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle file selection: validate + compress until under target size
+  const handleSignatureChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/gif'].includes(file.type)) {
+      alert('Please upload a valid image file (PNG, JPG, GIF)');
+      return;
     }
+
+    // Quick reject if file is huge (>10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Please choose a smaller image (max 10MB) before upload.');
+      return;
+    }
+
+    setSignatureFile(file);
+
+    // Strategy: try progressively lower quality values and dimensions
+    const qualityCandidates = [0.85, 0.75, 0.65, 0.55, 0.45];
+    const dimensionCandidates = [
+      [1200, 600],
+      [1000, 500],
+      [800, 400],
+      [600, 300],
+    ];
+
+    let finalDataUrl = null;
+
+    try {
+      for (let q of qualityCandidates) {
+        for (let dims of dimensionCandidates) {
+          const dataUrl = await resizeAndCompress(file, 'image/jpeg', q, dims[0], dims[1]);
+          const size = dataUrlByteSize(dataUrl);
+          if (size <= TARGET_BYTES) {
+            finalDataUrl = dataUrl;
+            break;
+          }
+        }
+        if (finalDataUrl) break;
+      }
+    } catch (err) {
+      console.error('Error during image compression:', err);
+      alert('Failed to process image. Try a different image.');
+      setSignatureFile(null);
+      return;
+    }
+
+    // Last attempt: aggressive low-quality small size
+    if (!finalDataUrl) {
+      try {
+        const tryLow = await resizeAndCompress(file, 'image/jpeg', 0.35, 600, 300);
+        if (dataUrlByteSize(tryLow) <= MAX_FILE_BYTES) {
+          finalDataUrl = tryLow;
+        }
+      } catch (e) {
+        // ignore, will handle below
+      }
+    }
+
+    if (!finalDataUrl) {
+      alert('Selected image could not be reduced below server limit. Please pick a smaller image or crop it locally.');
+      setSignatureFile(null);
+      return;
+    }
+
+    setSignaturePreview(finalDataUrl);
+    setFormData((prev) => ({ ...prev, signature: finalDataUrl }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
 
     try {
-      // If signature file is selected, convert to base64
-      let signatureData = formData.signature;
-
-      if (signatureFile) {
-        const reader = new FileReader();
-        const base64Promise = new Promise((resolve) => {
-          reader.onloadend = () => {
-            resolve(reader.result);
-          };
-          reader.readAsDataURL(signatureFile);
-        });
-        signatureData = await base64Promise;
-      }
-
-      const dataToSubmit = {
-        ...formData,
-        signature: signatureData,
+      // Build payload. The backend expects signature as string (either URL or base64 data URL).
+      // We keep existing signature URL in formData.signature (set during GET) so we re-send it if unchanged.
+      const payload = {
+        fullname: formData.fullname,
+        email: formData.email,
+        phone_no: formData.phone_no,
+        national_id: formData.national_id,
+        gender: formData.gender,
+        subcounty: formData.subcounty,
+        ward: formData.ward,
+        position: formData.position,
+        signature: formData.signature || null,
       };
 
-      await axios.post(
-        'https://e-bursary-backend.onrender.com/api/profile-form',
-        dataToSubmit,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      await axios.post(`${API_BASE}/api/profile-form`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
       alert('Profile created/updated successfully');
       setProfileExists(true);
@@ -172,7 +270,11 @@ const CommitteeProfile = () => {
       setSignatureFile(null);
     } catch (error) {
       console.error('Error submitting committee data:', error);
-      alert('Error submitting data. Please try again.');
+      if (error.response && error.response.status === 413) {
+        alert('Image too large for server. Please choose a smaller/compressed image and try again.');
+      } else {
+        alert('Error submitting data. Please try again.');
+      }
     }
   };
 
@@ -248,7 +350,7 @@ const CommitteeProfile = () => {
                       e.preventDefault();
                       const token = sessionStorage.getItem('authToken');
                       axios
-                        .post('https://e-bursary-backend.onrender.com/api/logout', {}, {
+                        .post(`${API_BASE}/api/logout`, {}, {
                           headers: { Authorization: `Bearer ${token}` }
                         })
                         .catch(() => { })
