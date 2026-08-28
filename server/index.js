@@ -1671,12 +1671,12 @@ app.get('/api/profile-committee', (req, res) => {
 });
 
 
-// POST or UPDATE committee profile
+// POST or UPDATE committee profile (UPDATED to handle signature changes safely)
 app.post('/api/profile-form', (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).send('Token is required');
 
-  jwt.verify(token, secret, (err, decoded) => {
+  jwt.verify(token, secret, async (err, decoded) => {
     if (err) return res.status(401).send('Unauthorized access');
 
     const { 
@@ -1687,16 +1687,59 @@ app.post('/api/profile-form', (req, res) => {
       ward, 
       position, 
       gender,
-      signature  // NEW: Accept signature (base64 image data)
+      signature  // may be: undefined/null, a URL string, or a base64 data URL
     } = req.body;
 
     if (!fullname || !phone_no || !national_id || !subcounty || !ward || !position || !gender) {
       return res.status(400).send('All profile fields are required');
     }
 
-    // NEW: Validate signature if provided
-    if (signature && typeof signature !== 'string') {
-      return res.status(400).send('Signature must be a valid image string');
+    // Normalize signature input:
+    // - treat empty string or missing value as null (meaning "no change" in update)
+    // - accept a http(s) URL as-is
+    // - accept a data:...base64,... image and save it to disk then convert to a URL
+    let signatureParam = null;
+    if (typeof signature === 'string') {
+      const trimmed = signature.trim();
+      if (trimmed !== '') {
+        signatureParam = trimmed;
+      } // else keep as null -> don't overwrite existing
+    }
+
+    // If signatureParam is a base64 data URL, save it and replace with a URL
+    if (signatureParam && signatureParam.startsWith('data:')) {
+      try {
+        // require modules locally so this snippet can be dropped in without changing top-of-file requires
+        const fs = require('fs');
+        const path = require('path');
+
+        const matches = signatureParam.match(/^data:(image\/(png|jpeg|jpg|gif));base64,(.+)$/);
+        if (!matches) {
+          return res.status(400).send('Signature must be a valid base64 image string');
+        }
+
+        const mime = matches[1]; // e.g. image/png
+        const base64Data = matches[3];
+        const ext = mime.split('/')[1] === 'jpeg' ? 'jpg' : mime.split('/')[1];
+
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        // Ensure folders exist (uploads/signatures)
+        const uploadDir = path.join(__dirname, 'uploads', 'signatures');
+        fs.mkdirSync(uploadDir, { recursive: true });
+
+        const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${ext}`;
+        const fullPath = path.join(uploadDir, filename);
+        fs.writeFileSync(fullPath, buffer);
+
+        // Build a public URL for the stored file using request host/protocol
+        const protocol = req.protocol;
+        const host = req.get('host'); // includes port when running locally
+        signatureParam = `${protocol}://${host}/uploads/signatures/${filename}`;
+      } catch (e) {
+        console.error('Error saving signature image:', e);
+        return res.status(500).send('Error processing signature image');
+      }
     }
 
     const email = decoded.email;
@@ -1714,7 +1757,8 @@ app.post('/api/profile-form', (req, res) => {
         ward = EXCLUDED.ward,
         position = EXCLUDED.position,
         gender = EXCLUDED.gender,
-        signature = EXCLUDED.signature
+        -- Only overwrite signature if a non-null value was provided; otherwise keep existing
+        signature = COALESCE(EXCLUDED.signature, bursary.profile_committee.signature)
       RETURNING *;
     `;
 
@@ -1727,7 +1771,7 @@ app.post('/api/profile-form', (req, res) => {
       ward,
       position,
       gender,
-      signature || null  // NEW: Pass signature or null if not provided
+      signatureParam || null
     ], (err, result) => {
       if (err) {
         console.error('Error inserting/updating committee data:', err);
@@ -1741,7 +1785,6 @@ app.post('/api/profile-form', (req, res) => {
     });
   });
 });
-
 
 app.get('/api/comreport', (req, res) => {
   const token = req.headers['authorization'];

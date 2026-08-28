@@ -34,7 +34,7 @@ const CommitteeProfile = () => {
     subcounty: '',
     ward: '',
     position: '',
-    signature: '', // NEW: for storing signature image path/base64
+    signature: '', // will hold either an existing URL or a base64 data URL when user selects a file
   });
 
   const [isProfileFetched, setIsProfileFetched] = useState(false);
@@ -86,6 +86,7 @@ const CommitteeProfile = () => {
         setFormData((prev) => ({
           ...prev,
           ...data,
+          signature: data.signature || '', // store existing signature URL (if any)
         }));
 
         // Load existing signature preview
@@ -104,7 +105,7 @@ const CommitteeProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // NEW: Handle signature file upload
+  // Handle signature file selection: validate, create preview, convert to base64 and store in formData.signature
   const handleSignatureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -122,10 +123,13 @@ const CommitteeProfile = () => {
 
       setSignatureFile(file);
 
-      // Create preview
+      // Create preview and convert to base64 immediately so backend can accept it directly
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSignaturePreview(reader.result);
+        const base64 = reader.result;
+        setSignaturePreview(base64);
+        // store base64 in formData.signature so handleSubmit can simply send formData
+        setFormData((prev) => ({ ...prev, signature: base64 }));
       };
       reader.readAsDataURL(file);
     }
@@ -136,28 +140,29 @@ const CommitteeProfile = () => {
     const token = sessionStorage.getItem('authToken');
 
     try {
-      // If signature file is selected, convert to base64
-      let signatureData = formData.signature;
-
-      if (signatureFile) {
-        const reader = new FileReader();
-        const base64Promise = new Promise((resolve) => {
-          reader.onloadend = () => {
-            resolve(reader.result);
-          };
-          reader.readAsDataURL(signatureFile);
-        });
-        signatureData = await base64Promise;
-      }
-
-      const dataToSubmit = {
-        ...formData,
-        signature: signatureData,
+      // Build payload; omit signature property if it's an empty string (so backend treats it as "no change")
+      const payload = {
+        fullname: formData.fullname,
+        email: formData.email,
+        phone_no: formData.phone_no,
+        national_id: formData.national_id,
+        gender: formData.gender,
+        subcounty: formData.subcounty,
+        ward: formData.ward,
+        position: formData.position,
       };
+
+      if (formData.signature && typeof formData.signature === 'string' && formData.signature.trim() !== '') {
+        // signature may be:
+        // - an existing URL (from server) -> backend will accept as URL
+        // - a base64 data URL (when user selected a file) -> backend will save it to disk
+        payload.signature = formData.signature;
+      }
+      // If formData.signature is empty/undefined -> omit signature to avoid overwriting existing signature.
 
       await axios.post(
         'https://e-bursary-backend.onrender.com/api/profile-form',
-        dataToSubmit,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
