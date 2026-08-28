@@ -17,6 +17,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import "./Overlay.css";
 
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024; // 2MB (server limit)
+const SAFE_TARGET_BYTES = 1.8 * 1024 * 1024; // try to keep below this
+
 const CommitteeProfile = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [committeeDetails, setCommitteeDetails] = useState({});
@@ -34,7 +37,7 @@ const CommitteeProfile = () => {
     subcounty: '',
     ward: '',
     position: '',
-    signature: '', // will hold either an existing URL or a base64 data URL when user selects a file
+    signature: '', // will hold either existing URL or compressed base64 data URL
   });
 
   const [isProfileFetched, setIsProfileFetched] = useState(false);
@@ -86,7 +89,7 @@ const CommitteeProfile = () => {
         setFormData((prev) => ({
           ...prev,
           ...data,
-          signature: data.signature || '', // store existing signature URL (if any)
+          signature: data.signature || '',
         }));
 
         // Load existing signature preview
@@ -105,34 +108,120 @@ const CommitteeProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle signature file selection: validate, create preview, convert to base64 and store in formData.signature
-  const handleSignatureChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!['image/png', 'image/jpeg', 'image/jpg', 'image/gif'].includes(file.type)) {
-        alert('Please upload a valid image file (PNG, JPG, GIF)');
-        return;
-      }
+  // Helpers: resize/compress image using canvas, return dataURL
+  const dataUrlByteSize = (dataURL) => {
+    const base64 = dataURL.split(',')[1] || '';
+    // approximate byte length
+    const padding = (base64.endsWith('==') ? 2 : (base64.endsWith('=') ? 1 : 0));
+    return Math.ceil((base64.length * 3) / 4) - padding;
+  };
 
-      // Validate file size (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File size must be less than 2MB');
-        return;
-      }
-
-      setSignatureFile(file);
-
-      // Create preview and convert to base64 immediately so backend can accept it directly
+  const resizeAndCompress = (file, maxWidth = 1000, maxHeight = 400, mime = 'image/jpeg', quality = 0.8) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result;
-        setSignaturePreview(base64);
-        // store base64 in formData.signature so handleSubmit can simply send formData
-        setFormData((prev) => ({ ...prev, signature: base64 }));
+      reader.onload = () => {
+        img.onload = () => {
+          // compute target size while keeping aspect ratio
+          let { width, height } = img;
+          const ratio = width / height;
+          if (width > maxWidth) {
+            width = maxWidth;
+            height = Math.round(width / ratio);
+          }
+          if (height > maxHeight) {
+            height = maxHeight;
+            width = Math.round(height * ratio);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          try {
+            const dataURL = canvas.toDataURL(mime, quality);
+            resolve(dataURL);
+          } catch (e) {
+            reject(e);
+          }
+        };
+        img.onerror = (e) => reject(e);
+        img.src = reader.result;
       };
+      reader.onerror = (e) => reject(e);
       reader.readAsDataURL(file);
+    });
+  };
+
+  // NEW: Handle signature file selection -> validate + compress/resize to reduce size before storing base64
+  const handleSignatureChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/gif'].includes(file.type)) {
+      alert('Please upload a valid image file (PNG, JPG, GIF)');
+      return;
     }
+
+    // Quick check: if already under MAX_IMAGE_BYTES, we can convert directly (but still compress to JPEG for smaller payload)
+    // We'll attempt conversion & compression loop with decreasing quality values until we hit SAFE_TARGET_BYTES
+    setSignatureFile(file);
+
+    const qualityCandidates = [0.8, 0.7, 0.6, 0.5, 0.4];
+    let finalDataUrl = null;
+    try {
+      for (let q of qualityCandidates) {
+        // prefer jpeg for compression (better size). Transparency loss for PNG is usually acceptable for a signature image
+        const mime = 'image/jpeg';
+        // pick reasonable max dimensions for signature images (they usually don't need to be large)
+        const dataUrl = await resizeAndCompress(file, 1000, 400, mime, q);
+        const size = dataUrlByteSize(dataUrl);
+
+        if (size <= SAFE_TARGET_BYTES) {
+          finalDataUrl = dataUrl;
+          break;
+        }
+
+        // if original file is already small: accept it
+        if (file.size <= SAFE_TARGET_BYTES && !finalDataUrl) {
+          // get direct dataURL with default quality
+          const direct = await resizeAndCompress(file, 1000, 400, mime, q);
+          if (dataUrlByteSize(direct) <= MAX_IMAGE_BYTES) {
+            finalDataUrl = direct;
+            break;
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error compressing signature image:', err);
+      alert('There was an error processing the image. Please try a different image.');
+      return;
+    }
+
+    // If still not compressed enough, try a last attempt with very small quality
+    if (!finalDataUrl) {
+      try {
+        const tryLow = await resizeAndCompress(file, 800, 300, 'image/jpeg', 0.35);
+        if (dataUrlByteSize(tryLow) <= MAX_IMAGE_BYTES) {
+          finalDataUrl = tryLow;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    if (!finalDataUrl) {
+      alert('Selected image is too large even after compression. Please choose a smaller image (crop/resize) under 2MB.');
+      setSignatureFile(null);
+      return;
+    }
+
+    // At this point finalDataUrl should be small enough
+    setSignaturePreview(finalDataUrl);
+    setFormData((prev) => ({ ...prev, signature: finalDataUrl }));
   };
 
   const handleSubmit = async (e) => {
@@ -140,7 +229,7 @@ const CommitteeProfile = () => {
     const token = sessionStorage.getItem('authToken');
 
     try {
-      // Build payload; omit signature property if it's an empty string (so backend treats it as "no change")
+      // Build payload; omit signature when empty to avoid overwriting existing signature
       const payload = {
         fullname: formData.fullname,
         email: formData.email,
@@ -153,12 +242,8 @@ const CommitteeProfile = () => {
       };
 
       if (formData.signature && typeof formData.signature === 'string' && formData.signature.trim() !== '') {
-        // signature may be:
-        // - an existing URL (from server) -> backend will accept as URL
-        // - a base64 data URL (when user selected a file) -> backend will save it to disk
         payload.signature = formData.signature;
       }
-      // If formData.signature is empty/undefined -> omit signature to avoid overwriting existing signature.
 
       await axios.post(
         'https://e-bursary-backend.onrender.com/api/profile-form',
@@ -177,7 +262,11 @@ const CommitteeProfile = () => {
       setSignatureFile(null);
     } catch (error) {
       console.error('Error submitting committee data:', error);
-      alert('Error submitting data. Please try again.');
+      if (error.response && error.response.status === 413) {
+        alert('Uploaded image is too large for the server. Please choose a smaller image (crop/resize) and try again.');
+      } else {
+        alert('Error submitting data. Please try again.');
+      }
     }
   };
 
