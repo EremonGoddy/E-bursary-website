@@ -233,13 +233,13 @@ const StudentDashboard = () => {
   return (
     <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       {/* Top Bar */}
-      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-2.5 z-50 md:pl-20 md:pr-20">
+      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-3 md:p-2.5 z-50 md:pl-20 md:pr-20">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">
             EBursary
           </h1>
           <div className="flex items-center space-x-1">
-            <h2 className="text-sm md:text-lg mr-1 md:mr-5 font-bold text-[#14213d]">
+            <h2 className="text-[1rem] md:text-lg mr-3 md:mr-5 font-bold text-[#14213d]">
               Welcome: {userName}
             </h2>
             <div className="flex items-center space-x-2">
@@ -252,14 +252,14 @@ const StudentDashboard = () => {
                     : '/images/user.png'
                 }
                 alt="User"
-                className="rounded-full w-7 h-7 md:w-9 md:h-9 mr-1 md:mr-0"
+                className="rounded-full w-8 h-8 md:w-9 md:h-9 mr-1 md:mr-0"
               />
             </div>
             {/* Sidebar toggle only visible on small screens */}
             <div className="block md:hidden">
               <FontAwesomeIcon
                 icon={faBars}
-                className="text-xl cursor-pointer text-[#14213d]"
+                className="text-[1.4rem] cursor-pointer text-[#14213d]"
                 onClick={toggleSidebar}
               />
             </div>
@@ -379,7 +379,7 @@ ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
 
         {/* Main Content */}
         <div
-          className={`flex-1 transition-all duration-300 -mt-6 md:-mt-6 pt-4  
+          className={`flex-1 transition-all duration-300 -mt-9 md:-mt-6 pt-4  
 ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
 `}
         >
