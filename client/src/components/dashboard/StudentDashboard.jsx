@@ -546,7 +546,7 @@ ${sidebarActive
           <div className="shadow-overlay fixed inset-0 bg-black bg-opacity-40 z-40" onClick={handleCloseForm}></div>
           {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center mt-10 z-50">
-            <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[370px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
+            <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[360px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
               {/* Cancel (close) icon in top right */}
               <div className="mb-7 md:mt-6 ">
                 <FontAwesomeIcon
@@ -582,7 +582,7 @@ ${sidebarActive
                       name={id}
                       value={formData[id] || ''}
                       onChange={handleInputChange}
-                      className="flex-1 max-w-[320px] border border-gray-300 rounded-md px-3 md:px-3 md:py-2 py-1 shadow-sm  focus:ring-1 focus:ring-[#14213d] focus:border-transparent transition duration-200"
+                      className="w-full min-w-0 flex-1 md:max-w-[320px] border border-gray-300 rounded-md px-2 py-1 md:px-3 md:py-2 shadow-sm focus:ring-1 focus:ring-[#14213d] focus:border-transparent transition duration-200"
                     />
                   </div>
                 ))}
