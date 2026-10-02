@@ -546,7 +546,7 @@ ${sidebarActive
           <div className="shadow-overlay fixed inset-0 bg-black bg-opacity-40 z-40" onClick={handleCloseForm}></div>
           {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center mt-10 z-50">
-            <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[330px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
+            <div className="bg-white p-3 rounded-[0.5rem] shadow-lg w-full max-w-[370px] md:max-w-[500px] relative pl-3 pr-3 md:pr-6 md:pl-6">
               {/* Cancel (close) icon in top right */}
               <div className="mb-7 md:mt-6 ">
                 <FontAwesomeIcon
