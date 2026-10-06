@@ -420,7 +420,7 @@ ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
                   </div>
                 </div>
                 {/* User Profile */}
-                <div className=" p-6 flex -mt-2 md:mt-0 flex-col items-center  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+               <div className="p-6 flex -mt-2 md:mt-0 -mx-1 md:mx-0 flex-col items-center backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                   <h2 className="text-xl font-bold mb-2  text-[#14213d]">User Profile</h2>
                   <hr className="my-4 w-full " />
                   <div className="text-center leading-8">
