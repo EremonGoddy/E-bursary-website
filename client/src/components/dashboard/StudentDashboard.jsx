@@ -394,8 +394,8 @@ ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
             ) : Object.keys(studentDetails).length > 0 ? (
               <>
                 {/* Bursary Funds & Status */}
-                <div className="flex flex-col gap-1 md:gap-4">
-                  <div className="w-[calc(100%+1rem)] -ml-1 md:w-full md:ml-0 p-4 flex flex-col items-center mb-2 backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
+                <div className="flex flex-col gap-1 md:gap-4 -mx-2 md:mx-0">
+                  <div className=" p-4  flex flex-col items-center mb-2  backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01]">
                     <h2 className=" font-bold mb-1 text-[#14213d]">
                       Bursary funds allocated:
                     </h2>
