@@ -460,7 +460,8 @@ ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
                       <FontAwesomeIcon icon={faEdit} /> Update Profile
                     </button>
                   </div>
-                  <hr className="my-4" />
+                 
+                  <hr className="my-4 w-full border-t-2 border-gray-500" />
                   <table className="table-auto w-full text-left">
                     <tbody className="leading-8 text-[#14213d]">
                       <tr>

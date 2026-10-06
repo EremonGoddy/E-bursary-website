@@ -464,7 +464,7 @@ const StudentReport = () => {
         <div className={`
           flex-1 md:ml-25 transition-all duration-300
           ${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[40px]'}`}>
-          <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[1500px] mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-0 md:p-8">
+        <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[360px] md:max-w-[1500px] mx-auto -mt-6 md:mt-2 mb-4 md:mb-6 p-4 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-[#14213d] text-center">Bursary Report</h1>
 
             {/* Responsive Report Info */}
