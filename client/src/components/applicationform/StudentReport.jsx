@@ -446,12 +446,12 @@ const StudentReport = () => {
                         <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
                       )}
                     </div>
-                    <span className={`${sidebarActive ? 'inline-block ml-2 text-xl font-semibold' : 'hidden'}`}>{item.label}</span>
+                    <span className={`${sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'}`}>{item.label}</span>
                   </Link>
                 )}
 
                 {!sidebarActive && (
-                  <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+                  <span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
                     {item.label}
                   </span>
                 )}
