@@ -293,7 +293,7 @@ ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
           <ul className="flex flex-col h-full mt-6 space-y-10">
             {sidebarItems.map((item, index) => (
               <li
-                className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`}
+                className={`group relative ${item.isLogout ? 'mt-50 md:mt-55' : ''}`}
                 key={index}
               >
                 {item.isLogout ? (
