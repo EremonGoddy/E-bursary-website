@@ -551,7 +551,7 @@ ${sidebarActive
               <div className="mb-7 md:mt-6 ">
                 <FontAwesomeIcon
                   icon={faTimes}
-                  className="absolute w-7 h-7 top-1  -right-1 md:right-2 text-[#14213d] hover:text-[#14213d] hover:bg-gray-200 p-1 rounded-full text-3xl cursor-pointer transition duration-200 ease-in-out active:scale-90"
+                  className="absolute w-8 h-8 top-1  -right-1 md:right-2 text-[#14213d] hover:text-[#14213d] hover:bg-gray-200 p-1 rounded-full text-3xl cursor-pointer transition duration-200 ease-in-out active:scale-90"
                   onClick={handleCloseForm}
                 />
               </div>
