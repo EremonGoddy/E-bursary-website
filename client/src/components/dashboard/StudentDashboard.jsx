@@ -377,12 +377,15 @@ ${sidebarActive ? 'md:w-[210px] md:p-4' : 'md:w-[36px] md:p-2'}
           </ul>
         </div>
 
-        {/* Main Content */}
-        <div
-          className={`flex-1 transition-all duration-300 -mt-9 md:-mt-6 pt-4  
+      {/* Main Content */}
+<div
+  onClick={() => {
+    if (sidebarActive) setSidebarActive(false);
+  }}
+  className={`flex-1 transition-all duration-300 -mt-9 md:-mt-6 pt-4
 ${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
 `}
-        >
+>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {loading ? (
               <div className="col-span-1 md:col-span-3 flex justify-center items-center min-h-[300px]">
