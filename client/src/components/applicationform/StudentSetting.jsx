@@ -381,8 +381,14 @@ sidebarActive
 </ul>
 </div>
 {/* Main Content Area */}
-<div className={`flex-1 md:ml-25 transition-all mt-2 duration-300
-${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
+<div
+  onClick={() => {
+    if (sidebarActive) setSidebarActive(false);
+  }}
+  className={`flex-1 transition-all duration-300 -mt-1 md:-mt-6 pt-4
+${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
+`}
+>
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] max-w-[350px] md:max-w-[500px]  mx-auto -mt-9 md:-mt-2 mb-4 md:mb-6 p-4 md:p-8">
 <h2 className="text-2xl font-bold text-[#14213d] mb-4 text-center">Change Password</h2>
 <form onSubmit={handleChangePassword} className="space-y-4 text-[#14213d] relative">
