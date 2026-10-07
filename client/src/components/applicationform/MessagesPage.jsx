@@ -127,34 +127,39 @@ navigate('/personaldetails');
 return (
 <div className="w-full min-h-screen relative bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
 {/* Top Bar */}
-<div className="bg-white fixed top-0 left-0 w-full shadow-lg p-2 md:p-3 z-50 md:pl-20 md:pr-20">
-<div className="flex justify-between items-center">
-<h1 className="text-2xl font-bold text-[#14213d]">EBursary</h1>
-<div className="flex items-center space-x-1">
-<h2 className=" text-sm md:text-lg font-bold text-[#14213d]">
-Welcome: {userName}
-</h2>
-<img
-src={
-studentDetails.gender === 'Female'
-? '/images/woman.png'
-: studentDetails.gender === 'Male'
-? '/images/patient.png'
-: '/images/user.png'
-}
-alt="User"
-className="rounded-full w-9 h-9"
-/>
-<div className="block md:hidden">
-<FontAwesomeIcon
-icon={faBars}
-className="text-xl cursor-pointer text-[#14213d]"
-onClick={toggleSidebar}
-/>
-</div>
-</div>
-</div>
-</div>
+      <div className="bg-white fixed top-0 left-0 w-full shadow-lg p-3 md:p-2.5 z-50 md:pl-20 md:pr-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-[#14213d]">
+            EBursary
+          </h1>
+          <div className="flex items-center space-x-1">
+            <h2 className="text-[1rem] md:text-lg mr-3 md:mr-5 font-bold text-[#14213d]">
+              Welcome: {userName}
+            </h2>
+            <div className="flex items-center space-x-2">
+              <img
+                src={
+                  studentDetails.gender === 'Female'
+                    ? '/images/woman.png'
+                    : studentDetails.gender === 'Male'
+                    ? '/images/patient.png'
+                    : '/images/user.png'
+                }
+                alt="User"
+                className="rounded-full w-8 h-8 md:w-9 md:h-9 mr-1 md:mr-0"
+              />
+            </div>
+            {/* Sidebar toggle only visible on small screens */}
+            <div className="block md:hidden">
+              <FontAwesomeIcon
+                icon={faBars}
+                className="text-[1.4rem] cursor-pointer text-[#14213d]"
+                onClick={toggleSidebar}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
 <div className="flex pt-20 min-h-screen">
 {/* Sidebar */}
@@ -219,7 +224,7 @@ label: 'Logout',
 isLogout: true
 }
 ].map((item, index) => (
-<li className={`group relative ${item.isLogout ? 'mt-30 md:mt-55' : ''}`} key={index}>
+<li className={`group relative ${item.isLogout ? 'mt-50 md:mt-55' : ''}`} key={index}>
       
 {item.isLogout ? (
 <a
@@ -284,7 +289,7 @@ sidebarActive ? 'justify-start' : 'justify-center'
 </div>
 <span
 className={`${
-sidebarActive ? 'inline-block ml-2 text-xl font-semibold' : 'hidden'
+sidebarActive ? 'inline-block ml-2 font-semibold' : 'hidden'
 }`}
 >
 {item.label}
@@ -293,7 +298,7 @@ sidebarActive ? 'inline-block ml-2 text-xl font-semibold' : 'hidden'
 )}
 
 {!sidebarActive && (
-<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-[1.1rem] w-[120px] flex items-center justify-center z-50">
+<span className="absolute left-full ml-5 top-1/2 -translate-y-1/2 bg-[#14213d] text-white font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-[120px] flex items-center justify-center z-50">
 {item.label}
 </span>
 )}
@@ -302,9 +307,15 @@ sidebarActive ? 'inline-block ml-2 text-xl font-semibold' : 'hidden'
 </ul>
 </div>
 {/* Main Content */}
-<div className={`flex-1 md:ml-25 transition-all mt-2 duration-300
-${sidebarActive ? 'ml-[0px] md:ml-[200px]' : 'ml-0 md:ml-[50px]'}`}>
-<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl -mt-7 md:mt-0 rounded-2xl max-w-[600px] mx-auto p-2">
+<div
+  onClick={() => {
+    if (sidebarActive) setSidebarActive(false);
+  }}
+  className={`flex-1 transition-all duration-300 -mt-4 md:-mt-6 pt-4
+${sidebarActive ? 'ml-[0px] md:ml-[210px]' : 'ml-0 md:ml-[50px]'}
+`}
+>
+<div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl -mt-7 md:mt-0 rounded-2xl w-[calc(100%+1rem)] -ml-2 md:w-full md:ml-auto md:max-w-[600px] md:mx-auto p-2">
 {loading ? (
 <p className="text-lg text-gray-500 animate-pulse">Loading...</p>
 ) : (
