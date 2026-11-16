@@ -34,10 +34,12 @@ const Documentupload = () => {
   const navigate = useNavigate();
   const userId = sessionStorage.getItem('userId');
 
-  const toggleSidebar = () => setSidebarActive((active) => !active);
+  const toggleSidebar = () => {
+    setSidebarActive((active) => !active);
+  };
 
-  const handleFileChange = (e, field) => {
-    const file = e.target.files[0] || null;
+  const handleFileChange = (event, field) => {
+    const file = event.target.files?.[0] || null;
 
     setDocuments((previous) => ({
       ...previous,
@@ -48,27 +50,51 @@ const Documentupload = () => {
   };
 
   const fetchDocuments = async () => {
-    if (!userId) return;
+    if (!userId) {
+      setDocumentList([]);
+      setDocumentUploaded(false);
+      return;
+    }
 
     try {
-      const response = await axios.get(`${API_URL}/api/upload/list/${userId}`);
-      const data = response.data;
+      // This endpoint exists in the backend code you shared.
+      const response = await axios.get(
+        `${API_URL}/api/get-document/${userId}`
+      );
 
-      if (Array.isArray(data)) {
-        setDocumentList(data);
-      } else if (data && typeof data === 'object') {
-        setDocumentList([data]);
-      } else {
-        setDocumentList([]);
-      }
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data
+          ? [response.data]
+          : [];
+
+      setDocumentList(data);
+
+      const hasUploadedDocument = data.some(
+        (record) =>
+          record.admission_letter ||
+          record.fees_structure ||
+          record.parent_guardian_id
+      );
+
+      setDocumentUploaded(Boolean(hasUploadedDocument));
     } catch (error) {
+      console.error(
+        'Error fetching uploaded documents:',
+        error.response?.status,
+        error.response?.data || error.message
+      );
       setDocumentList([]);
+      setDocumentUploaded(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setUploadStatus('');
+
+    // Capture the form before awaiting the request.
+    const form = event.currentTarget;
 
     if (!userId) {
       setUploadStatus('User not found. Please login again.');
@@ -91,17 +117,25 @@ const Documentupload = () => {
     formDataToSend.append('guardianIdCopy', documents.guardianIdCopy);
 
     try {
+      // Let the browser/Axios set the multipart boundary automatically.
       const response = await axios.post(
         `${API_URL}/api/upload`,
-        formDataToSend,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        formDataToSend
       );
 
+      const successMessage =
+        typeof response.data === 'string'
+          ? response.data
+          : response.data?.message;
+
       if (
-        typeof response.data !== 'string' ||
-        !response.data.toLowerCase().includes('success')
+        response.status < 200 ||
+        response.status >= 300 ||
+        !successMessage?.toLowerCase().includes('success')
       ) {
-        throw new Error('File upload failed');
+        throw new Error(
+          successMessage || 'The server did not confirm the upload.'
+        );
       }
 
       setUploadStatus('Files uploaded successfully!');
@@ -110,16 +144,24 @@ const Documentupload = () => {
         feesStructure: null,
         guardianIdCopy: null,
       });
+      form.reset();
 
-      e.currentTarget.reset();
       await fetchDocuments();
-
       setTimeout(() => navigate('/studentdashboard'), 800);
     } catch (error) {
-      console.error('Error uploading files:', error);
-      setUploadStatus(
-        error.response?.data || 'File upload failed!'
+      console.error(
+        'Error uploading files:',
+        error.response?.status,
+        error.response?.data || error.message
       );
+
+      const responseData = error.response?.data;
+      const errorMessage =
+        typeof responseData === 'string'
+          ? responseData
+          : responseData?.error || responseData?.message;
+
+      setUploadStatus(errorMessage || error.message || 'File upload failed!');
     }
   };
 
@@ -145,42 +187,15 @@ const Documentupload = () => {
         },
       })
       .then((response) => {
-        setStudentDetails(response.data);
+        setStudentDetails(response.data || {});
       })
       .catch((error) => {
         if (error.response?.status === 401) {
           navigate('/signin');
+        } else {
+          console.error('Error fetching student details:', error);
         }
       });
-
-    if (currentUserId) {
-      axios
-        .get(`${API_URL}/api/upload/status/${currentUserId}`, {
-          headers: { Authorization: token },
-        })
-        .then((response) => {
-          const data = response.data || {};
-          setDocumentUploaded(
-            Boolean(
-              data.uploaded ||
-              data.admission_letter ||
-              data.fees_structure ||
-              data.parent_guardian_id
-            )
-          );
-        })
-        .catch(() => setDocumentUploaded(false));
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const currentUserId = sessionStorage.getItem('userId');
-
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
 
     if (currentUserId) {
       axios
@@ -188,37 +203,14 @@ const Documentupload = () => {
           headers: { Authorization: token },
         })
         .then((response) => {
-          const message = response.data.status_message;
+          const message = response.data?.status_message;
           setHasNewMessage(
             Boolean(message && message.toLowerCase().includes('new'))
           );
         })
         .catch((error) => {
-          console.error('Error checking status message:', error);
-        });
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const name = sessionStorage.getItem('userName');
-    const currentUserId = sessionStorage.getItem('userId');
-
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
-
-    setUserName(name || '');
-
-    if (currentUserId) {
-      axios
-        .get(`${API_URL}/api/upload/status/${currentUserId}`, {
-          headers: { Authorization: token },
-        })
-        .catch((error) => {
           if (error.response?.status !== 404) {
-            setUploadStatus('Error checking upload status!');
+            console.error('Error checking status message:', error);
           }
         });
 
@@ -246,8 +238,14 @@ const Documentupload = () => {
       return filePath;
     }
 
-    const normalizedPath = filePath.replace(/^\.?\//, '');
-    return `${API_URL}/${normalizedPath}`;
+    // The backend stores production uploads under /tmp/uploads.
+    // The static route exposes that directory at /uploads.
+    const filename = filePath
+      .replace(/\\/g, '/')
+      .split('/')
+      .pop();
+
+    return `${API_URL}/uploads/${encodeURIComponent(filename)}`;
   };
 
   return (
@@ -350,8 +348,8 @@ const Documentupload = () => {
                 {item.isLogout ? (
                   <a
                     href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
+                    onClick={(event) => {
+                      event.preventDefault();
                       const token = sessionStorage.getItem('authToken');
 
                       axios
@@ -509,7 +507,9 @@ const Documentupload = () => {
                   type="file"
                   id="admissionLetter"
                   name="admissionLetter"
-                  onChange={(e) => handleFileChange(e, 'admissionLetter')}
+                  onChange={(event) =>
+                    handleFileChange(event, 'admissionLetter')
+                  }
                   required
                   className="form-input w-full border border-gray-300 rounded px-2 py-1 focus:border-[#14213d] file:mr-4 file:py-2 file:px-4 file:border-0 file:font-semibold file:bg-blue-50 file:cursor-pointer file:text-[#14213d] hover:file:bg-blue-100"
                 />
@@ -526,7 +526,9 @@ const Documentupload = () => {
                   type="file"
                   id="feesStructure"
                   name="feesStructure"
-                  onChange={(e) => handleFileChange(e, 'feesStructure')}
+                  onChange={(event) =>
+                    handleFileChange(event, 'feesStructure')
+                  }
                   required
                   className="form-input w-full border border-gray-300 rounded px-2 py-1 focus:border-[#14213d] file:mr-4 file:py-2 file:px-4 file:border-0 file:font-semibold file:bg-blue-50 file:cursor-pointer file:text-[#14213d] hover:file:bg-blue-100"
                 />
@@ -543,7 +545,9 @@ const Documentupload = () => {
                   type="file"
                   id="guardianIdCopy"
                   name="guardianIdCopy"
-                  onChange={(e) => handleFileChange(e, 'guardianIdCopy')}
+                  onChange={(event) =>
+                    handleFileChange(event, 'guardianIdCopy')
+                  }
                   required
                   className="form-input w-full border border-gray-300 rounded px-2 py-1 focus:border-[#14213d] file:mr-4 file:py-2 file:px-4 file:border-0 file:font-semibold file:bg-blue-50 file:cursor-pointer file:text-[#14213d] hover:file:bg-blue-100"
                 />
