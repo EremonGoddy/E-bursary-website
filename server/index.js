@@ -801,34 +801,65 @@ const upload = multer({
 });
 
 
-app.post('/api/upload', upload.single('document'), async (req, res) => {
-  const { documentName, userId } = req.body;
-  const document = req.file;
+app.post(
+  '/api/upload',
+  upload.fields([
+    { name: 'admissionLetter', maxCount: 1 },
+    { name: 'feesStructure', maxCount: 1 },
+    { name: 'guardianIdCopy', maxCount: 1 },
+  ]),
+  async (req, res) => {
+    const { userId } = req.body;
+    const files = req.files || {};
 
-  if (!document) {
-    return res.status(400).send('No file uploaded');
+    if (!userId) {
+      return res.status(400).send('userId is required');
+    }
+
+    const admissionLetter = files.admissionLetter?.[0];
+    const feesStructure = files.feesStructure?.[0];
+    const guardianIdCopy = files.guardianIdCopy?.[0];
+
+    if (!admissionLetter || !feesStructure || !guardianIdCopy) {
+      return res.status(400).send(
+        'Admission Letter, Fees Structure, and Parent/Guardian ID Copy are required'
+      );
+    }
+
+    const getFilePath = (file) =>
+      file.path.startsWith('/tmp/')
+        ? file.path
+        : path.relative(__dirname, file.path);
+
+    const admissionLetterPath = getFilePath(admissionLetter);
+    const feesStructurePath = getFilePath(feesStructure);
+    const guardianIdCopyPath = getFilePath(guardianIdCopy);
+
+    try {
+      await pool.query(
+        `INSERT INTO bursary.uploaded_document
+          (user_id, admission_letter, fees_structure, parent_guardian_id)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (user_id)
+         DO UPDATE SET
+           admission_letter = EXCLUDED.admission_letter,
+           fees_structure = EXCLUDED.fees_structure,
+           parent_guardian_id = EXCLUDED.parent_guardian_id`,
+        [
+          userId,
+          admissionLetterPath,
+          feesStructurePath,
+          guardianIdCopyPath,
+        ]
+      );
+
+      return res.send('Documents uploaded and saved successfully');
+    } catch (err) {
+      console.error('Error saving documents to database:', err);
+      return res.status(500).send('Database error');
+    }
   }
-  if (!userId) {
-    return res.status(400).send('userId is required');
-  }
-
-  const filePath = document.path.startsWith('/tmp/')
-    ? document.path
-    : path.relative(__dirname, document.path);
-
-  const query = `
-    INSERT INTO bursary.uploaded_document (user_id, document_name, file_path) 
-    VALUES ($1, $2, $3)
-  `;
-
-  try {
-    await pool.query(query, [userId, documentName, filePath]);
-    res.send('File uploaded and saved to database successfully');
-  } catch (err) {
-    console.error('Error saving to database:', err);
-    res.status(500).send('Database error');
-  }
-});
+);
 
 app.get('/api/admin-details', async (req, res) => {
   const role = 'Admin';
