@@ -1709,10 +1709,7 @@ app.get('/api/user-report/:id', (req, res) => {
   });
 });
 
-const multer = require('multer');
-const crypto = require('crypto');
-const path = require('path');
-const fs = require('fs');
+const crypto = require('crypto'); 
 
 // ensure dirs
 const SIGN_DIR = path.join(UPLOAD_DIR, 'signatures');
