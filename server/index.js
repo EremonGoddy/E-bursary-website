@@ -1717,7 +1717,6 @@ fs.mkdirSync(SIGN_DIR, { recursive: true });
 
 // static serve uploads (ensure CORS header present so browser can use getImageData)
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
-const cors = require('cors');
 app.use(cors({ origin: CLIENT_ORIGIN, exposedHeaders: ['Content-Disposition'] }));
 app.use('/uploads', express.static(UPLOAD_DIR, {
   setHeaders: (res, _path) => {
