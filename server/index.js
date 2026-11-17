@@ -722,108 +722,98 @@ app.post('/api/disclosure-details', async (req, res) => {
   }
 });
 
-// ✅ Check Upload Status Route for PostgreSQL
-app.get('/api/upload/status/:userId', async (req, res) => {
-  const { userId } = req.params;
+// Document upload setup.
+// Keep the existing top-level imports for fs, path, multer, and express.
+// Define UPLOAD_DIR and upload only once in the entire file.
 
-  try {
-    const result = await pool.query(
-      'SELECT * FROM bursary.uploaded_document WHERE user_id = $1',
-      [userId]
-    );
+const UPLOAD_DIR =
+  process.env.NODE_ENV === 'production'
+    ? '/tmp/uploads'
+    : path.join(__dirname, 'uploads');
 
-    console.log('Checking document for userId:', userId);
-    console.log('Query result:', result.rows);
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-    let uploaded = false;
-
-    if (
-      result.rows.length > 0 &&
-      result.rows[0].file_path &&
-      result.rows[0].file_path.trim() !== ''
-    ) {
-      uploaded = true;
-    }
-
-    // ✅ Log the check
-    const logMessage = `Checked document upload status for user ID ${userId}: ${uploaded ? 'Uploaded' : 'Not Uploaded'}`;
-    await pool.query(
-      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
-      [logMessage]
-    );
-
-    res.json({ uploaded });
-  } catch (error) {
-    console.error('Error checking upload status:', error);
-    res.status(500).json({ uploaded: false });
-  }
-});
-
-// Use /tmp/uploads for cloud environments like Render
-const UPLOAD_DIR = process.env.NODE_ENV === 'production' 
-  ? '/tmp/uploads' 
-  : path.join(__dirname, 'uploads');
-
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+const documentStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+  filename: (_req, file, cb) => {
+    cb(null, `${Date.now()}-${path.basename(file.originalname)}`);
   },
 });
 
-// Restrict to PDF and image files
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = [
+const documentFileFilter = (_req, file, cb) => {
+  const allowedTypes = new Set([
     'application/pdf',
     'image/jpeg',
     'image/png',
-    'image/jpg',
-    'image/gif'
-  ];
+    'image/gif',
+  ]);
 
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PDF and image files are allowed!'), false);
+  if (allowedTypes.has(file.mimetype)) {
+    return cb(null, true);
   }
+
+  cb(new Error('Only PDF and image files are allowed.'));
 };
 
-const upload = multer({ 
-  storage, 
-  fileFilter 
+const upload = multer({
+  storage: documentStorage,
+  fileFilter: documentFileFilter,
+  limits: {
+    files: 3,
+    fileSize: 10 * 1024 * 1024, // 10 MB per file
+  },
 });
 
+// Keep this static route only once in the file.
+// The frontend builds document links under /uploads/<filename>.
+app.use('/uploads', express.static(UPLOAD_DIR));
 
-// Reuse the existing `upload` instance declared near the top:
-// const upload = multer({ storage, fileFilter, ... });
+const documentFields = upload.fields([
+  { name: 'admissionLetter', maxCount: 1 },
+  { name: 'feesStructure', maxCount: 1 },
+  { name: 'guardianIdCopy', maxCount: 1 },
+]);
 
-app.post(
-  '/api/upload',
-  upload.fields([
-    { name: 'admissionLetter', maxCount: 1 },
-    { name: 'feesStructure', maxCount: 1 },
-    { name: 'guardianIdCopy', maxCount: 1 },
-  ]),
-  async (req, res) => {
-    const { userId } = req.body;
-    const files = req.files || {};
+// Upload three documents and save their paths in the database.
+app.post('/api/upload', (req, res) => {
+  documentFields(req, res, async (uploadError) => {
+    if (uploadError) {
+      console.error('Document upload rejected:', {
+        code: uploadError.code,
+        field: uploadError.field,
+        message: uploadError.message,
+      });
 
-    if (!userId) {
-      return res.status(400).json({ message: 'userId is required.' });
+      const status = uploadError.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+      return res.status(status).json({
+        message: uploadError.message || 'Document upload rejected.',
+        field: uploadError.field || null,
+      });
     }
 
+    const files = req.files || {};
+    const uploadedFiles = Object.values(files).flat();
+
+    const removeUploadedFiles = () => {
+      for (const file of uploadedFiles) {
+        if (file.path) {
+          fs.unlink(file.path, () => {});
+        }
+      }
+    };
+
+    const { userId } = req.body;
     const admissionLetter = files.admissionLetter?.[0];
     const feesStructure = files.feesStructure?.[0];
     const guardianIdCopy = files.guardianIdCopy?.[0];
 
+    if (!userId) {
+      removeUploadedFiles();
+      return res.status(400).json({ message: 'userId is required.' });
+    }
+
     if (!admissionLetter || !feesStructure || !guardianIdCopy) {
+      removeUploadedFiles();
       return res.status(400).json({
         message:
           'Admission Letter, Fees Structure, and Parent/Guardian ID Copy are required.',
@@ -852,15 +842,43 @@ app.post(
         message: 'Documents uploaded and saved successfully.',
       });
     } catch (error) {
+      removeUploadedFiles();
       console.error('Error saving uploaded documents:', error.message);
       return res.status(500).json({
         message: 'Database error saving documents.',
       });
     }
-  }
-);
+  });
+});
 
-// Replace your existing /api/get-document/:id route with this one.
+// Check the document columns used by the upload route.
+// Do not check file_path; that isn't one of the columns being saved above.
+app.get('/api/upload/status/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT admission_letter, fees_structure, parent_guardian_id
+       FROM bursary.uploaded_document
+       WHERE user_id = $1`,
+      [userId]
+    );
+
+    const document = result.rows[0];
+    const uploaded = Boolean(
+      document?.admission_letter &&
+      document?.fees_structure &&
+      document?.parent_guardian_id
+    );
+
+    return res.json({ uploaded });
+  } catch (error) {
+    console.error('Error checking document status:', error.message);
+    return res.status(500).json({ uploaded: false });
+  }
+});
+
+// Fetch documents directly, without joining personal_details.
 app.get('/api/get-document/:id', async (req, res) => {
   try {
     const result = await pool.query(
@@ -870,7 +888,7 @@ app.get('/api/get-document/:id', async (req, res) => {
       [req.params.id]
     );
 
-    return res.status(200).json(result.rows);
+    return res.json(result.rows);
   } catch (error) {
     console.error('Error fetching uploaded documents:', error.message);
     return res.status(500).json({
