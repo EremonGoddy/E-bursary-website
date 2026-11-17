@@ -759,92 +759,63 @@ app.get('/api/upload/status/:userId', async (req, res) => {
   }
 });
 
-// Document upload and fetch setup.
-// Reuse the fs, path, multer, pool, and app declarations already at the top
-// of server.js.
+// Use /tmp/uploads for cloud environments like Render
+const UPLOAD_DIR = process.env.NODE_ENV === 'production' 
+  ? '/tmp/uploads' 
+  : path.join(__dirname, 'uploads');
 
-const UPLOAD_DIR =
-  process.env.NODE_ENV === 'production'
-    ? '/tmp/uploads'
-    : path.join(__dirname, 'uploads');
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-const documentStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
-    const safeOriginalName = path.basename(file.originalname);
-    cb(null, `${Date.now()}-${safeOriginalName}`);
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
   },
 });
 
-const documentFileFilter = (_req, file, cb) => {
-  const allowedTypes = new Set([
+// Restrict to PDF and image files
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
     'application/pdf',
     'image/jpeg',
     'image/png',
-    'image/gif',
-  ]);
+    'image/jpg',
+    'image/gif'
+  ];
 
-  if (allowedTypes.has(file.mimetype)) {
-    return cb(null, true);
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only PDF and image files are allowed!'), false);
   }
-
-  const error = new Error('Only PDF and image files are allowed.');
-  error.status = 400;
-  cb(error);
 };
 
-const documentUpload = multer({
-  storage: documentStorage,
-  fileFilter: documentFileFilter,
-  limits: {
-    files: 3,
-    fileSize: 10 * 1024 * 1024, // 10 MB per file
-  },
+const upload = multer({ 
+  storage, 
+  fileFilter 
 });
 
-const documentFields = documentUpload.fields([
-  { name: 'admissionLetter', maxCount: 1 },
-  { name: 'feesStructure', maxCount: 1 },
-  { name: 'guardianIdCopy', maxCount: 1 },
-]);
 
-// Serve uploaded files from /uploads/<filename>.
-app.use('/uploads', express.static(UPLOAD_DIR));
+// Reuse the existing `upload` instance declared near the top:
+// const upload = multer({ storage, fileFilter, ... });
 
-app.post('/api/upload', (req, res) => {
-  documentFields(req, res, async (uploadError) => {
-    if (uploadError) {
-      // err.field helps identify a field-name mismatch.
-      console.error('Document upload rejected:', {
-        code: uploadError.code,
-        field: uploadError.field,
-        message: uploadError.message,
-      });
-
-      const status = uploadError.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
-      return res.status(status).json({
-        message: uploadError.message || 'Document upload rejected.',
-        field: uploadError.field || null,
-      });
-    }
-
-    const files = req.files || {};
-    const uploadedFiles = Object.values(files).flat();
-
-    const removeUploadedFiles = () => {
-      for (const file of uploadedFiles) {
-        if (file?.path && fs.existsSync(file.path)) {
-          fs.unlink(file.path, () => {});
-        }
-      }
-    };
-
+app.post(
+  '/api/upload',
+  upload.fields([
+    { name: 'admissionLetter', maxCount: 1 },
+    { name: 'feesStructure', maxCount: 1 },
+    { name: 'guardianIdCopy', maxCount: 1 },
+  ]),
+  async (req, res) => {
     const { userId } = req.body;
+    const files = req.files || {};
 
     if (!userId) {
-      removeUploadedFiles();
       return res.status(400).json({ message: 'userId is required.' });
     }
 
@@ -853,7 +824,6 @@ app.post('/api/upload', (req, res) => {
     const guardianIdCopy = files.guardianIdCopy?.[0];
 
     if (!admissionLetter || !feesStructure || !guardianIdCopy) {
-      removeUploadedFiles();
       return res.status(400).json({
         message:
           'Admission Letter, Fees Structure, and Parent/Guardian ID Copy are required.',
@@ -882,31 +852,30 @@ app.post('/api/upload', (req, res) => {
         message: 'Documents uploaded and saved successfully.',
       });
     } catch (error) {
-      removeUploadedFiles();
       console.error('Error saving uploaded documents:', error.message);
-      return res.status(500).json({ message: 'Database error saving documents.' });
+      return res.status(500).json({
+        message: 'Database error saving documents.',
+      });
     }
-  });
-});
+  }
+);
 
-// Fetch directly from uploaded_document.
-// Avoids the personal_details JOIN causing an empty result when no matching
-// personal_details row exists.
+// Replace your existing /api/get-document/:id route with this one.
 app.get('/api/get-document/:id', async (req, res) => {
-  const { id } = req.params;
-
   try {
     const result = await pool.query(
       `SELECT user_id, admission_letter, fees_structure, parent_guardian_id
        FROM bursary.uploaded_document
        WHERE user_id = $1`,
-      [id]
+      [req.params.id]
     );
 
     return res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching uploaded documents:', error.message);
-    return res.status(500).json({ message: 'Error fetching uploaded documents.' });
+    return res.status(500).json({
+      message: 'Error fetching uploaded documents.',
+    });
   }
 });
 
