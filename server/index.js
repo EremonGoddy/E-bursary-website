@@ -18,30 +18,19 @@ const app = express();
 
 /* ----------------------------- CORS ----------------------------- */
 
-const allowedOrigins = (
-  process.env.CLIENT_ORIGINS ||
-  'https://e-bursary-website.vercel.app,http://localhost:5173'
-)
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+/* ----------------------------- CORS ----------------------------- */
 
-const corsOptions = {
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+const allowedOrigins = [
+  'https://e-bursary-website.vercel.app'
+];
 
-    return callback(
-      new Error(`Origin ${origin} is not allowed by CORS policy`)
-    );
-  },
+app.use(cors({
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Disposition'],
-};
-
-app.use(cors(corsOptions));
+  exposedHeaders: ['Content-Disposition']
+}));
+  
 
 /* -------------------------- Middleware -------------------------- */
 
