@@ -24,7 +24,6 @@ const allowedOrigins = (
 )
   .split(',')
   .map((origin) => origin.trim())
-  .replace(Boolean)
   .filter(Boolean);
 
 const corsOptions = {
