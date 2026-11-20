@@ -1,101 +1,164 @@
-// Load environment variables
+// server.js
 require('dotenv').config();
-const pool = require("./db-config");
-const express = require("express");
-const app = express();
-const cors = require("cors");
+
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require("body-parser");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
-const multer = require("multer");
+const crypto = require('crypto');
 
+const pool = require('./db-config');
 
+const app = express();
 
-// ✅ Middleware
-app.use(cors());
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-// at top of server.js, after creating `app`
-app.use(express.json({ limit: '10mb' }));        // allow up to 10MB JSON (increase if you must)
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+/* ----------------------------- CORS ----------------------------- */
 
-// ✅ JWT Secret from .env or fallback
-const secret = process.env.JWT_SECRET || "your_jwt_secret";
+const allowedOrigins = (
+  process.env.CLIENT_ORIGINS ||
+  'https://e-bursary-website.vercel.app,http://localhost:5173'
+)
+  .split(',')
+  .map((origin) => origin.trim())
+  .replace(Boolean)
+  .filter(Boolean);
 
-// ✅ Authenticate JWT Token Middleware
-const authenticateToken = (req, res, next) => {
-const authHeader = req.headers["authorization"];
-const token = authHeader && authHeader.split(" ")[1];
-if (!token) return res.status(401).json({ message: "Token required" });
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-jwt.verify(token, secret, (err, user) => {
-if (err) return res.status(403).json({ message: "Invalid token" });
-req.user = user;
-next();
-});
+    return callback(
+      new Error(`Origin ${origin} is not allowed by CORS policy`)
+    );
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Disposition'],
 };
 
-// ✅ Example route to test DB and server
-app.get("/", (req, res) => {
-res.send("🚀 Backend is running and connected to PostgreSQL.");
+app.use(cors(corsOptions));
+
+/* -------------------------- Middleware -------------------------- */
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/* -------------------------- JWT/Auth --------------------------- */
+
+const secret = process.env.JWT_SECRET;
+
+if (!secret) {
+  throw new Error('JWT_SECRET is required');
+}
+
+const authenticateToken = (req, res, next) => {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res.status(401).json({ message: 'Token required' });
+  }
+
+  const parts = authorization.split(' ');
+  const token = parts.length === 2 ? parts[1] : null;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token required' });
+  }
+
+  jwt.verify(token, secret, (error, user) => {
+    if (error) {
+      return res.status(403).json({ message: 'Invalid token' });
+    }
+
+    req.user = user;
+    next();
+  });
+};
+
+/* ----------------------------- Root ----------------------------- */
+
+app.get('/', (_req, res) => {
+  res.send('🚀 Backend is running and connected to PostgreSQL.');
 });
 
-// ✅ Verify current password API
-app.get("/api/verify-password", authenticateToken, async (req, res) => {
-const { userId } = req.user;
-const { password } = req.query;
+/* ----------------------- Password Verification ------------------ */
 
-try {
-const result = await pool.query("SELECT password FROM bursary.users WHERE id = $1", [userId]);
+app.get(
+  '/api/verify-password',
+  authenticateToken,
+  async (req, res) => {
+    const { userId } = req.user;
+    const { password } = req.query;
 
-if (result.rows.length === 0) {
-return res.status(404).json({ message: "User not found" });
-}
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' });
+    }
 
-const hashedPassword = result.rows[0].password;
-const isMatch = await bcrypt.compare(password, hashedPassword);
+    try {
+      const result = await pool.query(
+        'SELECT password FROM bursary.users WHERE id = $1',
+        [userId]
+      );
 
-if (!isMatch) {
-return res.status(401).json({ message: "Invalid password" });
-}
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'User not found' });
+      }
 
-res.status(200).json({ message: "Password verified" });
-} catch (error) {
-console.error("Error verifying password:", error);
-res.status(500).json({ message: "Server error" });
-}
-});
+      const isMatch = await bcrypt.compare(
+        password,
+        result.rows[0].password
+      );
 
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid password' });
+      }
 
-// ✅ SEND OTP ROUTE (send-otp)
+      res.status(200).json({ message: 'Password verified' });
+    } catch (error) {
+      console.error('Error verifying password:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+/* ------------------------------ OTP ----------------------------- */
+
 app.post('/api/send-otp', async (req, res) => {
   const { email, phoneNumber } = req.body;
 
   if (!email && !phoneNumber) {
-    return res.status(400).json({ message: 'Please provide either email or phone number' });
+    return res.status(400).json({
+      message: 'Please provide either email or phone number',
+    });
   }
 
   try {
-    let user;
+    let userResult;
 
     if (email) {
-      const result = await pool.query('SELECT * FROM bursary.users WHERE email = $1', [email]);
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'User with this email not found' });
-      }
-      user = result.rows[0];
+      userResult = await pool.query(
+        'SELECT * FROM bursary.users WHERE email = $1',
+        [email]
+      );
+    } else {
+      userResult = await pool.query(
+        'SELECT * FROM bursary.users WHERE phone_number = $1',
+        [phoneNumber]
+      );
     }
 
-    if (phoneNumber) {
-      const result = await pool.query('SELECT * FROM bursary.users WHERE phone_number = $1', [phoneNumber]);
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'User with this phone number not found' });
-      }
-      user = result.rows[0];
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        message: 'User not found',
+      });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -103,64 +166,83 @@ app.post('/api/send-otp', async (req, res) => {
 
     if (email) {
       await pool.query(
-        'UPDATE bursary.users SET otp_code = $1, otp_expires = $2 WHERE email = $3',
+        `UPDATE bursary.users
+         SET otp_code = $1, otp_expires = $2
+         WHERE email = $3`,
         [otp, expiresAt, email]
       );
+
+      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        return res.status(500).json({
+          message: 'Email service is not configured',
+        });
+      }
 
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'eremon.godwin@gmail.com',
-          pass: 'wvobbwumiliwbfdg',
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
         },
       });
 
       await transporter.sendMail({
-        from: 'Your App <eremon.godwin@gmail.com>',
+        from: `Bursary System <${process.env.EMAIL_USER}>`,
         to: email,
         subject: 'Your OTP Code',
         text: `Your OTP code is: ${otp}\n\nIt expires in 5 minutes.`,
       });
 
-      return res.json({ message: 'OTP sent to email successfully' });
+      return res.json({
+        message: 'OTP sent to email successfully',
+      });
     }
 
-    if (phoneNumber) {
-      await pool.query(
-        'UPDATE bursary.users SET otp_code = $1, otp_expires = $2 WHERE phone_number = $3',
-        [otp, expiresAt, phoneNumber]
-      );
+    await pool.query(
+      `UPDATE bursary.users
+       SET otp_code = $1, otp_expires = $2
+       WHERE phone_number = $3`,
+      [otp, expiresAt, phoneNumber]
+    );
 
-      console.log(`OTP ${otp} would be sent via SMS to phone: ${phoneNumber}`);
+    console.log(
+      `OTP ${otp} would be sent via SMS to phone: ${phoneNumber}`
+    );
 
-      return res.json({ message: 'OTP sent to phone successfully (simulated)' });
-    }
-
-  } catch (err) {
-    console.error('Error sending OTP:', err);
+    return res.json({
+      message: 'OTP sent to phone successfully (simulated)',
+    });
+  } catch (error) {
+    console.error('Error sending OTP:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-
-// ✅ VERIFY OTP ROUTE (verify-otp)
 app.post('/api/verify-otp', async (req, res) => {
   const { email, phoneNumber, otp } = req.body;
 
   if (!otp || (!email && !phoneNumber)) {
-    return res.status(400).json({ message: 'OTP and either email or phone number are required' });
+    return res.status(400).json({
+      message: 'OTP and either email or phone number are required',
+    });
   }
 
   try {
     let userResult;
 
     if (email) {
-      userResult = await pool.query('SELECT * FROM bursary.users WHERE email = $1', [email]);
-    } else if (phoneNumber) {
-      userResult = await pool.query('SELECT * FROM bursary.users WHERE phone_number = $1', [phoneNumber]);
+      userResult = await pool.query(
+        'SELECT * FROM bursary.users WHERE email = $1',
+        [email]
+      );
+    } else {
+      userResult = await pool.query(
+        'SELECT * FROM bursary.users WHERE phone_number = $1',
+        [phoneNumber]
+      );
     }
 
-    if (!userResult || userResult.rows.length === 0) {
+    if (userResult.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
@@ -170,70 +252,87 @@ app.post('/api/verify-otp', async (req, res) => {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
 
-    const currentTime = new Date();
-    const expiryTime = new Date(user.otp_expires);
-
-    if (currentTime > expiryTime) {
+    if (new Date() > new Date(user.otp_expires)) {
       return res.status(400).json({ message: 'OTP has expired' });
     }
 
-    return res.json({ message: 'OTP verified successfully' });
+    await pool.query(
+      'UPDATE bursary.users SET otp_code = NULL, otp_expires = NULL WHERE id = $1',
+      [user.id]
+    );
 
-  } catch (err) {
-    console.error('Error verifying OTP:', err);
-    res.status(500).json({ message: 'Server error while verifying OTP' });
+    res.json({ message: 'OTP verified successfully' });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({
+      message: 'Server error while verifying OTP',
+    });
   }
 });
 
+/* ---------------------------- Sign In --------------------------- */
 
-
-
-app.post("/api/signin", async (req, res) => {
+app.post('/api/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res.status(400).json({
+        message: 'Email and password are required',
+      });
     }
 
-    const userQuery = "SELECT * FROM bursary.users WHERE email = $1";
-    const userResult = await pool.query(userQuery, [email]);
+    const userResult = await pool.query(
+      'SELECT * FROM bursary.users WHERE email = $1',
+      [email]
+    );
 
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     const user = userResult.rows[0];
-    console.log('User from DB:', user);
-    console.log('Password from request:', password);
-    console.log('Password hash from DB:', user.password);
-
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({
+        message: 'Invalid email or password',
+      });
     }
 
-    const studentResult = await pool.query("SELECT * FROM bursary.personal_details WHERE email = $1", [email]);
-    const committeeResult = await pool.query("SELECT * FROM bursary.profile_committee WHERE email = $1", [email]);
+    const [studentResult, committeeResult] = await Promise.all([
+      pool.query(
+        'SELECT * FROM bursary.personal_details WHERE email = $1',
+        [email]
+      ),
+      pool.query(
+        'SELECT * FROM bursary.profile_committee WHERE email = $1',
+        [email]
+      ),
+    ]);
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, secret, { expiresIn: "1h" });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      secret,
+      { expiresIn: '1h' }
+    );
 
     const response = {
-      message: "Login successful",
+      message: 'Login successful',
       token,
       role: user.role,
       name: user.name,
-      student: null,
-      committee: null
+      student: studentResult.rows[0] || null,
+      committee: null,
     };
-
-    if (studentResult.rows.length > 0) {
-      response.student = studentResult.rows[0];
-    }
 
     if (committeeResult.rows.length > 0) {
       const committee = committeeResult.rows[0];
+
       response.committee = {
         fullname: committee.fullname,
         email: committee.email,
@@ -242,176 +341,154 @@ app.post("/api/signin", async (req, res) => {
         subcounty: committee.subcounty,
         ward: committee.ward,
         position: committee.position,
+        signature: committee.signature || null,
       };
     }
 
-    /*Insert into activity log
-    const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
-    await pool.query(logQuery, [`User ${user.name} (${user.role}) signed in.`]);
-    
-*/
-    return res.status(200).json(response);
-
+    res.status(200).json(response);
   } catch (error) {
-    console.error("Error in /api/signin:", error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
-app.post('/api/logout', authenticateToken, async (req, res) => {
-  const userId = req.user.userId || req.user.id; // fallback
-
-  console.log("Decoded user on logout:", req.user); // ✅ Add this
-
-  try {
-    const result = await pool.query("SELECT name FROM bursary.users WHERE id = $1", [userId]);
-
-    if (result.rows.length > 0) {
-      const userName = result.rows[0].name;
-      const logMessage = `User ${userName} logged out.`;
-
-      //await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
-    }
-
-    res.status(200).json({ message: 'Logout successful' });
-  } catch (err) {
-    console.error('Error logging logout:', err);
+    console.error('Error in /api/signin:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+app.post('/api/logout', authenticateToken, async (req, res) => {
+  const userId = req.user.userId;
 
+  try {
+    await pool.query(
+      'SELECT name FROM bursary.users WHERE id = $1',
+      [userId]
+    );
 
-app.post("/api/approve-student", async (req, res) => {
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Error logging logout:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/* ---------------------- Student Information --------------------- */
+
+app.post('/api/approve-student', async (req, res) => {
   try {
     const { studentUserId, committeeName } = req.body;
 
     if (!studentUserId || !committeeName) {
-      return res.status(400).json({ message: "Student ID and Committee Name are required" });
+      return res.status(400).json({
+        message: 'Student ID and Committee Name are required',
+      });
     }
 
-    const updateQuery = `
-      UPDATE bursary.personal_details
-      SET approved_by_committee = $1
-      WHERE user_id = $2
-      RETURNING *;
-    `;
-
-    const result = await pool.query(updateQuery, [committeeName, studentUserId]);
+    const result = await pool.query(
+      `UPDATE bursary.personal_details
+       SET approved_by_committee = $1
+       WHERE user_id = $2
+       RETURNING *`,
+      [committeeName, studentUserId]
+    );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Student not found" });
+      return res.status(404).json({ message: 'Student not found' });
     }
 
-    /* ✅ Log activity
-    const logMessage = `Committee member ${committeeName} approved student with user ID ${studentUserId}`;
-    await pool.query(
-      'INSERT INTO activity_log (log_message) VALUES ($1)',
-      [logMessage]
-    );*/
-
-    return res.status(200).json({
-      message: "Student approved successfully",
-      student: result.rows[0]
+    res.status(200).json({
+      message: 'Student approved successfully',
+      student: result.rows[0],
     });
-
   } catch (error) {
-    console.error("Error in /api/approve-student:", error);
-    return res.status(500).json({ message: "Server error" });
+    console.error('Error in /api/approve-student:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-
-// ✅ Fetch status message and "is_new" flag
 app.get('/api/status-message/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const sql = `
-    SELECT status_message, is_new
-    FROM bursary.personal_details 
-    WHERE user_id = $1
-  `;
   try {
-    const result = await pool.query(sql, [userId]);
+    const result = await pool.query(
+      `SELECT status_message, is_new
+       FROM bursary.personal_details
+       WHERE user_id = $1`,
+      [req.params.userId]
+    );
 
-    if (result.rows.length > 0) {
-      res.json({
-        status_message: result.rows[0].status_message,
-        is_new: result.rows[0].is_new
-      });
-    } else {
-      res.status(404).json({ message: 'Not found' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found' });
     }
+
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Error fetching status message:', error);
     res.status(500).send('Server error');
   }
 });
 
-// ✅ Mark message as "read" when viewed
 app.put('/api/status-message/user/:userId/read', async (req, res) => {
-  const userId = req.params.userId;
-  const sql = `
-    UPDATE bursary.personal_details
-    SET is_new = false
-    WHERE user_id = $1
-    RETURNING status_message, is_new
-  `;
   try {
-    const result = await pool.query(sql, [userId]);
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ message: 'Not found' });
+    const result = await pool.query(
+      `UPDATE bursary.personal_details
+       SET is_new = false
+       WHERE user_id = $1
+       RETURNING status_message, is_new`,
+      [req.params.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found' });
     }
+
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Error marking message as read:', error);
     res.status(500).send('Server error');
   }
 });
 
+/* ---------------------------- Users ----------------------------- */
 
-
-// ✅ Register a new user (PostgreSQL, checks for duplicate email and name)
-app.post("/api/post", async (req, res) => {
+app.post('/api/post', async (req, res) => {
   const { name, email, password, role, phoneNumber } = req.body;
 
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({
+      message: 'Name, email, password, and role are required',
+    });
+  }
+
   try {
-    // Check if email already exists
-    const existingEmail = await pool.query("SELECT * FROM bursary.users WHERE email = $1", [email]);
-    if (existingEmail.rows.length > 0) {
-      return res.status(400).json({ message: "Email is already registered" });
+    const existing = await pool.query(
+      `SELECT id
+       FROM bursary.users
+       WHERE LOWER(email) = LOWER($1)
+          OR LOWER(name) = LOWER($2)
+          OR phone_number = $3`,
+      [email, name, phoneNumber]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(400).json({
+        message: 'Email, name, or phone number is already registered',
+      });
     }
 
-    // Check if name already exists
-    const existingName = await pool.query("SELECT * FROM bursary.users WHERE name = $1", [name]);
-    if (existingName.rows.length > 0) {
-      return res.status(400).json({ message: "Name is already registered" });
-    }
-
-     // Check if name already exists
-    const existingphoneNumber = await pool.query("SELECT * FROM bursary.users WHERE phone_number = $1", [phoneNumber]);
-    if (existingphoneNumber.rows.length > 0) {
-      return res.status(400).json({ message: "Phone Number is already registered" });
-    }
-
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert the new user
     const result = await pool.query(
-      "INSERT INTO bursary.users (name, email, password, role, phone_number) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      `INSERT INTO bursary.users
+       (name, email, password, role, phone_number)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, name, email, role, phone_number`,
       [name, email, hashedPassword, role, phoneNumber]
     );
 
-     /*Log the activity
-    const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
-    await pool.query(logQuery, [`New user registered: ${name} (${role})`]);
-*/
-    // Respond with the created user data
-    res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: result.rows[0],
+    });
   } catch (error) {
-    console.error("Error inserting user:", error);
-    res.status(500).json({ message: "Server error while registering user" });
+    console.error('Error inserting user:', error);
+    res.status(500).json({
+      message: 'Server error while registering user',
+    });
   }
 });
 
@@ -419,328 +496,499 @@ app.post('/api/reset-password', async (req, res) => {
   const { contactValue, newPassword } = req.body;
 
   if (!contactValue || !newPassword) {
-    return res.status(400).json({ message: 'Both contact and new password are required' });
+    return res.status(400).json({
+      message: 'Both contact and new password are required',
+    });
   }
 
   try {
-    // Check if the user exists by email or phone number
     const result = await pool.query(
-      'SELECT * FROM bursary.users WHERE email = $1 OR phone_number = $1',
+      `SELECT id
+       FROM bursary.users
+       WHERE email = $1 OR phone_number = $1
+       LIMIT 1`,
       [contactValue]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'User not found with provided email or phone number' });
+      return res.status(404).json({
+        message: 'User not found',
+      });
     }
 
-    const userId = result.rows[0].id;
-
-    // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update password
-    await pool.query('UPDATE bursary.users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+    await pool.query(
+      'UPDATE bursary.users SET password = $1 WHERE id = $2',
+      [hashedPassword, result.rows[0].id]
+    );
 
-    /* Log activity
-    const logMessage = `User ${userName} (${contactValue}) reset their password.`;
-    await pool.query('INSERT INTO activity_log (log_message) VALUES ($1)', [logMessage]);
-*/
-    res.status(200).json({ message: 'Password reset successfully' });
+    res.status(200).json({
+      message: 'Password reset successfully',
+    });
   } catch (error) {
     console.error('Error resetting password:', error);
-    res.status(500).json({ message: 'Server error while resetting password' });
+    res.status(500).json({
+      message: 'Server error while resetting password',
+    });
   }
 });
 
-
-// ✅ Change password API
-app.post("/api/change-password", authenticateToken, async (req, res) => {
+app.post('/api/change-password', authenticateToken, async (req, res) => {
   const { userId } = req.user;
   const { currentPassword, newPassword } = req.body;
 
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({
+      message: 'Current and new passwords are required',
+    });
+  }
+
   try {
-    const result = await pool.query("SELECT password FROM bursary.users WHERE id = $1", [userId]);
+    const result = await pool.query(
+      'SELECT password FROM bursary.users WHERE id = $1',
+      [userId]
+    );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const hashedPassword = result.rows[0].password;
-    const isMatch = await bcrypt.compare(currentPassword, hashedPassword);
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      result.rows[0].password
+    );
 
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid current password" });
+      return res.status(401).json({
+        message: 'Invalid current password',
+      });
     }
 
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    await pool.query("UPDATE bursary.users SET password = $1 WHERE id = $2", [hashedNewPassword, userId]);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    /* Insert into activity log
-    const logMessage = `User ${name} changed their password successfully.`;
-    await pool.query("INSERT INTO activity_log (log_message) VALUES ($1)", [logMessage]);
-*/
-    res.status(200).json({ message: "Password updated successfully" });
+    await pool.query(
+      'UPDATE bursary.users SET password = $1 WHERE id = $2',
+      [hashedPassword, userId]
+    );
+
+    res.status(200).json({
+      message: 'Password updated successfully',
+    });
   } catch (error) {
-    console.error("Error updating password:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating password:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Helper functions for each step
+/* -------------------- Application Progress ---------------------- */
+
 async function hasPersonalDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM bursary.personal_details WHERE user_id = $1', [userId]);
-  return res.rows.length > 0;
-}
-async function hasAmountDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM bursary.amount_details WHERE user_id = $1', [userId]);
-  return res.rows.length > 0;
-}
-async function hasFamilyDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM bursary.family_details WHERE user_id = $1', [userId]);
-  return res.rows.length > 0;
-}
-async function hasDisclosureDetails(userId) {
-  const res = await pool.query('SELECT 1 FROM bursary.disclosure_details WHERE user_id = $1', [userId]);
-  return res.rows.length > 0;
-}
-async function hasUploadedDocuments(userId) {
-  const res = await pool.query('SELECT 1 FROM bursary.uploaded_document WHERE user_id = $1', [userId]);
-  return res.rows.length > 0;
+  const result = await pool.query(
+    'SELECT 1 FROM bursary.personal_details WHERE user_id = $1',
+    [userId]
+  );
+
+  return result.rows.length > 0;
 }
 
-// The progress endpoint
+async function hasAmountDetails(userId) {
+  const result = await pool.query(
+    'SELECT 1 FROM bursary.amount_details WHERE user_id = $1',
+    [userId]
+  );
+
+  return result.rows.length > 0;
+}
+
+async function hasFamilyDetails(userId) {
+  const result = await pool.query(
+    'SELECT 1 FROM bursary.family_details WHERE user_id = $1',
+    [userId]
+  );
+
+  return result.rows.length > 0;
+}
+
+async function hasDisclosureDetails(userId) {
+  const result = await pool.query(
+    'SELECT 1 FROM bursary.disclosure_details WHERE user_id = $1',
+    [userId]
+  );
+
+  return result.rows.length > 0;
+}
+
+async function hasUploadedDocuments(userId) {
+  const result = await pool.query(
+    'SELECT 1 FROM bursary.uploaded_document WHERE user_id = $1',
+    [userId]
+  );
+
+  return result.rows.length > 0;
+}
+
 app.get('/api/application-progress/:userId', async (req, res) => {
   const { userId } = req.params;
+
   try {
     const steps = [
       await hasPersonalDetails(userId),
       await hasAmountDetails(userId),
       await hasFamilyDetails(userId),
       await hasDisclosureDetails(userId),
-      await hasUploadedDocuments(userId)
+      await hasUploadedDocuments(userId),
     ];
+
     const completedSteps = [];
     let currentStep = 0;
-    for (let i = 0; i < steps.length; i++) {
-      if (steps[i]) {
-        completedSteps.push(i);
-        currentStep = i + 1;
-      } else break;
+
+    for (let index = 0; index < steps.length; index++) {
+      if (!steps[index]) break;
+
+      completedSteps.push(index);
+      currentStep = index + 1;
     }
-
-  // If all steps are completed
-    if (completedSteps.length === 5) {
-      // Fetch user's full name from personal_details
-      const nameResult = await pool.query(
-        'SELECT fullname FROM bursary.personal_details WHERE user_id = $1',
-        [userId]
-      );
-
-      if (nameResult.rows.length > 0) {
-        const fullname = nameResult.rows[0].fullname;
-        const logMessage = `Student ${fullname} submitted bursary application successfully.`;
-
-        // Avoid duplicate log entry
-        const existingLog = await pool.query(
-          'SELECT 1 FROM bursary.activity_log WHERE log_message = $1',
-          [logMessage]
-        );
-
-        if (existingLog.rows.length === 0) {
-          await pool.query(
-            'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
-            [logMessage]
-          );
-        }
-      }
-    }
-
 
     res.json({ currentStep, completedSteps });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error('Application progress error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// GET personal details by user_id (PostgreSQL version with pool)
+/* ---------------------- Personal Details ------------------------ */
+
 app.get('/api/personal-details/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const sql = `SELECT * FROM bursary.personal_details WHERE user_id = $1 LIMIT 1`;
   try {
-    const result = await pool.query(sql, [userId]);
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]); // returns the row including user_id
-    } else {
-      res.status(404).json({ message: "Not found" });
+    const result = await pool.query(
+      `SELECT *
+       FROM bursary.personal_details
+       WHERE user_id = $1
+       LIMIT 1`,
+      [req.params.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found' });
     }
-  } catch (err) {
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
     res.status(500).send('Server error');
   }
 });
-// ✅ Insert into personal_details with duplicate name OR email check
+
 app.post('/api/personal-details', async (req, res) => {
-  const { fullname, email, subcounty, ward, village, birth, gender, institution, year, admission } = req.body;
+  const {
+    fullname,
+    email,
+    subcounty,
+    ward,
+    village,
+    birth,
+    gender,
+    institution,
+    year,
+    admission,
+  } = req.body;
 
-  // Duplicate check (case-insensitive for both name and email)
-  const checkSql = `
-    SELECT 1 FROM bursary.personal_details 
-    WHERE LOWER(fullname) = LOWER($1) OR LOWER(email) = LOWER($2)
-  `;
   try {
-    const checkResult = await pool.query(checkSql, [fullname, email]);
-    if (checkResult.rows.length > 0) {
-      return res.status(409).json({ message: 'This full name or email is already registered.' });
+    const check = await pool.query(
+      `SELECT 1
+       FROM bursary.personal_details
+       WHERE LOWER(fullname) = LOWER($1)
+          OR LOWER(email) = LOWER($2)`,
+      [fullname, email]
+    );
+
+    if (check.rows.length > 0) {
+      return res.status(409).json({
+        message: 'This full name or email is already registered.',
+      });
     }
 
-    const sql = `
-      INSERT INTO bursary.personal_details 
-      (fullname, email, subcounty, ward, village, birth, gender, institution, year, admission, status) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')
-      RETURNING user_id
-    `;
-    const result = await pool.query(sql, [fullname, email, subcounty, ward, village, birth, gender, institution, year, admission]);
-    res.json({ message: 'Data inserted successfully', userId: result.rows[0].user_id });
-  } catch (err) {
-    console.error('Error inserting data:', err);
+    const result = await pool.query(
+      `INSERT INTO bursary.personal_details
+       (
+         fullname, email, subcounty, ward, village, birth,
+         gender, institution, year, admission, status
+       )
+       VALUES
+       ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')
+       RETURNING user_id`,
+      [
+        fullname,
+        email,
+        subcounty,
+        ward,
+        village,
+        birth,
+        gender,
+        institution,
+        year,
+        admission,
+      ]
+    );
+
+    res.json({
+      message: 'Data inserted successfully',
+      userId: result.rows[0].user_id,
+    });
+  } catch (error) {
+    console.error('Error inserting data:', error);
     res.status(500).send('Server error');
   }
 });
 
-// Get all fullnames from personal_details table (case-insensitive, optional)
-app.get('/students/all-names', async (req, res) => {
+app.get('/students/all-names', async (_req, res) => {
   try {
-    const result = await pool.query('SELECT fullname, email FROM bursary.personal_details');
+    const result = await pool.query(
+      'SELECT fullname, email FROM bursary.personal_details'
+    );
+
     res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// GET /api/amount-details/user/:userId
+/* ------------------------- Amount Details ----------------------- */
+
 app.get('/api/amount-details/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const sql = `SELECT * FROM bursary.amount_details WHERE user_id = $1 LIMIT 1`;
   try {
-    const result = await pool.query(sql, [userId]);
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ message: "Not found" });
+    const result = await pool.query(
+      `SELECT *
+       FROM bursary.amount_details
+       WHERE user_id = $1
+       LIMIT 1`,
+      [req.params.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found' });
     }
-  } catch (err) {
+
+    res.json(result.rows[0]);
+  } catch (error) {
     res.status(500).send('Server error');
   }
 });
 
-// ✅ Insert into amount_details
 app.post('/api/amount-details', async (req, res) => {
-  const { userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch } = req.body;
-
-  const sql = `
-    INSERT INTO bursary.amount_details 
-    (user_id, payable_words, payable_figures, outstanding_words, outstanding_figures, school_accountname, school_accountnumber, school_branch) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  `;
+  const {
+    userId,
+    payablewords,
+    payablefigures,
+    outstandingwords,
+    outstandingfigures,
+    accountname,
+    accountnumber,
+    branch,
+  } = req.body;
 
   try {
-    await pool.query(sql, [userId, payablewords, payablefigures, outstandingwords, outstandingfigures, accountname, accountnumber, branch]);
+    await pool.query(
+      `INSERT INTO bursary.amount_details
+       (
+         user_id,
+         payable_words,
+         payable_figures,
+         outstanding_words,
+         outstanding_figures,
+         school_accountname,
+         school_accountnumber,
+         school_branch
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        userId,
+        payablewords,
+        payablefigures,
+        outstandingwords,
+        outstandingfigures,
+        accountname,
+        accountnumber,
+        branch,
+      ]
+    );
+
     res.send('Data inserted successfully');
-  } catch (err) {
-    console.error('Error inserting data:', err);
+  } catch (error) {
+    console.error('Error inserting data:', error);
     res.status(500).send('Server error');
   }
 });
 
-// ✅ Get family details by user ID (for frontend check/redirect)
+/* ------------------------- Family Details ----------------------- */
+
 app.get('/api/family-details/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const sql = `SELECT * FROM bursary.family_details WHERE user_id = $1 LIMIT 1`;
   try {
-    const result = await pool.query(sql, [userId]);
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ message: "Not found" });
+    const result = await pool.query(
+      `SELECT *
+       FROM bursary.family_details
+       WHERE user_id = $1
+       LIMIT 1`,
+      [req.params.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found' });
     }
-  } catch (err) {
+
+    res.json(result.rows[0]);
+  } catch (error) {
     res.status(500).send('Server error');
   }
 });
 
-// ✅ Insert into family_details
 app.post('/api/family-details', async (req, res) => {
-  const { userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income } = req.body;
-
-  const sql = `
-    INSERT INTO bursary.family_details 
-    (user_id, family_status, disability, parent_guardian_name, relationship, contact_info, occupation, guardian_children, working_siblings, studying_siblings, monthly_income) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-  `;
+  const {
+    userId,
+    family_status,
+    disability,
+    parentname,
+    relationship,
+    contact,
+    occupation,
+    guardian_children,
+    working_siblings,
+    studying_siblings,
+    monthly_income,
+  } = req.body;
 
   try {
-    await pool.query(sql, [userId, family_status, disability, parentname, relationship, contact, occupation, guardian_children, working_siblings, studying_siblings, monthly_income]);
+    await pool.query(
+      `INSERT INTO bursary.family_details
+       (
+         user_id,
+         family_status,
+         disability,
+         parent_guardian_name,
+         relationship,
+         contact_info,
+         occupation,
+         guardian_children,
+         working_siblings,
+         studying_siblings,
+         monthly_income
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [
+        userId,
+        family_status,
+        disability,
+        parentname,
+        relationship,
+        contact,
+        occupation,
+        guardian_children,
+        working_siblings,
+        studying_siblings,
+        monthly_income,
+      ]
+    );
+
     res.send('Data inserted successfully');
-  } catch (err) {
-    console.error('Error inserting data:', err);
+  } catch (error) {
+    console.error('Error inserting data:', error);
     res.status(500).send('Server error');
   }
 });
 
-// ✅ Get disclosure details by user ID (for frontend check/redirect)
+/* ----------------------- Disclosure Details --------------------- */
+
 app.get('/api/disclosure-details/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const sql = `SELECT * FROM bursary.disclosure_details WHERE user_id = $1 LIMIT 1`;
   try {
-    const result = await pool.query(sql, [userId]);
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ message: "Not found" });
+    const result = await pool.query(
+      `SELECT *
+       FROM bursary.disclosure_details
+       WHERE user_id = $1
+       LIMIT 1`,
+      [req.params.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found' });
     }
-  } catch (err) {
+
+    res.json(result.rows[0]);
+  } catch (error) {
     res.status(500).send('Server error');
   }
 });
 
-// ✅ Insert into disclosure_details
 app.post('/api/disclosure-details', async (req, res) => {
-  const { userId, bursary, bursarysource, bursaryamount, helb, granted, noreason } = req.body;
-
-  const sql = `
-    INSERT INTO bursary.disclosure_details 
-    (user_id, receiving_bursary, bursary_source, bursary_amount, applied_helb, helb_outcome, helb_noreason) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-  `;
+  const {
+    userId,
+    bursary,
+    bursarysource,
+    bursaryamount,
+    helb,
+    granted,
+    noreason,
+  } = req.body;
 
   try {
-    await pool.query(sql, [userId, bursary, bursarysource, bursaryamount, helb, granted, noreason]);
+    await pool.query(
+      `INSERT INTO bursary.disclosure_details
+       (
+         user_id,
+         receiving_bursary,
+         bursary_source,
+         bursary_amount,
+         applied_helb,
+         helb_outcome,
+         helb_noreason
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        userId,
+        bursary,
+        bursarysource,
+        bursaryamount,
+        helb,
+        granted,
+        noreason,
+      ]
+    );
+
     res.send('Data inserted successfully');
-  } catch (err) {
-    console.error('Error inserting data:', err);
+  } catch (error) {
+    console.error('Error inserting data:', error);
     res.status(500).send('Server error');
   }
 });
 
-// Document upload setup.
-// Keep the existing top-level imports for fs, path, multer, and express.
-// Define UPLOAD_DIR and upload only once in the entire file.
+/* ------------------------- Document Upload ---------------------- */
 
 const UPLOAD_DIR =
   process.env.NODE_ENV === 'production'
     ? '/tmp/uploads'
     : path.join(__dirname, 'uploads');
 
+const SIGN_DIR = path.join(UPLOAD_DIR, 'signatures');
+
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+fs.mkdirSync(SIGN_DIR, { recursive: true });
 
 const documentStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
-    cb(null, `${Date.now()}-${path.basename(file.originalname)}`);
+  destination(_req, _file, callback) {
+    callback(null, UPLOAD_DIR);
+  },
+
+  filename(_req, file, callback) {
+    const safeName = path.basename(file.originalname).replace(
+      /[^a-zA-Z0-9._-]/g,
+      '_'
+    );
+
+    callback(null, `${Date.now()}-${safeName}`);
   },
 });
 
-const documentFileFilter = (_req, file, cb) => {
+const documentFileFilter = (_req, file, callback) => {
   const allowedTypes = new Set([
     'application/pdf',
     'image/jpeg',
@@ -749,10 +997,10 @@ const documentFileFilter = (_req, file, cb) => {
   ]);
 
   if (allowedTypes.has(file.mimetype)) {
-    return cb(null, true);
+    return callback(null, true);
   }
 
-  cb(new Error('Only PDF and image files are allowed.'));
+  callback(new Error('Only PDF and image files are allowed.'));
 };
 
 const upload = multer({
@@ -760,12 +1008,10 @@ const upload = multer({
   fileFilter: documentFileFilter,
   limits: {
     files: 3,
-    fileSize: 10 * 1024 * 1024, // 10 MB per file
+    fileSize: 10 * 1024 * 1024,
   },
 });
 
-// Keep this static route only once in the file.
-// The frontend builds document links under /uploads/<filename>.
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 const documentFields = upload.fields([
@@ -774,17 +1020,12 @@ const documentFields = upload.fields([
   { name: 'guardianIdCopy', maxCount: 1 },
 ]);
 
-// Upload three documents and save their paths in the database.
 app.post('/api/upload', (req, res) => {
   documentFields(req, res, async (uploadError) => {
     if (uploadError) {
-      console.error('Document upload rejected:', {
-        code: uploadError.code,
-        field: uploadError.field,
-        message: uploadError.message,
-      });
+      const status =
+        uploadError.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
 
-      const status = uploadError.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
       return res.status(status).json({
         message: uploadError.message || 'Document upload rejected.',
         field: uploadError.field || null,
@@ -795,11 +1036,11 @@ app.post('/api/upload', (req, res) => {
     const uploadedFiles = Object.values(files).flat();
 
     const removeUploadedFiles = () => {
-      for (const file of uploadedFiles) {
-        if (file.path) {
+      uploadedFiles.forEach((file) => {
+        if (file.path && fs.existsSync(file.path)) {
           fs.unlink(file.path, () => {});
         }
-      }
+      });
     };
 
     const { userId } = req.body;
@@ -809,7 +1050,9 @@ app.post('/api/upload', (req, res) => {
 
     if (!userId) {
       removeUploadedFiles();
-      return res.status(400).json({ message: 'userId is required.' });
+      return res.status(400).json({
+        message: 'userId is required.',
+      });
     }
 
     if (!admissionLetter || !feesStructure || !guardianIdCopy) {
@@ -823,7 +1066,12 @@ app.post('/api/upload', (req, res) => {
     try {
       await pool.query(
         `INSERT INTO bursary.uploaded_document
-           (user_id, admission_letter, fees_structure, parent_guardian_id)
+         (
+           user_id,
+           admission_letter,
+           fees_structure,
+           parent_guardian_id
+         )
          VALUES ($1, $2, $3, $4)
          ON CONFLICT (user_id)
          DO UPDATE SET
@@ -838,290 +1086,341 @@ app.post('/api/upload', (req, res) => {
         ]
       );
 
-      return res.status(200).json({
+      res.status(200).json({
         message: 'Documents uploaded and saved successfully.',
       });
     } catch (error) {
       removeUploadedFiles();
-      console.error('Error saving uploaded documents:', error.message);
-      return res.status(500).json({
+      console.error('Error saving uploaded documents:', error);
+      res.status(500).json({
         message: 'Database error saving documents.',
       });
     }
   });
 });
 
-// Check the document columns used by the upload route.
-// Do not check file_path; that isn't one of the columns being saved above.
 app.get('/api/upload/status/:userId', async (req, res) => {
-  const { userId } = req.params;
-
   try {
     const result = await pool.query(
       `SELECT admission_letter, fees_structure, parent_guardian_id
        FROM bursary.uploaded_document
        WHERE user_id = $1`,
-      [userId]
+      [req.params.userId]
     );
 
     const document = result.rows[0];
-    const uploaded = Boolean(
-      document?.admission_letter &&
-      document?.fees_structure &&
-      document?.parent_guardian_id
-    );
 
-    return res.json({ uploaded });
+    res.json({
+      uploaded: Boolean(
+        document?.admission_letter &&
+        document?.fees_structure &&
+        document?.parent_guardian_id
+      ),
+    });
   } catch (error) {
-    console.error('Error checking document status:', error.message);
-    return res.status(500).json({ uploaded: false });
+    res.status(500).json({
+      uploaded: false,
+    });
   }
 });
 
-// Fetch documents directly, without joining personal_details.
 app.get('/api/get-document/:id', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT user_id, admission_letter, fees_structure, parent_guardian_id
-       FROM bursary.uploaded_document
-       WHERE user_id = $1`,
+      `SELECT
+         ud.*,
+         pd.fullname,
+         pd.admission,
+         pd.institution
+       FROM bursary.uploaded_document ud
+       JOIN bursary.personal_details pd
+         ON ud.user_id = pd.user_id
+       WHERE pd.user_id = $1`,
       [req.params.id]
     );
 
-    return res.json(result.rows);
+    res.json(result.rows);
   } catch (error) {
-    console.error('Error fetching uploaded documents:', error.message);
-    return res.status(500).json({
+    console.error('Error fetching documents:', error);
+    res.status(500).json({
       message: 'Error fetching uploaded documents.',
     });
   }
 });
 
-app.get('/api/admin-details', async (req, res) => {
-  const role = 'Admin';
-  const sql = 'SELECT name, email FROM bursary.users WHERE role = $1';
+/* ---------------------------- Profiles -------------------------- */
 
+app.get('/api/admin-details', async (_req, res) => {
   try {
-    const result = await pool.query(sql, [role]);
+    const result = await pool.query(
+      `SELECT name, email
+       FROM bursary.users
+       WHERE role = $1
+       LIMIT 1`,
+      ['Admin']
+    );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Admin not found' });
+      return res.status(404).json({
+        message: 'Admin not found',
+      });
     }
 
-    res.status(200).json(result.rows[0]); // Return the first matching admin.
-  } catch (err) {
-    console.error('Error fetching admin details:', err);
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching admin details:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.post('/api/forgot-password', async (req, res) => {
-  const { identifier } = req.body;
+app.get('/api/profile-committee', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT *
+       FROM bursary.profile_committee
+       WHERE email = $1
+       LIMIT 1`,
+      [req.user.email]
+    );
 
-  if (!identifier) {
-    return res.status(400).json({ error: 'Email is required.' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Committee profile not found',
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching committee profile:', error);
+    res.status(500).json({
+      message: 'Server error',
+    });
   }
+});
 
-  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+app.post('/api/profile-committee', authenticateToken, async (req, res) => {
+  const {
+    fullname,
+    email,
+    phone_no,
+    national_id,
+    subcounty,
+    ward,
+    position,
+  } = req.body;
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+    const result = await pool.query(
+      `INSERT INTO bursary.profile_committee
+       (
+         fullname,
+         email,
+         phone_no,
+         national_id,
+         subcounty,
+         ward,
+         position
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (email)
+       DO UPDATE SET
+         fullname = EXCLUDED.fullname,
+         phone_no = EXCLUDED.phone_no,
+         national_id = EXCLUDED.national_id,
+         subcounty = EXCLUDED.subcounty,
+         ward = EXCLUDED.ward,
+         position = EXCLUDED.position
+       RETURNING *`,
+      [
+        fullname,
+        email || req.user.email,
+        phone_no,
+        national_id,
+        subcounty,
+        ward,
+        position,
+      ]
+    );
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: identifier,
-      subject: 'Password Reset Code',
-      text: `Your password reset code is: ${resetCode}`,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    console.log(`Reset code sent to ${identifier}: ${resetCode}`);
-
-    // TODO: Save resetCode in DB with expiry timestamp for verification later
-
-     // ✅ Log the activity
-    const logMessage = `Password reset code sent to ${identifier}`;
-    await pool.query('INSERT INTO bursary.activity_log (log_message) VALUES ($1)', [logMessage]);
-
-    res.status(200).json({ message: 'Reset code sent successfully.' });
+    res.status(200).json(result.rows[0]);
   } catch (error) {
-    console.error('Error sending email:', error);
-    res.status(500).json({ error: 'Failed to send reset code. Please try again later.' });
+    console.error('Error saving committee profile:', error);
+    res.status(500).json({
+      message: 'Server error',
+    });
   }
 });
 
-app.get('/api/student', (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).send('Token is required');
+app.get('/api/comreport', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         'REFNO' || LPAD(CAST(id AS TEXT), 2, '0') AS reference_number,
+         fullname,
+         email,
+         phone_no,
+         national_id,
+         subcounty,
+         ward,
+         position
+       FROM bursary.profile_committee
+       WHERE email = $1`,
+      [req.user.email]
+    );
 
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
-
-    const sqlGet = `
-      SELECT fullname, email, subcounty, ward, village, 
-      TO_CHAR(birth, 'YYYY-MM-DD') AS birth, 
-      gender, institution, year, admission, status, bursary
-      FROM bursary.personal_details 
-      WHERE email = $1
-    `;
-
-    try {
-      const result = await pool.query(sqlGet, [decoded.email]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).send('Student not found');
-      }
-
-      res.json(result.rows[0]);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      res.status(500).send('Error fetching data');
+    if (result.rows.length === 0) {
+      return res.status(404).send('Committee member not found');
     }
-  });
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching committee data:', error);
+    res.status(500).send('Error fetching committee data');
+  }
 });
 
+/* ----------------------- Student Reports ------------------------ */
 
-app.get('/api/reports', (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).send('Token is required');
+app.get('/api/student', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         fullname,
+         email,
+         subcounty,
+         ward,
+         village,
+         TO_CHAR(birth, 'YYYY-MM-DD') AS birth,
+         gender,
+         institution,
+         year,
+         admission,
+         status,
+         bursary
+       FROM bursary.personal_details
+       WHERE email = $1`,
+      [req.user.email]
+    );
 
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
-
-    console.log('\n🔍 DEBUG: /api/reports called for:', decoded.email);
-
-    const sqlGet = `
-      SELECT 
-        'REFXE' || LPAD(pd.user_id::text, 2, '0') AS reference_number,
-        pd.fullname,
-        pd.email,
-        pd.subcounty,
-        pd.ward,
-        pd.village,
-        TO_CHAR(pd.birth, 'YYYY-MM-DD') AS birth,
-        pd.gender,
-        pd.institution,
-        pd.year,
-        pd.admission,
-        pd.status,
-        pd.bursary,
-        pd.approved_by_committee,
-        pd.allocation_date,
-        pc.signature as committee_signature,
-        pc.fullname as committee_fullname,
-        pc.position as committee_position
-      FROM bursary.personal_details pd
-      LEFT JOIN bursary.profile_committee pc 
-        ON TRIM(LOWER(pd.approved_by_committee)) = TRIM(LOWER(pc.fullname))
-      WHERE pd.email = $1
-    `;
-
-    try {
-      const result = await pool.query(sqlGet, [decoded.email]);
-
-      if (result.rows.length === 0) {
-        console.log('❌ No student found for email:', decoded.email);
-        return res.status(404).send('Student not found');
-      }
-
-      const student = result.rows[0];
-
-      // DEBUG LOGGING
-      console.log('\n📋 DATABASE QUERY RESULT:');
-      console.log('   Student Name:', student.fullname);
-      console.log('   Student Email:', student.email);
-      console.log('   Approved By Committee:', student.approved_by_committee);
-      console.log('   Committee Name (from JOIN):', student.committee_fullname || 'NOT FOUND');
-      console.log('   Committee Position:', student.committee_position || 'N/A');
-      console.log('   Committee Signature Exists:', !!student.committee_signature);
-      console.log('   Signature Length:', student.committee_signature?.length || 0);
-      if (student.committee_signature) {
-        console.log('   Signature Preview:', student.committee_signature.substring(0, 100) + '...');
-        console.log('   ✅ SIGNATURE FOUND AND WILL BE SENT');
-      } else {
-        console.log('   ❌ SIGNATURE NOT FOUND - Check if committee member name matches exactly');
-      }
-      console.log('');
-
-      // Extract first letter from the committee name (approved_by_committee)
-      let digital_signature = null;
-      if (student.approved_by_committee) {
-        const firstLetter = student.approved_by_committee.trim().charAt(0).toUpperCase();
-        digital_signature = `HOLD-${firstLetter}`;  // Placeholder only
-      }
-
-      const responseData = {
-        reference_number: student.reference_number,
-        fullname: student.fullname,
-        email: student.email,
-        subcounty: student.subcounty,
-        ward: student.ward,
-        village: student.village,
-        birth: student.birth,
-        gender: student.gender,
-        institution: student.institution,
-        year: student.year,
-        admission: student.admission,
-        status: student.status,
-        bursary: student.bursary,
-        approved_by_committee: student.approved_by_committee,
-        allocation_date: student.allocation_date,
-        digital_signature: digital_signature,
-        committee_signature: student.committee_signature || null,  // ✅ Signature from profile_committee table
-        committee_fullname: student.committee_fullname || null,
-        committee_position: student.committee_position || null
-      };
-
-      console.log('📤 Sending response with committee_signature:', responseData.committee_signature ? 'YES (Length: ' + responseData.committee_signature.length + ')' : 'NO');
-      console.log('');
-
-      res.json(responseData);
-
-    } catch (err) {
-      console.error('❌ Error fetching data:', err);
-      res.status(500).json({ error: 'Error fetching data', details: err.message });
+    if (result.rows.length === 0) {
+      return res.status(404).send('Student not found');
     }
-  });
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching student:', error);
+    res.status(500).send('Error fetching data');
+  }
 });
 
-app.put('/api/student/update', (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).send('Token is required');
+app.get('/api/reports', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         'REFXE' || LPAD(pd.user_id::text, 2, '0') AS reference_number,
+         pd.fullname,
+         pd.email,
+         pd.subcounty,
+         pd.ward,
+         pd.village,
+         TO_CHAR(pd.birth, 'YYYY-MM-DD') AS birth,
+         pd.gender,
+         pd.institution,
+         pd.year,
+         pd.admission,
+         pd.status,
+         pd.bursary,
+         pd.approved_by_committee,
+         pd.allocation_date,
+         pc.signature AS committee_signature,
+         pc.fullname AS committee_fullname,
+         pc.position AS committee_position
+       FROM bursary.personal_details pd
+       LEFT JOIN bursary.profile_committee pc
+         ON TRIM(LOWER(pd.approved_by_committee)) =
+            TRIM(LOWER(pc.fullname))
+       WHERE pd.email = $1`,
+      [req.user.email]
+    );
 
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
+    if (result.rows.length === 0) {
+      return res.status(404).send('Student not found');
+    }
 
-    const {
-      fullname,
-      email,
-      subcounty,
-      ward,
-      village,
-      birth,
-      gender,
-      institution,
-      year,
-      admission
-    } = req.body;
+    const student = result.rows[0];
+    let digitalSignature = null;
 
-    const formattedBirth = birth ? new Date(birth).toISOString().split('T')[0] : null;
+    if (student.approved_by_committee) {
+      const firstLetter =
+        student.approved_by_committee.trim().charAt(0).toUpperCase();
 
-    const sqlUpdate = `
-      UPDATE bursary.personal_details 
-      SET fullname = $1, email = $2, subcounty = $3, ward = $4, village = $5,
-          birth = $6, gender = $7, institution = $8, year = $9, admission = $10
-      WHERE email = $11
-    `;
+      digitalSignature = `HOLD-${firstLetter}`;
+    }
 
-    try {
-      await pool.query(sqlUpdate, [
+    res.json({
+      reference_number: student.reference_number,
+      fullname: student.fullname,
+      email: student.email,
+      subcounty: student.subcounty,
+      ward: student.ward,
+      village: student.village,
+      birth: student.birth,
+      gender: student.gender,
+      institution: student.institution,
+      year: student.year,
+      admission: student.admission,
+      status: student.status,
+      bursary: student.bursary,
+      approved_by_committee: student.approved_by_committee,
+      allocation_date: student.allocation_date,
+      digital_signature: digitalSignature,
+      committee_signature: student.committee_signature || null,
+      committee_fullname: student.committee_fullname || null,
+      committee_position: student.committee_position || null,
+    });
+  } catch (error) {
+    console.error('Error fetching report:', error);
+    res.status(500).json({
+      error: 'Error fetching data',
+      details: error.message,
+    });
+  }
+});
+
+app.put('/api/student/update', authenticateToken, async (req, res) => {
+  const {
+    fullname,
+    email,
+    subcounty,
+    ward,
+    village,
+    birth,
+    gender,
+    institution,
+    year,
+    admission,
+  } = req.body;
+
+  const formattedBirth = birth
+    ? new Date(birth).toISOString().split('T')[0]
+    : null;
+
+  try {
+    await pool.query(
+      `UPDATE bursary.personal_details
+       SET
+         fullname = $1,
+         email = $2,
+         subcounty = $3,
+         ward = $4,
+         village = $5,
+         birth = $6,
+         gender = $7,
+         institution = $8,
+         year = $9,
+         admission = $10
+       WHERE email = $11`,
+      [
         fullname,
         email,
         subcounty,
@@ -1132,805 +1431,864 @@ app.put('/api/student/update', (req, res) => {
         institution,
         year,
         admission,
-        decoded.email
-      ]);
+        req.user.email,
+      ]
+    );
 
-      /* Insert activity log
-      const logMessage = `Student profile updated: ${fullname} (${email})`;
-      const logQuery = 'INSERT INTO activity_log (log_message) VALUES ($1)';
-      await pool.query(logQuery, [logMessage]);
-*/
-      res.send({ message: 'Profile updated successfully', data: req.body });
-    } catch (err) {
-      console.error('Error updating data:', err);
-      res.status(500).send('Error updating data');
-    }
-  });
-});
-
-// Committee Count Route (Updated)
-app.get('/api/committee-count', async (req, res) => {
-  // ✅ Sum all funds from all wards
-  const queryTotalFunds = 'SELECT SUM(amount) AS total_amount FROM bursary.bursary_funds';
-  const queryAllocatedFunds = 'SELECT SUM(bursary) AS total_allocated FROM bursary.personal_details';
-
-  try {
-    // Get total amount from all wards
-    const totalResult = await pool.query(queryTotalFunds);
-    const totalAmount = totalResult.rows[0].total_amount || 0;
-
-    // Get total allocated to students
-    const allocatedResult = await pool.query(queryAllocatedFunds);
-    const allocatedAmount = allocatedResult.rows[0].total_allocated || 0;
-
-    // Compute remaining amount
-    const remainingAmount = totalAmount - allocatedAmount;
-
-    // Send response
-    res.status(200).json({
-      amount: totalAmount,
-      allocated: allocatedAmount,
-      remaining: remainingAmount
+    res.send({
+      message: 'Profile updated successfully',
+      data: req.body,
     });
-  } catch (err) {
-    console.error('Error in fund calculations:', err);
-    res.status(500).json({ error: 'Server error calculating funds' });
+  } catch (error) {
+    console.error('Error updating student:', error);
+    res.status(500).send('Error updating data');
   }
 });
 
+/* -------------------------- Statistics -------------------------- */
 
-// Committee Count Route (Ward-Based)
+app.get('/api/committee-count', async (_req, res) => {
+  try {
+    const totalResult = await pool.query(
+      'SELECT COALESCE(SUM(amount), 0) AS total_amount FROM bursary.bursary_funds'
+    );
+
+    const allocatedResult = await pool.query(
+      'SELECT COALESCE(SUM(bursary), 0) AS total_allocated FROM bursary.personal_details'
+    );
+
+    const totalAmount = Number(totalResult.rows[0].total_amount);
+    const allocatedAmount = Number(
+      allocatedResult.rows[0].total_allocated
+    );
+
+    res.status(200).json({
+      amount: totalAmount,
+      allocated: allocatedAmount,
+      remaining: totalAmount - allocatedAmount,
+    });
+  } catch (error) {
+    console.error('Error in fund calculations:', error);
+    res.status(500).json({
+      error: 'Server error calculating funds',
+    });
+  }
+});
+
 app.get('/api/bursary-count/:ward', async (req, res) => {
   const { ward } = req.params;
 
-  // Query total funds for this ward
-  const queryTotalFunds = `
-    SELECT amount 
-    FROM bursary.bursary_funds 
-    WHERE ward_allocated = $1
-  `;
-
-  // Query total allocated funds for this ward (students belonging to that ward)
-  const queryAllocatedFunds = `
-    SELECT SUM(bursary) AS total_allocated
-    FROM bursary.personal_details
-    WHERE ward = $1
-  `;
-
   try {
-    // Get total fund for the ward
-    const totalResult = await pool.query(queryTotalFunds, [ward]);
+    const totalResult = await pool.query(
+      `SELECT amount
+       FROM bursary.bursary_funds
+       WHERE ward_allocated = $1
+       LIMIT 1`,
+      [ward]
+    );
+
     if (totalResult.rows.length === 0) {
-      return res.status(404).json({ error: `No bursary fund found for ward: ${ward}` });
+      return res.status(404).json({
+        error: `No bursary fund found for ward: ${ward}`,
+      });
     }
 
-    const totalAmount = totalResult.rows[0].amount;
+    const allocatedResult = await pool.query(
+      `SELECT COALESCE(SUM(bursary), 0) AS total_allocated
+       FROM bursary.personal_details
+       WHERE ward = $1`,
+      [ward]
+    );
 
-    // Get allocated funds for that ward
-    const allocatedResult = await pool.query(queryAllocatedFunds, [ward]);
-    const allocatedAmount = allocatedResult.rows[0].total_allocated || 0;
-    const remainingAmount = totalAmount - allocatedAmount;
+    const totalAmount = Number(totalResult.rows[0].amount);
+    const allocatedAmount = Number(
+      allocatedResult.rows[0].total_allocated
+    );
 
     res.status(200).json({
       ward,
       amount: totalAmount,
       allocated: allocatedAmount,
-      remaining: remainingAmount
+      remaining: totalAmount - allocatedAmount,
     });
-  } catch (err) {
-    console.error('Error in fund calculations:', err);
-    res.status(500).json({ error: 'Server error calculating funds per ward' });
+  } catch (error) {
+    console.error('Error in fund calculations:', error);
+    res.status(500).json({
+      error: 'Server error calculating funds per ward',
+    });
   }
 });
 
-
-// Quick Statistics Route
-app.get('/api/quick-statistics', async (req, res) => {
-  const queryTotal = 'SELECT COUNT(*) AS total FROM bursary.personal_details';
-  const queryApproved = "SELECT COUNT(*) AS approved FROM bursary.personal_details WHERE status = 'Approved'";
-  const queryRejected = "SELECT COUNT(*) AS rejected FROM bursary.personal_details WHERE status = 'Rejected'";
-  const queryPending = "SELECT COUNT(*) AS pending FROM bursary.personal_details WHERE status = 'pending'";
-  const queryIncomplete = "SELECT COUNT(*) AS incomplete FROM bursary.personal_details WHERE status = 'Incomplete'";
-
+app.get('/api/quick-statistics', async (_req, res) => {
   try {
-    const totalResult = await pool.query(queryTotal);
-    const approvedResult = await pool.query(queryApproved);
-    const rejectedResult = await pool.query(queryRejected);
-    const pendingResult = await pool.query(queryPending);
-    const incompleteResult = await pool.query(queryIncomplete);
+    const result = await pool.query(
+      `SELECT
+         COUNT(*) AS total,
+         COUNT(*) FILTER (WHERE status = 'Approved') AS approved,
+         COUNT(*) FILTER (WHERE status = 'Rejected') AS rejected,
+         COUNT(*) FILTER (WHERE status = 'pending') AS pending,
+         COUNT(*) FILTER (WHERE status = 'Incomplete') AS incomplete
+       FROM bursary.personal_details`
+    );
 
-    const totalApplications = totalResult.rows[0].total;
-    const approvedApplications = approvedResult.rows[0].approved;
-    const rejectedApplications = rejectedResult.rows[0].rejected;
-    const pendingApplications = pendingResult.rows[0].pending;
-    const incompleteApplications = incompleteResult.rows[0].incomplete;
-
-    res.status(200).json({ total: totalApplications, approved: approvedApplications, 
-      rejected: rejectedApplications, pending: pendingApplications, incomplete: incompleteApplications });
-  } catch (err) {
-    console.error('Error fetching statistics:', err);
-    res.status(500).json({ error: 'Error fetching statistics' });
+    res.status(200).json({
+      total: Number(result.rows[0].total),
+      approved: Number(result.rows[0].approved),
+      rejected: Number(result.rows[0].rejected),
+      pending: Number(result.rows[0].pending),
+      incomplete: Number(result.rows[0].incomplete),
+    });
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    res.status(500).json({
+      error: 'Error fetching statistics',
+    });
   }
 });
 
-app.get('/api/committee-statistics', async (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).send('Token is required');
-
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
-
+app.get(
+  '/api/committee-statistics',
+  authenticateToken,
+  async (req, res) => {
     try {
-      // ✅ Step 1: Get committee name from profile_committee based on decoded email
-      const committeeQuery = `
-        SELECT fullname 
-        FROM bursary.profile_committee 
-        WHERE LOWER(email) = LOWER($1)
-      `;
-      const committeeResult = await pool.query(committeeQuery, [decoded.email]);
+      const committeeResult = await pool.query(
+        `SELECT fullname
+         FROM bursary.profile_committee
+         WHERE LOWER(email) = LOWER($1)
+         LIMIT 1`,
+        [req.user.email]
+      );
 
       if (committeeResult.rows.length === 0) {
-        return res.status(404).json({ message: 'Committee not found' });
+        return res.status(404).json({
+          message: 'Committee not found',
+        });
       }
 
       const committeeName = committeeResult.rows[0].fullname;
 
-      // ✅ Step 2: Compare names (case-insensitive) in personal_details
-      const query = `
-        SELECT 
-          COUNT(*) FILTER (WHERE LOWER(approved_by_committee) = LOWER($1)) AS total,
-          COUNT(*) FILTER (WHERE status = 'Approved' AND LOWER(approved_by_committee) = LOWER($1)) AS approved,
-          COUNT(*) FILTER (WHERE status = 'Rejected' AND LOWER(approved_by_committee) = LOWER($1)) AS rejected,
-          COUNT(*) FILTER (WHERE status = 'Incomplete' AND LOWER(approved_by_committee) = LOWER($1)) AS incomplete
-        FROM bursary.personal_details
-      `;
-
-      const result = await pool.query(query, [committeeName]);
+      const result = await pool.query(
+        `SELECT
+           COUNT(*) FILTER (
+             WHERE LOWER(approved_by_committee) = LOWER($1)
+           ) AS total,
+           COUNT(*) FILTER (
+             WHERE status = 'Approved'
+               AND LOWER(approved_by_committee) = LOWER($1)
+           ) AS approved,
+           COUNT(*) FILTER (
+             WHERE status = 'Rejected'
+               AND LOWER(approved_by_committee) = LOWER($1)
+           ) AS rejected,
+           COUNT(*) FILTER (
+             WHERE status = 'Incomplete'
+               AND LOWER(approved_by_committee) = LOWER($1)
+           ) AS incomplete
+         FROM bursary.personal_details`,
+        [committeeName]
+      );
 
       res.status(200).json({
-        total: result.rows[0].total,
-        approved: result.rows[0].approved,
-        rejected: result.rows[0].rejected,
-        incomplete: result.rows[0].incomplete,
+        total: Number(result.rows[0].total),
+        approved: Number(result.rows[0].approved),
+        rejected: Number(result.rows[0].rejected),
+        incomplete: Number(result.rows[0].incomplete),
       });
-
-    } catch (err) {
-      console.error('Error fetching committee statistics:', err);
-      res.status(500).json({ error: 'Error fetching committee statistics' });
+    } catch (error) {
+      console.error('Error fetching committee statistics:', error);
+      res.status(500).json({
+        error: 'Error fetching committee statistics',
+      });
     }
-  });
-});
+  }
+);
 
+/* ------------------- Personal Information Lists ----------------- */
 
-
-
-app.get("/api/personalInformation", async (req, res) => {
+app.get('/api/personalInformation', async (_req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM bursary.personal_details");
-    res.send(result.rows);
+    const result = await pool.query(
+      'SELECT * FROM bursary.personal_details'
+    );
+
+    res.json(result.rows);
   } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).send("Error fetching data");
+    console.error('Error fetching data:', error);
+    res.status(500).send('Error fetching data');
   }
 });
 
-// ✅ Committee-based Personal Information Route
-app.get("/api/personalInformation/ward/:ward", async (req, res) => {
-  const { ward } = req.params;
-
+app.get('/api/personalInformation/ward/:ward', async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM bursary.personal_details WHERE ward = $1",
-      [ward]
+      'SELECT * FROM bursary.personal_details WHERE ward = $1',
+      [req.params.ward]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: `No students found in ${ward} ward` });
+      return res.status(404).json({
+        message: `No students found in ${req.params.ward} ward`,
+      });
     }
 
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error("Error fetching ward-based data:", error);
-    res.status(500).send("Error fetching personal information for this ward");
+    console.error('Error fetching ward data:', error);
+    res.status(500).send(
+      'Error fetching personal information for this ward'
+    );
   }
 });
 
+app.get('/api/personalInformation/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM bursary.personal_details WHERE user_id = $1',
+      [req.params.id]
+    );
 
-app.get("/api/personalInformation/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching personal details:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
 
-  const sqlGet = "SELECT * FROM bursary.personal_details WHERE user_id = $1";
+app.get('/api/amountInformation/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT ad.*, pd.fullname, pd.admission, pd.institution
+       FROM bursary.amount_details ad
+       JOIN bursary.personal_details pd
+         ON ad.user_id = pd.user_id
+       WHERE pd.user_id = $1`,
+      [req.params.id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching amount details:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
+
+app.get('/api/familyInformation/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT fd.*, pd.fullname, pd.admission, pd.institution
+       FROM bursary.family_details fd
+       JOIN bursary.personal_details pd
+         ON fd.user_id = pd.user_id
+       WHERE pd.user_id = $1`,
+      [req.params.id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching family details:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
+
+app.get('/api/disclosureInformation/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT dd.*, pd.fullname, pd.admission, pd.institution
+       FROM bursary.disclosure_details dd
+       JOIN bursary.personal_details pd
+         ON dd.user_id = pd.user_id
+       WHERE pd.user_id = $1`,
+      [req.params.id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching disclosure details:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
+
+/* ---------------------------- Statuses -------------------------- */
+
+app.put('/api/update-status/:id', async (req, res) => {
+  const { status, status_message } = req.body;
 
   try {
-    const result = await pool.query(sqlGet, [userId]);
-    res.send(result.rows);
+    await pool.query(
+      `UPDATE bursary.personal_details
+       SET status = $1, status_message = $2
+       WHERE user_id = $3`,
+      [status, status_message, req.params.id]
+    );
+
+    res.json({
+      message: `Status updated to ${status}`,
+      status_message,
+    });
   } catch (error) {
-    console.error("Error fetching personal details:", error);
-    res.status(500).send("Error fetching data");
+    console.error('Error updating status:', error);
+    res.status(500).json({
+      error: 'Error updating status and message',
+    });
   }
-});
-
-app.get("/api/amountInformation/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
-
-  const sqlGet = `
-    SELECT 
-      ad.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      bursary.amount_details ad
-    JOIN 
-      bursary.personal_details pd 
-    ON 
-      ad.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  try {
-    const result = await pool.query(sqlGet, [userId]);
-    res.send(result.rows);
-  } catch (error) {
-    console.error("Error fetching amount and personal details:", error);
-    res.status(500).send("Error fetching data");
-  }
-});
-
-app.get("/api/familyInformation/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log("User ID:", userId);
-
-  const sqlGet = `
-    SELECT 
-      fd.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      bursary.family_details fd
-    JOIN 
-      bursary.personal_details pd 
-    ON 
-      fd.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  try {
-    const result = await pool.query(sqlGet, [userId]);
-    res.send(result.rows);
-  } catch (error) {
-    console.error("Error fetching family and personal details:", error);
-    res.status(500).send("Error fetching data");
-  }
-});
-
-app.get("/api/disclosureInformation/:id", (req, res) => {
-  const userId = req.params.id;
-  console.log("User ID:", userId);
-
-  const sqlGet = `
-    SELECT 
-      dd.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      bursary.disclosure_details dd
-    JOIN 
-      bursary.personal_details pd 
-    ON 
-      dd.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  pool.query(sqlGet, [userId], (error, result) => {
-    if (error) {
-      console.error("Error fetching disclosure details:", error);
-      res.status(500).send("Error fetching data");
-    } else {
-      res.send(result.rows);
-    }
-  });
-});
-
-app.get("/api/get-document/:id", (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
-
-  const sqlGet = `
-    SELECT 
-      ud.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      bursary.uploaded_document ud
-    JOIN 
-      bursary.personal_details pd 
-    ON 
-      ud.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  pool.query(sqlGet, [userId], (error, result) => {
-    if (error) {
-      console.error("Error fetching uploaded document:", error);
-      res.status(500).send("Error fetching data");
-    } else {
-      res.send(result.rows);
-    }
-  });
-});
-
-app.put('/api/update-status/:id', (req, res) => {
-  const userId = req.params.id;
-  const { status, status_message } = req.body;  // 🆕 Added status_message
-
-  const query = `
-    UPDATE bursary.personal_details 
-    SET status = $1, status_message = $2  -- 🆕 Update both columns
-    WHERE user_id = $3
-  `;
-
-  pool.query(query, [status, status_message, userId], (error, result) => {
-    if (error) {
-      console.error('Error updating status and message:', error);  // Optional: log the actual error
-      return res.status(500).json({ error: 'Error updating status and message' });
-    }
-    res.json({ message: `Status updated to ${status}`, status_message: status_message });
-  });
-});
-
-
-app.get("/api/get-bursary/:id", (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
-
-  const sqlGet = `
-    SELECT 
-      ud.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      bursary.uploaded_document ud
-    JOIN 
-      bursary.personal_details pd 
-    ON 
-      ud.user_id = pd.user_id
-    WHERE pd.user_id = $1
-  `;
-
-  pool.query(sqlGet, [userId], (error, result) => {
-    if (error) {
-      console.error("Error fetching bursary details:", error);
-      res.status(500).send("Error fetching data");
-    } else {
-      res.send(result.rows);
-    }
-  });
-});
-
-app.get("/api/get-bursary", (req, res) => {
-  const sqlGetAll = `
-    SELECT 
-      ud.*, pd.fullname, pd.admission, pd.institution 
-    FROM 
-      bursary.uploaded_document ud
-    JOIN 
-      bursary.personal_details pd 
-    ON 
-      ud.user_id = pd.user_id
-  `;
-
-  pool.query(sqlGetAll, (error, result) => {
-    if (error) {
-      console.error("Error fetching all bursary details:", error);
-      res.status(500).send("Error fetching data");
-    } else {
-      res.send(result.rows);
-    }
-  });
 });
 
 app.put('/api/update-bursary/:id', async (req, res) => {
-  const userId = req.params.id;
   const { bursary } = req.body;
-
-  console.log('REQ BODY:', req.body);
-  console.log('REQ PARAMS:', req.params);
+  const userId = req.params.id;
 
   if (!bursary || isNaN(Number(bursary))) {
-    return res.status(400).json({ error: 'Invalid bursary value.' });
+    return res.status(400).json({
+      error: 'Invalid bursary value.',
+    });
   }
 
-  const updateQuery = `
-    UPDATE bursary.personal_details 
-    SET bursary = $1, allocation_date = CURRENT_TIMESTAMP 
-    WHERE user_id = $2
-  `;
-
   try {
-    // Step 1: Get student's name
     const nameResult = await pool.query(
       'SELECT fullname FROM bursary.personal_details WHERE user_id = $1',
       [userId]
     );
 
     if (nameResult.rowCount === 0) {
-      return res.status(404).json({ error: 'Student not found' });
+      return res.status(404).json({
+        error: 'Student not found',
+      });
     }
 
-    const studentName = nameResult.rows[0].name;
+    const studentName =
+      nameResult.rows[0].fullname;
 
-    // Step 2: Update bursary and date
-    await pool.query(updateQuery, [bursary, userId]);
-
-    // Step 3: Log activity using name
-    const logMessage = `Allocated Ksh ${bursary} to ${studentName} (user ID: ${userId})`;
     await pool.query(
-      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
-      [logMessage]
+      `UPDATE bursary.personal_details
+       SET bursary = $1, allocation_date = CURRENT_TIMESTAMP
+       WHERE user_id = $2`,
+      [Number(bursary), userId]
     );
 
-    res.json({ message: `Allocated Ksh ${bursary} to ${studentName} on ${new Date().toISOString()}` });
+    await pool.query(
+      `INSERT INTO bursary.activity_log (log_message)
+       VALUES ($1)`,
+      [
+        `Allocated Ksh ${bursary} to ${studentName} (user ID: ${userId})`,
+      ]
+    );
+
+    res.json({
+      message: `Allocated Ksh ${bursary} to ${studentName}`,
+    });
   } catch (error) {
-    console.error('Error updating bursary or logging activity:', error);
-    res.status(500).json({ error: 'Error updating bursary and date' });
+    console.error(
+      'Error updating bursary or logging activity:',
+      error
+    );
+    res.status(500).json({
+      error: 'Error updating bursary and date',
+    });
   }
 });
 
+/* ------------------------------ Users --------------------------- */
 
-app.get('/api/users', (req, res) => {
-  const query = 'SELECT * FROM bursary.users';
-  pool.query(query, (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.json(results.rows);
-  });
+app.get('/api/users', async (_req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, name, email, role, phone_number FROM bursary.users'
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
-app.post('/api/users', (req, res) => {
+app.post('/api/users', async (req, res) => {
   const { fullname, email, password, role } = req.body;
 
   if (!fullname || !email || !password || !role) {
-    return res.status(400).json({ message: 'All fields are required' });
+    return res.status(400).json({
+      message: 'All fields are required',
+    });
   }
 
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) return res.status(500).json({ message: 'Error hashing password' });
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const query = 'INSERT INTO bursary.users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id';
-    pool.query(query, [fullname, email, hashedPassword, role], (err, result) => {
-      if (err) return res.status(500).send(err);
+    const result = await pool.query(
+      `INSERT INTO bursary.users
+       (name, email, password, role)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id`,
+      [fullname, email, hashedPassword, role]
+    );
 
-      const logQuery = 'INSERT INTO bursary.activity_log (log_message) VALUES ($1)';
-      pool.query(logQuery, [`Added new user ${fullname}`]);
+    await pool.query(
+      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
+      [`Added new user ${fullname}`]
+    );
 
-      res.status(201).json({ message: 'User added', userId: result.rows[0].id });
+    res.status(201).json({
+      message: 'User added',
+      userId: result.rows[0].id,
     });
-  });
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
-app.delete('/api/users/:id', (req, res) => {
-  const userId = req.params.id;
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT name FROM bursary.users WHERE id = $1',
+      [req.params.id]
+    );
 
-  const selectQuery = 'SELECT name FROM bursary.users WHERE id = $1';
-  pool.query(selectQuery, [userId], (err, result) => {
-    if (err || result.rows.length === 0) {
-      return res.status(500).json({ message: 'Error fetching user or user not found' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'User not found',
+      });
     }
 
     const userFullName = result.rows[0].name;
 
-    const deleteQuery = 'DELETE FROM bursary.users WHERE id = $1';
-    pool.query(deleteQuery, [userId], (err) => {
-      if (err) return res.status(500).send(err);
+    await pool.query(
+      'DELETE FROM bursary.users WHERE id = $1',
+      [req.params.id]
+    );
 
-      const logQuery = 'INSERT INTO bursary.activity_log (log_message) VALUES ($1)';
-      pool.query(logQuery, [`Deleted user ${userFullName}`], (logErr) => {
-        if (logErr) return res.status(500).json({ message: 'Error logging activity' });
+    await pool.query(
+      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
+      [`Deleted user ${userFullName}`]
+    );
 
-        res.status(200).json({ message: 'User deleted' });
-      });
+    res.status(200).json({
+      message: 'User deleted',
     });
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
 });
 
-app.get('/api/activity-logs', (req, res) => {
-  const query = 'SELECT * FROM bursary.activity_log';
-  pool.query(query, (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.json(results.rows);
-  });
+/* -------------------------- Activity Logs ----------------------- */
+
+app.get('/api/activity-logs', async (_req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM bursary.activity_log'
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
-app.post('/api/bursary-funds', (req, res) => {
+/* ---------------------------- Funds ----------------------------- */
+
+app.post('/api/bursary-funds', async (req, res) => {
   const { amount, ward_allocated } = req.body;
 
   if (!amount || isNaN(amount) || !ward_allocated) {
-    return res.status(400).json({ message: 'Invalid amount or ward provided' });
+    return res.status(400).json({
+      message: 'Invalid amount or ward provided',
+    });
   }
 
-  const query = `
-    INSERT INTO bursary.bursary_funds (amount, ward_allocated)
-    VALUES ($1, $2)
-  `;
+  try {
+    await pool.query(
+      `INSERT INTO bursary.bursary_funds
+       (amount, ward_allocated)
+       VALUES ($1, $2)`,
+      [Number(amount), ward_allocated]
+    );
 
-  pool.query(query, [amount, ward_allocated], (err) => {
-    if (err) {
-      console.error('Error inserting data:', err);
-      return res.status(500).json({ message: 'Server error' });
-    }
-    res.status(200).json({ message: 'Funds disbursed successfully' });
-  });
+    res.status(200).json({
+      message: 'Funds disbursed successfully',
+    });
+  } catch (error) {
+    console.error('Error inserting bursary funds:', error);
+    res.status(500).json({
+      message: 'Server error',
+    });
+  }
 });
 
-
-// ✅ Adjust existing record
-app.put('/api/adjust-funds', (req, res) => {
+app.put('/api/adjust-funds', async (req, res) => {
   const { amount, ward_allocated } = req.body;
-  const id = 1; // adjust the first record or modify logic as needed
+  const id = 1;
 
-  const updateQuery = `
-    UPDATE bursary.bursary_funds 
-    SET amount = $1, ward_allocated = $2 
-    WHERE id = $3
-  `;
+  try {
+    await pool.query(
+      `UPDATE bursary.bursary_funds
+       SET amount = $1, ward_allocated = $2
+       WHERE id = $3`,
+      [amount, ward_allocated, id]
+    );
 
-  pool.query(updateQuery, [amount, ward_allocated, id], async (err) => {
-    if (err) return res.status(500).send(err);
+    await pool.query(
+      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
+      [
+        `Bursary fund for ${ward_allocated} adjusted to ${amount} shillings.`,
+      ]
+    );
 
-    try {
-      const logMessage = `Bursary fund for ${ward_allocated} adjusted to ${amount} shillings.`;
-      await pool.query(
-        'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
-        [logMessage]
-      );
-
-      res.status(200).json({ message: 'Fund allocation adjusted successfully!' });
-    } catch (logErr) {
-      console.error('Error logging activity:', logErr);
-      res.status(500).json({ message: 'Fund updated, but failed to log activity.' });
-    }
-  });
-});
-
-
-// API to fetch user report by ID
-app.get('/api/user-report/:id', (req, res) => {
-  const query = `
-    SELECT fullname, admission_number AS admission, institution, status, 
-           bursary AS "amountAllocated"
-    FROM bursary.personal_details 
-    WHERE user_id = $1
-  `;
-
-  const userId = req.params.id;
-
-  pool.query(query, [userId], (err, result) => {
-    if (err) {
-      console.error('Error fetching user data:', err.message);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  });
-});
-
-const crypto = require('crypto'); 
-
-// ensure dirs
-const SIGN_DIR = path.join(UPLOAD_DIR, 'signatures');
-fs.mkdirSync(SIGN_DIR, { recursive: true });
-
-// static serve uploads (ensure CORS header present so browser can use getImageData)
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
-app.use(cors({ origin: CLIENT_ORIGIN, exposedHeaders: ['Content-Disposition'] }));
-app.use('/uploads', express.static(UPLOAD_DIR, {
-  setHeaders: (res, _path) => {
-    res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
+    res.status(200).json({
+      message: 'Fund allocation adjusted successfully!',
+    });
+  } catch (error) {
+    console.error('Error adjusting funds:', error);
+    res.status(500).json({
+      message: 'Failed to adjust fund allocation.',
+    });
   }
-}));
+});
 
-// multer temp storage
+/* --------------------------- Forgot Password -------------------- */
 
-// helper: sha256 hash
+app.post('/api/forgot-password', async (req, res) => {
+  const { identifier } = req.body;
+
+  if (!identifier) {
+    return res.status(400).json({
+      error: 'Email is required.',
+    });
+  }
+
+  const resetCode = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
+
+  try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      return res.status(500).json({
+        error: 'Email service is not configured',
+      });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: identifier,
+      subject: 'Password Reset Code',
+      text: `Your password reset code is: ${resetCode}`,
+    });
+
+    await pool.query(
+      'INSERT INTO bursary.activity_log (log_message) VALUES ($1)',
+      [`Password reset code sent to ${identifier}`]
+    );
+
+    res.status(200).json({
+      message: 'Reset code sent successfully.',
+    });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({
+      error:
+        'Failed to send reset code. Please try again later.',
+    });
+  }
+});
+
+/* ------------------------- User Report -------------------------- */
+
+app.get('/api/user-report/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         fullname,
+         admission AS admission,
+         institution,
+         status,
+         bursary AS "amountAllocated"
+       FROM bursary.personal_details
+       WHERE user_id = $1`,
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: 'User not found',
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
+  }
+});
+
+/* ----------------------- Signature Upload ------------------------ */
+
 function sha256(buffer) {
-  return crypto.createHash('sha256').update(buffer).digest('hex');
+  return crypto
+    .createHash('sha256')
+    .update(buffer)
+    .digest('hex');
 }
 
-// helper: build public signature url
 function signatureUrl(req, filename) {
   return `${req.protocol}://${req.get('host')}/uploads/signatures/${filename}`;
 }
 
-// Upload endpoint
-app.post('/api/upload-signature', upload.single('signature'), async (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).json({ error: 'Token required' });
-  try {
-    jwt.verify(token, secret);
-  } catch (e) {
-    if (req.file) fs.unlinkSync(req.file.path);
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-  try {
-    const buf = fs.readFileSync(req.file.path);
-    const hash = sha256(buf);
-    // derive ext from original mimetype or originalname
-    const ext = (req.file.mimetype === 'image/png') ? 'png' : (req.file.mimetype === 'image/gif' ? 'gif' : 'jpg');
-    const filename = `${hash}.${ext}`;
-    const dest = path.join(SIGN_DIR, filename);
-    if (!fs.existsSync(dest)) {
-      fs.renameSync(req.file.path, dest);
-    } else {
-      // duplicate: remove temp
-      fs.unlinkSync(req.file.path);
-    }
-    const url = signatureUrl(req, filename);
-    return res.json({ url });
-  } catch (err) {
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    console.error('Upload error', err);
-    return res.status(500).json({ error: 'Upload error' });
-  }
-});
-
-app.get('/api/comreport', (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).send('Token is required');
-
-  jwt.verify(token, secret, (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized access');
-
-    const sqlGet = `
-      SELECT 
-        'REFNO' || LPAD(CAST(id AS TEXT), 2, '0') AS reference_number,
-        fullname, 
-        email,
-        phone_no,
-        national_id,
-        subcounty, 
-        ward, 
-        position
-      FROM bursary.profile_committee 
-      WHERE email = $1
-    `;
-
-    pool.query(sqlGet, [decoded.email], (err, result) => {
-      if (err) {
-        console.error('Error fetching committee data:', err);
-        return res.status(500).send('Error fetching committee data');
-      }
-
-      if (result.rows.length === 0) {
-        return res.status(404).send('Committee member not found');
-      }
-
-      res.json(result.rows[0]);
-    });
-  });
-});
-
-// ================================================
-// API: Amount form submission notification logic
-// ================================================
-app.post('/api/notify-committee-update/:userId', async (req, res) => {
-  const userId = req.params.userId;
-
-  try {
-    // 1️⃣ Get student status + reviewer name
-    const studentSql = `
-      SELECT status, approved_by_committee
-      FROM bursary.personal_details
-      WHERE user_id = $1
-    `;
-    const studentResult = await pool.query(studentSql, [userId]);
-
-    if (studentResult.rows.length === 0) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    const { status, approved_by_committee } = studentResult.rows[0];
-
-    // 2️⃣ IF STATUS IS PENDING → DO NOTHING
-    if (!approved_by_committee || status === "Pending") {
-      return res.json({
-        message: "No notification needed (status is pending)",
-        notified: false
+app.post(
+  '/api/upload-signature',
+  authenticateToken,
+  upload.single('signature'),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'No file uploaded',
       });
     }
 
-    // 3️⃣ IF STATUS IS INCOMPLETE → SEND NOTIFICATION
-    if (status === "Incomplete") {
-      const committeeSql = `
-        UPDATE bursary.profile_committee
-        SET 
-          status_message = 'The student has updated his/her information.',
-          is_new = true
-        WHERE fullname = $1
-        RETURNING id, fullname, status_message, is_new
-      `;
+    try {
+      const buffer = fs.readFileSync(req.file.path);
+      const hash = sha256(buffer);
 
-      const committeeResult = await pool.query(committeeSql, [approved_by_committee]);
+      let extension = 'jpg';
+
+      if (req.file.mimetype === 'image/png') {
+        extension = 'png';
+      } else if (req.file.mimetype === 'image/gif') {
+        extension = 'gif';
+      }
+
+      const filename = `${hash}.${extension}`;
+      const destination = path.join(SIGN_DIR, filename);
+
+      if (!fs.existsSync(destination)) {
+        fs.renameSync(req.file.path, destination);
+      } else {
+        fs.unlinkSync(req.file.path);
+      }
+
+      const url = signatureUrl(req, filename);
+
+      await pool.query(
+        `UPDATE bursary.profile_committee
+         SET signature = $1
+         WHERE email = $2`,
+        [url, req.user.email]
+      );
+
+      res.json({ url });
+    } catch (error) {
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
+      console.error('Signature upload error:', error);
+      res.status(500).json({
+        error: 'Upload error',
+      });
+    }
+  }
+);
+
+/* ---------------------------- Bursary --------------------------- */
+
+app.get('/api/get-bursary/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         ud.*,
+         pd.fullname,
+         pd.admission,
+         pd.institution
+       FROM bursary.uploaded_document ud
+       JOIN bursary.personal_details pd
+         ON ud.user_id = pd.user_id
+       WHERE pd.user_id = $1`,
+      [req.params.id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching bursary details:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
+
+app.get('/api/get-bursary', async (_req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         ud.*,
+         pd.fullname,
+         pd.admission,
+         pd.institution
+       FROM bursary.uploaded_document ud
+       JOIN bursary.personal_details pd
+         ON ud.user_id = pd.user_id`
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching bursary details:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
+
+/* ---------------------- Committee Notifications ----------------- */
+
+app.post('/api/notify-committee-update/:userId', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT status, approved_by_committee
+       FROM bursary.personal_details
+       WHERE user_id = $1`,
+      [req.params.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Student not found',
+      });
+    }
+
+    const {
+      status,
+      approved_by_committee,
+    } = result.rows[0];
+
+    if (!approved_by_committee || status === 'Pending') {
+      return res.json({
+        message:
+          'No notification needed (status is pending)',
+        notified: false,
+      });
+    }
+
+    if (status === 'Incomplete') {
+      const committeeResult = await pool.query(
+        `UPDATE bursary.profile_committee
+         SET
+           status_message =
+             'The student has updated his/her information.',
+           is_new = true
+         WHERE fullname = $1
+         RETURNING
+           id,
+           fullname,
+           status_message,
+           is_new`,
+        [approved_by_committee]
+      );
 
       if (committeeResult.rows.length === 0) {
-        return res.status(404).json({ message: "Committee member not found" });
+        return res.status(404).json({
+          message: 'Committee member not found',
+        });
       }
 
       return res.json({
-        message: "Notification sent to reviewing committee member",
+        message:
+          'Notification sent to reviewing committee member',
         notified: true,
-        committee: committeeResult.rows[0]
+        committee: committeeResult.rows[0],
       });
     }
 
-    // 4️⃣ OTHER STATUSES → NO ACTION
-    return res.json({
-      message: "No notification required for this status",
-      notified: false
+    res.json({
+      message: 'No notification required for this status',
+      notified: false,
     });
-
   } catch (error) {
-    console.error("Error processing committee notification:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error(
+      'Error processing committee notification:',
+      error
+    );
+    res.status(500).json({
+      message: 'Server error',
+    });
   }
 });
 
-// GET committee status_message
-app.get('/api/committee/status-message', async (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token missing');
-
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized');
-
-    const sql = `
-      SELECT status_message, is_new
-      FROM bursary.profile_committee
-      WHERE email = $1
-    `;
-
+app.get(
+  '/api/committee/status-message',
+  authenticateToken,
+  async (req, res) => {
     try {
-      const { rows } = await pool.query(sql, [decoded.email]);
-      if (!rows[0]) return res.status(404).json({ message: 'Committee member not found' });
+      const result = await pool.query(
+        `SELECT status_message, is_new
+         FROM bursary.profile_committee
+         WHERE email = $1`,
+        [req.user.email]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: 'Committee member not found',
+        });
+      }
 
       res.json({
-        status_message: rows[0].status_message ?? null,
-        is_new: rows[0].is_new ?? false
+        status_message:
+          result.rows[0].status_message ?? null,
+        is_new: result.rows[0].is_new ?? false,
       });
     } catch (error) {
-      console.error('Error fetching committee status_message:', error);
+      console.error(
+        'Error fetching committee status_message:',
+        error
+      );
       res.status(500).send('Database error');
     }
-  });
-});
+  }
+);
 
-
-// POST mark message as read (set is_new = false)
-app.post('/api/committee/status-message/read', async (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token missing');
-
-  jwt.verify(token, secret, async (err, decoded) => {
-    if (err) return res.status(401).send('Unauthorized');
-
-    const sql = `
-      UPDATE bursary.profile_committee
-      SET is_new = false
-      WHERE email = $1
-      RETURNING status_message, is_new
-    `;
-
+app.post(
+  '/api/committee/status-message/read',
+  authenticateToken,
+  async (req, res) => {
     try {
-      const { rows } = await pool.query(sql, [decoded.email]);
-      res.json(rows[0] || {});
+      const result = await pool.query(
+        `UPDATE bursary.profile_committee
+         SET is_new = false
+         WHERE email = $1
+         RETURNING status_message, is_new`,
+        [req.user.email]
+      );
+
+      res.json(result.rows[0] || {});
     } catch (error) {
-      console.error('Error updating is_new flag:', error);
+      console.error(
+        'Error updating is_new flag:',
+        error
+      );
       res.status(500).send('Database error');
     }
+  }
+);
+
+/* ---------------------------- Server ---------------------------- */
+
+app.use((error, _req, res, _next) => {
+  if (error.message?.includes('CORS')) {
+    return res.status(403).json({
+      message: error.message,
+    });
+  }
+
+  console.error(error);
+  res.status(500).json({
+    message: 'Server error',
   });
 });
 
-
-
-// ✅ Start server
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
