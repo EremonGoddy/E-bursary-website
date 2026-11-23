@@ -59,8 +59,8 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: 'Token required' });
   }
 
-  const parts = authorization.split(' ');
-  const token = parts.length === 2 ? parts[1] : null;
+  const parts = authorization.trim().split(' ');
+const token = parts.length === 2 ? parts[1] : parts[0];
 
   if (!token) {
     return res.status(401).json({ message: 'Token required' });
