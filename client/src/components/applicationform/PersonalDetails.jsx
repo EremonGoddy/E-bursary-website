@@ -121,12 +121,9 @@ setLoading(true);
 
 // ✅ Fetch student details only if token is present
 axios.get('https://e-bursary-backend.onrender.com/api/student', {
-headers: {
-Authorization: token,
-'Cache-Control': 'no-cache',
-Pragma: 'no-cache',
-Expires: '0',
-},
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
 })
 .then((response) => {
 setStudentDetails(response.data);
@@ -144,7 +141,7 @@ navigate('/signin');
 if (userId) {
 axios
 .get(`https://e-bursary-backend.onrender.com/api/upload/status/${userId}`, {
-headers: { Authorization: token }  // Optional but recommended for security
+headers: { Authorization: `Bearer ${token}` }// Optional but recommended for security
 })
 .then((res) => {
 const isUploaded = res.data && res.data.uploaded === true;
@@ -168,7 +165,7 @@ return;
 
 if (userId) {
 axios.get(`https://e-bursary-backend.onrender.com/api/status-message/user/${userId}`, {
-headers: { Authorization: token }
+headers: { Authorization: `Bearer ${token}` }
 })
 .then(response => {
 const message = response.data.status_message;
