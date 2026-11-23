@@ -18,7 +18,7 @@ const app = express();
 
 /* ----------------------------- CORS ----------------------------- */
 
-/* ----------------------------- CORS ----------------------------- */
+
 
 const allowedOrigins = [
   'https://e-bursary-website.vercel.app'
@@ -27,10 +27,15 @@ const allowedOrigins = [
 app.use(cors({
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Cache-Control',
+    'Pragma',
+    'Expires'
+  ],
   exposedHeaders: ['Content-Disposition']
 }));
-  
 
 /* -------------------------- Middleware -------------------------- */
 
