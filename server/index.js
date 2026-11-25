@@ -1121,7 +1121,10 @@ app.get('/api/get-document/:id', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT
-         ud.*,
+         ud.user_id,
+         ud.admission_letter,
+         ud.fees_structure,
+         ud.parent_guardian_id,
          pd.fullname,
          pd.admission,
          pd.institution
@@ -1132,7 +1135,23 @@ app.get('/api/get-document/:id', async (req, res) => {
       [req.params.id]
     );
 
-    res.json(result.rows);
+    const documents = result.rows.map((row) => ({
+      user_id: row.user_id,
+      fullname: row.fullname,
+      admission: row.admission,
+      institution: row.institution,
+      admission_letter_file: row.admission_letter
+        ? path.basename(row.admission_letter)
+        : null,
+      fees_structure_file: row.fees_structure
+        ? path.basename(row.fees_structure)
+        : null,
+      parent_guardian_id_file: row.parent_guardian_id
+        ? path.basename(row.parent_guardian_id)
+        : null,
+    }));
+
+    res.json(documents);
   } catch (error) {
     console.error('Error fetching documents:', error);
     res.status(500).json({

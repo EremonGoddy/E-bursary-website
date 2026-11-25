@@ -142,11 +142,16 @@ console.error('Error fetching profile data:', error);
 }, [navigate]);
 
 const isAllDataAvailable =
-    personalData.length > 0 &&
-    amountData.length > 0 &&
-    familyData.length > 0 &&
-    disclosureData.length > 0 &&
-    documentData.length > 0;
+  personalData.length > 0 &&
+  amountData.length > 0 &&
+  familyData.length > 0 &&
+  disclosureData.length > 0 &&
+  documentData.length > 0 &&
+  Boolean(
+    documentData[0]?.admission_letter_file &&
+    documentData[0]?.fees_structure_file &&
+    documentData[0]?.parent_guardian_id_file
+  );
 
     const navItems = [
     { icon: faHouse, label: 'Dashboard', to: '/committeedashboard' },
@@ -351,23 +356,41 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
 </div>
 </div>
 <div className="backdrop-blur-xl bg-white/80 border border-gray-300 shadow-xl rounded-2xl transition-all duration-300 transform hover:scale-[1.01] p-4 mb-3 md:mb-4">
-<h2 className="text-xl text-[#14213d] font-bold mb-2">Uploaded Documents</h2>
-{documentData.map((item) => (
-<div key={item.user_id} className="mb-2 text-[#14213d] space-y-3">
-<div><span className="font-bold">Document Name:</span> {item.document_name}</div>
-<div><span className="font-bold">File Path:</span> {item.file_path}</div>
-<div>
-<a
-className="text-blue-500 underline"
-href={`https://e-bursary-backend.onrender.com/uploads/${item.document_name}`}
-target="_blank"
-rel="noopener noreferrer"
->
-View Document
-</a>
-</div>
-</div>
-))}
+  <h2 className="text-xl text-[#14213d] font-bold mb-2">Uploaded Documents</h2>
+
+  {documentData.length === 0 ? (
+    <p className="text-[#14213d]">No documents uploaded yet.</p>
+  ) : (
+    documentData.map((item) => {
+      const documents = [
+        { label: 'Admission Letter', file: item.admission_letter_file },
+        { label: 'Fees Structure', file: item.fees_structure_file },
+        { label: 'Parent/Guardian ID Copy', file: item.parent_guardian_id_file },
+      ];
+
+      return (
+        <div key={item.user_id} className="mb-2 text-[#14213d] space-y-3">
+          {documents.map(({ label, file }) => (
+            <div key={label}>
+              <span className="font-bold">{label}:</span>{' '}
+              {file ? (
+                <a
+                  className="text-blue-500 underline"
+                  href={`https://e-bursary-backend.onrender.com/uploads/${file}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Document
+                </a>
+              ) : (
+                <span>Not uploaded</span>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    })
+  )}
 </div>
 {/* Approval and Rejection Buttons */}
 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
