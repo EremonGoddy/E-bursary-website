@@ -956,30 +956,18 @@ app.post('/api/disclosure-details', async (req, res) => {
 
 /* ------------------------- Document Upload ---------------------- */
 
-const UPLOAD_DIR =
-  process.env.NODE_ENV === 'production'
-    ? '/tmp/uploads'
-    : path.join(__dirname, 'uploads');
+const { createClient } = require('@supabase/supabase-js');
 
-const SIGN_DIR = path.join(UPLOAD_DIR, 'signatures');
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+  throw new Error('SUPABASE_URL and SUPABASE_SERVICE_KEY are required');
+}
 
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-fs.mkdirSync(SIGN_DIR, { recursive: true });
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
-const documentStorage = multer.diskStorage({
-  destination(_req, _file, callback) {
-    callback(null, UPLOAD_DIR);
-  },
-
-  filename(_req, file, callback) {
-    const safeName = path.basename(file.originalname).replace(
-      /[^a-zA-Z0-9._-]/g,
-      '_'
-    );
-
-    callback(null, `${Date.now()}-${safeName}`);
-  },
-});
+const BUCKET = 'documents';
 
 const documentFileFilter = (_req, file, callback) => {
   const allowedTypes = new Set([
@@ -996,8 +984,9 @@ const documentFileFilter = (_req, file, callback) => {
   callback(new Error('Only PDF and image files are allowed.'));
 };
 
+// Keep files in memory, then send them to Supabase
 const upload = multer({
-  storage: documentStorage,
+  storage: multer.memoryStorage(),
   fileFilter: documentFileFilter,
   limits: {
     files: 3,
@@ -1005,7 +994,24 @@ const upload = multer({
   },
 });
 
-app.use('/uploads', express.static(UPLOAD_DIR));
+async function saveToSupabase(file, folder) {
+  const safeName = path
+    .basename(file.originalname)
+    .replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  const filePath = `${folder}/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+    });
+
+  if (error) throw error;
+
+  return supabase.storage.from(BUCKET).getPublicUrl(filePath).data
+    .publicUrl;
+}
 
 const documentFields = upload.fields([
   { name: 'admissionLetter', maxCount: 1 },
@@ -1026,30 +1032,19 @@ app.post('/api/upload', (req, res) => {
     }
 
     const files = req.files || {};
-    const uploadedFiles = Object.values(files).flat();
-
-    const removeUploadedFiles = () => {
-      uploadedFiles.forEach((file) => {
-        if (file.path && fs.existsSync(file.path)) {
-          fs.unlink(file.path, () => {});
-        }
-      });
-    };
-
     const { userId } = req.body;
+
     const admissionLetter = files.admissionLetter?.[0];
     const feesStructure = files.feesStructure?.[0];
     const guardianIdCopy = files.guardianIdCopy?.[0];
 
     if (!userId) {
-      removeUploadedFiles();
       return res.status(400).json({
         message: 'userId is required.',
       });
     }
 
     if (!admissionLetter || !feesStructure || !guardianIdCopy) {
-      removeUploadedFiles();
       return res.status(400).json({
         message:
           'Admission Letter, Fees Structure, and Parent/Guardian ID Copy are required.',
@@ -1057,6 +1052,14 @@ app.post('/api/upload', (req, res) => {
     }
 
     try {
+      const folder = `user-${userId}`;
+
+      const [letterUrl, feesUrl, idUrl] = await Promise.all([
+        saveToSupabase(admissionLetter, folder),
+        saveToSupabase(feesStructure, folder),
+        saveToSupabase(guardianIdCopy, folder),
+      ]);
+
       await pool.query(
         `INSERT INTO bursary.uploaded_document
          (
@@ -1071,22 +1074,16 @@ app.post('/api/upload', (req, res) => {
            admission_letter = EXCLUDED.admission_letter,
            fees_structure = EXCLUDED.fees_structure,
            parent_guardian_id = EXCLUDED.parent_guardian_id`,
-        [
-          userId,
-          admissionLetter.path,
-          feesStructure.path,
-          guardianIdCopy.path,
-        ]
+        [userId, letterUrl, feesUrl, idUrl]
       );
 
       res.status(200).json({
         message: 'Documents uploaded and saved successfully.',
       });
     } catch (error) {
-      removeUploadedFiles();
       console.error('Error saving uploaded documents:', error);
       res.status(500).json({
-        message: 'Database error saving documents.',
+        message: 'Error saving documents.',
       });
     }
   });
@@ -1140,15 +1137,9 @@ app.get('/api/get-document/:id', async (req, res) => {
       fullname: row.fullname,
       admission: row.admission,
       institution: row.institution,
-      admission_letter_file: row.admission_letter
-        ? path.basename(row.admission_letter)
-        : null,
-      fees_structure_file: row.fees_structure
-        ? path.basename(row.fees_structure)
-        : null,
-      parent_guardian_id_file: row.parent_guardian_id
-        ? path.basename(row.parent_guardian_id)
-        : null,
+      admission_letter_file: row.admission_letter,
+      fees_structure_file: row.fees_structure,
+      parent_guardian_id_file: row.parent_guardian_id,
     }));
 
     res.json(documents);
@@ -2065,8 +2056,7 @@ app.post(
     }
 
     try {
-      const buffer = fs.readFileSync(req.file.path);
-      const hash = sha256(buffer);
+      const hash = sha256(req.file.buffer);
 
       let extension = 'jpg';
 
@@ -2076,16 +2066,19 @@ app.post(
         extension = 'gif';
       }
 
-      const filename = `${hash}.${extension}`;
-      const destination = path.join(SIGN_DIR, filename);
+      const filePath = `signatures/${hash}.${extension}`;
 
-      if (!fs.existsSync(destination)) {
-        fs.renameSync(req.file.path, destination);
-      } else {
-        fs.unlinkSync(req.file.path);
-      }
+      const { error } = await supabase.storage
+        .from(BUCKET)
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true,
+        });
 
-      const url = signatureUrl(req, filename);
+      if (error) throw error;
+
+      const url = supabase.storage.from(BUCKET).getPublicUrl(filePath)
+        .data.publicUrl;
 
       await pool.query(
         `UPDATE bursary.profile_committee
@@ -2096,10 +2089,6 @@ app.post(
 
       res.json({ url });
     } catch (error) {
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-
       console.error('Signature upload error:', error);
       res.status(500).json({
         error: 'Upload error',
@@ -2107,7 +2096,6 @@ app.post(
     }
   }
 );
-
 /* ---------------------------- Bursary --------------------------- */
 
 app.get('/api/get-bursary/:id', async (req, res) => {

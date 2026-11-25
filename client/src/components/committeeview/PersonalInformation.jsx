@@ -374,14 +374,14 @@ ${sidebarActive ? 'ml-[100px] md:ml-[190px]' : 'ml-[0px] md:ml-[30px]'}
             <div key={label}>
               <span className="font-bold">{label}:</span>{' '}
               {file ? (
-                <a
-                  className="text-blue-500 underline"
-                  href={`https://e-bursary-backend.onrender.com/uploads/${file}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Document
-                </a>
+               <a
+  className="text-blue-500 underline"
+  href={file}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  View Document
+</a>
               ) : (
                 <span>Not uploaded</span>
               )}
